@@ -1,0 +1,62 @@
+[
+  {
+    "recipe_name":"Adzuki Bean Salad",
+    "ingredient_list":[
+      {
+        "ingredient":"Adzuki Beans",
+        "quantity":100
+      },
+      {
+        "ingredient":"Chicken Breast(Grilled)",
+        "quantity":200
+      }
+    ],
+    "instructions":"Cook Adzuki Beans until tender. Grill Chicken Breast. Mix with greens and dressing.",
+    "prep_time":30,
+    "dietary":"omnivore",
+    "complexity":"easy"
+  },
+  {
+    "recipe_name":"Bean Soup",
+    "ingredient_list":[
+      {
+        "ingredient":"Adzuki Beans",
+        "quantity":150
+      }
+    ],
+    "instructions":"Boil Adzuki Beans with spices and vegetables. Simmer for 1 hour.",
+    "prep_time":60,
+    "dietary":"vegan",
+    "complexity":"medium"
+  },
+  {
+    "recipe_name":"MeatManiac",
+    "ingredient_list":[
+      {
+        "ingredient":"Beef.Flank(Raw)",
+        "quantity":250
+      }
+    ],
+    "instructions":"Fry and Garnish with vegetables",
+    "prep_time":40,
+    "dietary":"omnivore",
+    "complexity":"medium"
+  },
+  {
+    "recipe_name":"Bomb",
+    "ingredient_list":[
+      {
+        "ingredient":"Alcoholic.Whiskey.Proof 86",
+        "quantity":60
+      },
+      {
+        "ingredient":"Alcoholic.Beer.Strong",
+        "quantity":500
+      }
+    ],
+    "instructions":"Serve whiskey in a double shot, pour the cold beer on ice, drop the shot in your glass, and drink all at once.",
+    "prep_time":5,
+    "dietary":"vegan",
+    "complexity":"easy"
+  }
+]
