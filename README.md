@@ -13,7 +13,7 @@ A web application to calculate nutritional values and costs of ingredients and r
 
 ## Setup Instructions
 ### Backend
-1. Clone the repository: `git clone https://github.com/your-github-username/nutrition-calculator.git`
+1. Clone the repository: `git clone https://github.com/m-for-maniac/nutrition-calculator.git`
 2. Navigate to backend: `cd nutrition-calculator/backend`
 3. Create a virtual environment: `python3.9 -m venv venv`
 4. Activate: `source venv/bin/activate`
