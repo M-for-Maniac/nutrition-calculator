@@ -29,3 +29,14 @@ A web application to calculate nutritional values and costs of ingredients and r
 
 ## Requirements
 ### Backend (`requirements.txt`)
+flask==2.0.1
+flask-cors==4.0.1
+pandas==2.0.1
+gunicorn==22.0.0
+werkzeug==2.2.3
+numpy==1.23.5
+
+
+### Frontend (`package.json`)
+- React, Axios, react-chartjs-2, chart.js, react-router-dom, bootstrap, react-select, @fortawesome/fontawesome-free
+- gh-pages for deployment
