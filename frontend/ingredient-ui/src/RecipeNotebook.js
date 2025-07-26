@@ -23,6 +23,8 @@ function RecipeNotebook({ setErrorMessage }) {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [scaleFactor, setScaleFactor] = useState(1.0);
 
+  const BASE_URL = 'https://maniac.pythonanywhere.com';
+
   const styles = {
     container: { 
       backgroundColor: '#f8f9fa', 
@@ -42,8 +44,8 @@ function RecipeNotebook({ setErrorMessage }) {
     },
     input: {
       fontSize: '1rem',
-      padding: '14px', // Increased for visibility
-      minHeight: '48px' // Ensure placeholders visible
+      padding: '14px',
+      minHeight: '48px'
     },
     modal: {
       maxWidth: '90vw',
@@ -52,7 +54,7 @@ function RecipeNotebook({ setErrorMessage }) {
   };
 
   useEffect(() => {
-    axios.get('http://localhost:5000/ingredients')
+    axios.get(`${BASE_URL}/ingredients`)
       .then(res => {
         setIngredients(res.data);
         setErrorMessage('');
@@ -65,7 +67,7 @@ function RecipeNotebook({ setErrorMessage }) {
 
   useEffect(() => {
     if (ingredients.length === 0) return;
-    let url = 'http://localhost:5000/get_recipes';
+    let url = `${BASE_URL}/get_recipes`;
     const params = [];
     if (recipeMaxCalories) params.push(`max_calories=${recipeMaxCalories}`);
     if (recipeMaxCost) params.push(`max_cost=${recipeMaxCost}`);
@@ -93,7 +95,7 @@ function RecipeNotebook({ setErrorMessage }) {
       quantity: parseFloat(ingredientQuantities[opt.value]) || 100
     }));
     setErrorMessage('');
-    axios.post('http://localhost:5000/add_recipe', {
+    axios.post(`${BASE_URL}/add_recipe`, {
       recipe_name: newRecipeName,
       ingredient_list: ingredientList,
       instructions: newRecipeInstructions,
@@ -103,7 +105,7 @@ function RecipeNotebook({ setErrorMessage }) {
     })
       .then(res => {
         setRecipeMessage(res.data.message);
-        axios.get('http://localhost:5000/get_recipes')
+        axios.get(`${BASE_URL}/get_recipes`)
           .then(res => setAllRecipes(res.data))
           .catch(err => setErrorMessage(err.response?.data?.error || 'Error fetching recipes'));
         setNewRecipeName('');
@@ -125,7 +127,7 @@ function RecipeNotebook({ setErrorMessage }) {
       setErrorMessage('Invalid ingredient list for recipe');
       return;
     }
-    axios.post('http://localhost:5000/recipe_nutrition', { 
+    axios.post(`${BASE_URL}/recipe_nutrition`, { 
       ingredient_list, 
       scale_factor: parseFloat(scaleFactor) || 1.0 
     })
@@ -141,10 +143,10 @@ function RecipeNotebook({ setErrorMessage }) {
   const handleDeleteRecipe = (recipe_name) => {
     if (!window.confirm(`Are you sure you want to delete ${recipe_name}?`)) return;
     setErrorMessage('');
-    axios.post('http://localhost:5000/delete_recipe', { recipe_name })
+    axios.post(`${BASE_URL}/delete_recipe`, { recipe_name })
       .then(res => {
         setRecipeMessage(res.data.message);
-        axios.get('http://localhost:5000/get_recipes')
+        axios.get(`${BASE_URL}/get_recipes`)
           .then(res => {
             setAllRecipes(res.data);
             setRecipeNutrition(prev => {
@@ -198,7 +200,7 @@ function RecipeNotebook({ setErrorMessage }) {
       quantity: parseFloat(ingredientQuantities[opt.value]) || 100
     }));
     setErrorMessage('');
-    axios.post('http://localhost:5000/update_recipe', {
+    axios.post(`${BASE_URL}/update_recipe`, {
       recipe_name: newRecipeName,
       ingredient_list: ingredientList,
       instructions: newRecipeInstructions,
@@ -208,7 +210,7 @@ function RecipeNotebook({ setErrorMessage }) {
     })
       .then(res => {
         setRecipeMessage(res.data.message);
-        axios.get('http://localhost:5000/get_recipes')
+        axios.get(`${BASE_URL}/get_recipes`)
           .then(res => {
             setAllRecipes(res.data);
             setEditModalOpen(false);
@@ -430,7 +432,7 @@ function RecipeNotebook({ setErrorMessage }) {
                 <td>
                   <div className="d-flex flex-column flex-sm-row gap-2 align-items-sm-center">
                     <input
-                      type="number"
+                      type="number Bose number"
                       min="0.1"
                       step="0.1"
                       className="form-control"

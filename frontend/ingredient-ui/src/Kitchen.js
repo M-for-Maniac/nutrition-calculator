@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Pie } from 'react-chartjs-2'; // Changed to Pie
+import { Pie } from 'react-chartjs-2';
 import { Link } from 'react-router-dom';
 import 'chart.js/auto';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -23,6 +23,8 @@ function Kitchen({ setErrorMessage }) {
   const [purchaseAmount, setPurchaseAmount] = useState('');
   const [updateMessage, setUpdateMessage] = useState('');
   const [openAccordions, setOpenAccordions] = useState([]);
+
+  const BASE_URL = 'https://maniac.pythonanywhere.com';
 
   const styles = {
     container: { 
@@ -55,8 +57,8 @@ function Kitchen({ setErrorMessage }) {
     },
     input: {
       fontSize: '1rem',
-      padding: '14px', // Increased for visibility
-      minHeight: '48px' // Ensure placeholders are visible
+      padding: '14px',
+      minHeight: '48px'
     },
     icon: {
       fontSize: '1rem',
@@ -66,21 +68,21 @@ function Kitchen({ setErrorMessage }) {
   };
 
   const categories = [
-  'Vegetables',
-  'Fruits',
-  'Grains and Cereals',
-  'Legumes and Beans',
-  'Meat and Poultry',
-  'Dairy and Alternatives',
-  'Nuts and Seeds',
-  'Spices and Herbs',
-  'Beverages',
-  'Condiments and Sauces',
-  'Sweets and Snacks',
-  'Baking Ingredients', // New
-  'Eggs', // New
-  'Other'
-]
+    'Vegetables',
+    'Fruits',
+    'Grains and Cereals',
+    'Legumes and Beans',
+    'Meat and Poultry',
+    'Dairy and Alternatives',
+    'Nuts and Seeds',
+    'Spices and Herbs',
+    'Beverages',
+    'Condiments and Sauces',
+    'Sweets and Snacks',
+    'Baking Ingredients',
+    'Eggs',
+    'Other'
+  ];
 
   const getCategoryIcon = (category) => {
     const iconMap = {
@@ -90,7 +92,7 @@ function Kitchen({ setErrorMessage }) {
       'Legumes and Beans': 'seedling',
       'Meat and Poultry': 'drumstick-bite',
       'Dairy and Alternatives': 'cheese',
-      'Nuts and Seeds': 'seedling', // Changed from 'nut' to 'seedling'
+      'Nuts and Seeds': 'seedling',
       'Spices and Herbs': 'mortar-pestle',
       'Beverages': 'mug-hot',
       'Condiments and Sauces': 'bottle-droplet',
@@ -112,7 +114,7 @@ function Kitchen({ setErrorMessage }) {
   }, [selected]);
 
   useEffect(() => {
-    let url = 'http://localhost:5000/ingredients';
+    let url = `${BASE_URL}/ingredients`;
     const params = [];
     if (maxCalories) params.push(`max_calories=${maxCalories}`);
     if (minProtein) params.push(`min_protein=${minProtein}`);
@@ -145,7 +147,7 @@ function Kitchen({ setErrorMessage }) {
       numericSelected[key] = parseFloat(value) || 0;
     }
     setErrorMessage('');
-    axios.post('http://localhost:5000/calculate', numericSelected)
+    axios.post(`${BASE_URL}/calculate`, numericSelected)
       .then(res => {
         setResults(res.data);
       })
@@ -155,7 +157,7 @@ function Kitchen({ setErrorMessage }) {
       });
 
     const selectedIngredients = Object.keys(numericSelected).filter(key => numericSelected[key] > 0);
-    axios.post('http://localhost:5000/recipes', { 
+    axios.post(`${BASE_URL}/recipes`, { 
       ingredients: selectedIngredients,
       dietary: dietaryFilter,
       complexity: complexityFilter
@@ -189,14 +191,14 @@ function Kitchen({ setErrorMessage }) {
       return;
     }
     setErrorMessage('');
-    axios.post('http://localhost:5000/update_price', {
+    axios.post(`${BASE_URL}/update_price`, {
       ingredient_name: updateIngredient,
       purchase_cost: parseFloat(purchaseCost),
       purchase_amount: parseFloat(purchaseAmount)
     })
       .then(res => {
         setUpdateMessage(res.data.message);
-        axios.get('http://localhost:5000/ingredients')
+        axios.get(`${BASE_URL}/ingredients`)
           .then(res => {
             setIngredients(res.data);
             setFilteredIngredients(res.data);
@@ -431,6 +433,7 @@ function Kitchen({ setErrorMessage }) {
               ))}
           </ul>
           <div className="card">
+            {/* Uncomment if you want to re-enable the Pie chart */}
             {/* <div className="card-body">
               <h3 className="card-title" style={{ fontSize: '1.3rem' }}>Nutrition Chart</h3>
               <Pie
@@ -447,7 +450,7 @@ function Kitchen({ setErrorMessage }) {
                         Object.keys(results)[i] !== 'PurchaseAmt'
                       ),
                       backgroundColor: [
-                        'rgba(40, 167, 69, 0.6)', // Green
+                        'rgba(40, 167, 69, 0.6)',
                         'rgba(255, 99, 132, 0.6)',
                         'rgba(54, 162, 235, 0.6)',
                         'rgba(255, 206, 86, 0.6)',
@@ -471,12 +474,12 @@ function Kitchen({ setErrorMessage }) {
                   maintainAspectRatio: false,
                   plugins: { 
                     legend: { 
-                      position: 'right', // Move legend to right for mobile
-                      labels: { font: { size: 12 } } // Smaller font for mobile
+                      position: 'right',
+                      labels: { font: { size: 12 } }
                     }
                   }
                 }}
-                height={250} // Fixed height for compactness
+                height={250}
               />
             </div> */}
           </div>
