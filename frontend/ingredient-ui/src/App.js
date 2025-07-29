@@ -1,18 +1,26 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import Home from './Home';
 import Kitchen from './Kitchen';
 import RecipeNotebook from './RecipeNotebook';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 function App() {
+  const { t, i18n } = useTranslation();
   const [errorMessage, setErrorMessage] = useState('');
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+  };
 
   return (
     <Router>
-      <div className="container-fluid" style={{ minHeight: '100vh' }}>
-        <nav className="navbar navbar-expand-lg navbar-light bg-light mb-4">
-          <div className="container">
-            <Link className="navbar-brand" to="/kitchen" style={{ fontSize: '1.5rem' }}>Nutrition Calculator</Link>
+      <div className="App" dir={i18n.language === 'fa' ? 'rtl' : 'ltr'}>
+        <nav className="navbar navbar-expand-lg navbar-light bg-light">
+          <div className="container-fluid">
+            <Link className="navbar-brand" to="/">{t('app.title')}</Link>
             <button
               className="navbar-toggler"
               type="button"
@@ -25,22 +33,52 @@ function App() {
               <span className="navbar-toggler-icon"></span>
             </button>
             <div className="collapse navbar-collapse" id="navbarNav">
-              <div className="navbar-nav">
-                <Link className="nav-link" to="/kitchen" style={{ fontSize: '1.1rem', padding: '10px' }}>Kitchen</Link>
-                <Link className="nav-link" to="/cookbook" style={{ fontSize: '1.1rem', padding: '10px' }}>Cookbook</Link>
+              <ul className="navbar-nav me-auto">
+                <li className="nav-item">
+                  <Link className="nav-link" to="/">{t('app.home')}</Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/kitchen">{t('app.kitchen')}</Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/cookbook">{t('app.cookbook')}</Link>
+                </li>
+              </ul>
+              <div className="dropdown">
+                <button
+                  className="btn btn-primary-custom dropdown-toggle"
+                  type="button"
+                  id="languageDropdown"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  {t('app.language')}
+                </button>
+                <ul className="dropdown-menu" aria-labelledby="languageDropdown">
+                  <li>
+                    <button className="dropdown-item" onClick={() => changeLanguage('en')}>
+                      {t('app.english')}
+                    </button>
+                  </li>
+                  <li>
+                    <button className="dropdown-item" onClick={() => changeLanguage('fa')}>
+                      {t('app.persian')}
+                    </button>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
         </nav>
         {errorMessage && (
-          <div className="container">
-            <div className="alert alert-danger mb-3">{errorMessage}</div>
+          <div className="alert alert-danger text-center" role="alert">
+            {errorMessage}
           </div>
         )}
         <Routes>
+          <Route path="/" element={<Home setErrorMessage={setErrorMessage} />} />
           <Route path="/kitchen" element={<Kitchen setErrorMessage={setErrorMessage} />} />
           <Route path="/cookbook" element={<RecipeNotebook setErrorMessage={setErrorMessage} />} />
-          <Route path="/" element={<Kitchen setErrorMessage={setErrorMessage} />} />
         </Routes>
       </div>
     </Router>

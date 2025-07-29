@@ -1,5 +1,6 @@
 body {
   margin: 0;
+  padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -13,5 +14,189 @@ code {
 }
 
 button:hover {
-  background-color: #218838;
+  background-color: #2b604b; /* Dark green on hover */
+}
+
+.hero {
+  font-weight: bold;
+  padding: 2rem 1rem;
+  max-width: 100%;
+  overflow-x: hidden;
+  margin-top: 1rem;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  line-height: 1.2;
+  font-weight: bold;
+}
+
+.hero p {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.hero .btn {
+  min-width: 150px;
+  max-width: 250px;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 1rem;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.hero .btn:hover {
+  transform: scale(1.05);
+}
+
+@media (max-width: 576px) {
+  .hero h1 {
+    font-size: 1.8rem;
+  }
+  .hero p {
+    font-size: 1rem;
+  }
+  .hero .btn {
+    max-width: 100%;
+  }
+}
+
+.features .card {
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-radius: 12px;
+}
+
+.features .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.tips .carousel-item {
+  padding: 1rem;
+  border-radius: 12px;
+}
+
+.tour {
+  padding: 2rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f8f9fa, #d6c5ac);
+}
+
+.tour .card {
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-radius: 12px;
+  border: none;
+}
+
+.tour .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.tour .btn {
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.tour .btn:hover {
+  transform: scale(1.05);
+}
+
+.cta .btn {
+  padding: 0.75rem 1.5rem;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.cta .btn:hover {
+  transform: scale(1.05);
+}
+
+.navbar {
+  margin: 0;
+  padding: 0.5rem;
+  left: 0;
+  right: 0;
+}
+
+.footer {
+  margin: 0;
+  padding: 0;
+  left: 0;
+  right: 0;
+}
+
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] .navbar-nav {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+[dir="rtl"] .dropdown-menu {
+  text-align: right;
+}
+
+[dir="rtl"] .hero .btn {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+[dir="rtl"] .card-body {
+  text-align: right;
+}
+
+[dir="rtl"] .carousel-control-prev {
+  right: 0;
+  left: auto;
+}
+
+[dir="rtl"] .carousel-control-next {
+  left: 0;
+  right: auto;
+}
+
+/* Custom Button Styles */
+.btn-primary-custom {
+  background-color: #3a846a; /* Teal green */
+  border-color: #3a846a;
+  color: #d6c5ac; /* Light beige text */
+}
+
+.btn-primary-custom:hover {
+  background-color: #2b604b; /* Dark green on hover */
+  border-color: #2b604b;
+  color: #d6c5ac;
+}
+
+.btn-secondary-custom {
+  background-color: transparent;
+  border-color: #3a846a; /* Teal green outline */
+  color: #3a846a;
+}
+
+.btn-secondary-custom:hover {
+  background-color: #2b604b; /* Dark green on hover */
+  border-color: #2b604b;
+  color: #d6c5ac;
+}
+
+.btn-accent-custom {
+  background-color: #bf0811; /* Bold red for emphasis */
+  border-color: #bf0811;
+  color: #d6c5ac;
+}
+
+.btn-accent-custom:hover {
+  background-color: #a0070d; /* Slightly darker red */
+  border-color: #a0070d;
+  color: #d6c5ac;
+}
+
+/* Custom Icon Styles */
+.icon-primary {
+  color: #3a846a; /* Teal green */
+}
+
+.icon-secondary {
+  color: #2b604b; /* Dark green */
 }

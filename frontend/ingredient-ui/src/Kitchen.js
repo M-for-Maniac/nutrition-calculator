@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Pie } from 'react-chartjs-2';
+// import { Pie } from 'react-chartjs-2';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import 'chart.js/auto';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 function Kitchen({ setErrorMessage }) {
+  const { t } = useTranslation();
   const [ingredients, setIngredients] = useState([]);
   const [selected, setSelected] = useState({});
   const [results, setResults] = useState(null);
@@ -23,83 +25,32 @@ function Kitchen({ setErrorMessage }) {
   const [purchaseAmount, setPurchaseAmount] = useState('');
   const [updateMessage, setUpdateMessage] = useState('');
   const [openAccordions, setOpenAccordions] = useState([]);
+  const [currency, setCurrency] = useState('Toman');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const BASE_URL = 'https://maniac.pythonanywhere.com';
+  const BASE_URL = process.env.NODE_ENV === 'production' ? 'https://mformaniac.pythonanywhere.com' : 'http://localhost:5000';
 
   const styles = {
-    container: { 
-      backgroundColor: '#f8f9fa', 
-      padding: '20px', 
-      borderRadius: '8px',
-      minHeight: '100vh'
-    },
-    button: { 
-      marginRight: '10px', 
-      padding: '12px 24px', 
-      fontSize: '1.1rem', 
-      backgroundColor: '#28a745',
-      color: '#fff',
-      border: 'none',
-      borderRadius: '6px',
-      transition: 'background-color 0.2s ease'
-    },
-    accordionButton: {
-      fontSize: '1.1rem',
-      padding: '15px',
-      backgroundColor: '#e9ecef',
-      color: '#333',
-      transition: 'background-color 0.2s ease',
-      display: 'flex',
-      alignItems: 'center'
-    },
-    accordionButtonCollapsed: {
-      backgroundColor: '#dee2e6'
-    },
-    input: {
-      fontSize: '1rem',
-      padding: '14px',
-      minHeight: '48px'
-    },
-    icon: {
-      fontSize: '1rem',
-      marginRight: '10px',
-      color: '#28a745'
-    }
+    container: { backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '8px', minHeight: '100vh' },
+    button: { marginRight: '10px', padding: '12px 24px', fontSize: '1.1rem', backgroundColor: '#28a745', color: '#fff', border: 'none', borderRadius: '6px', transition: 'background-color 0.2s ease' },
+    accordionButton: { fontSize: '1.1rem', padding: '15px', backgroundColor: '#e9ecef', color: '#333', transition: 'background-color 0.2s ease', display: 'flex', alignItems: 'center' },
+    accordionButtonCollapsed: { backgroundColor: '#dee2e6' },
+    input: { fontSize: '1rem', padding: '14px', minHeight: '48px' },
+    icon: { fontSize: '1rem', marginRight: '10px', color: '#28a745' },
+    currencySelect: { fontSize: '1rem', padding: '10px', width: '120px' }
   };
 
   const categories = [
-    'Vegetables',
-    'Fruits',
-    'Grains and Cereals',
-    'Legumes and Beans',
-    'Meat and Poultry',
-    'Dairy and Alternatives',
-    'Nuts and Seeds',
-    'Spices and Herbs',
-    'Beverages',
-    'Condiments and Sauces',
-    'Sweets and Snacks',
-    'Baking Ingredients',
-    'Eggs',
-    'Other'
+    'Vegetables', 'Fruits', 'Grains and Cereals', 'Legumes and Beans', 'Meat and Poultry', 'Dairy and Alternatives',
+    'Nuts and Seeds', 'Spices and Herbs', 'Beverages', 'Condiments and Sauces', 'Sweets and Snacks', 'Baking Ingredients', 'Eggs', 'Other'
   ];
 
   const getCategoryIcon = (category) => {
     const iconMap = {
-      'Vegetables': 'leaf',
-      'Fruits': 'apple-alt',
-      'Grains and Cereals': 'wheat-awn',
-      'Legumes and Beans': 'seedling',
-      'Meat and Poultry': 'drumstick-bite',
-      'Dairy and Alternatives': 'cheese',
-      'Nuts and Seeds': 'seedling',
-      'Spices and Herbs': 'mortar-pestle',
-      'Beverages': 'mug-hot',
-      'Condiments and Sauces': 'bottle-droplet',
-      'Sweets and Snacks': 'cookie',
-      'Baking Ingredients': 'cookie-bite',
-      'Eggs': 'egg',
-      'Other': 'utensils'
+      'Vegetables': 'leaf', 'Fruits': 'apple-alt', 'Grains and Cereals': 'wheat-awn', 'Legumes and Beans': 'seedling',
+      'Meat and Poultry': 'drumstick-bite', 'Dairy and Alternatives': 'cheese', 'Nuts and Seeds': 'seedling',
+      'Spices and Herbs': 'mortar-pestle', 'Beverages': 'mug-hot', 'Condiments and Sauces': 'bottle-droplet',
+      'Sweets and Snacks': 'cookie', 'Baking Ingredients': 'cookie-bite', 'Eggs': 'egg', 'Other': 'utensils'
     };
     return iconMap[category] || 'utensils';
   };
@@ -114,6 +65,7 @@ function Kitchen({ setErrorMessage }) {
   }, [selected]);
 
   useEffect(() => {
+    setIsLoading(true);
     let url = `${BASE_URL}/ingredients`;
     const params = [];
     if (maxCalories) params.push(`max_calories=${maxCalories}`);
@@ -129,20 +81,22 @@ function Kitchen({ setErrorMessage }) {
       })
       .catch(err => {
         console.error('Error fetching ingredients:', err);
-        setErrorMessage('Failed to load ingredients. Please try again.');
-      });
-  }, [maxCalories, minProtein, maxFat, dietaryFilter, setErrorMessage]);
+        setErrorMessage(err.response?.data?.error || t('kitchen.error.fetchIngredients'));
+      })
+      .finally(() => setIsLoading(false));
+  }, [maxCalories, minProtein, maxFat, dietaryFilter, setErrorMessage, t]);
 
   useEffect(() => {
     const filtered = ingredients.filter(ing =>
       (ing.ingredient_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-       ing.persian_name.toLowerCase().includes(searchTerm.toLowerCase()))
+       ing.persian_name?.toLowerCase().includes(searchTerm.toLowerCase()))
     );
     setFilteredIngredients(filtered);
   }, [searchTerm, ingredients]);
 
   const handleCalculate = () => {
-    const numericSelected = {};
+    setIsLoading(true);
+    const numericSelected = { currency };
     for (const [key, value] of Object.entries(selected)) {
       numericSelected[key] = parseFloat(value) || 0;
     }
@@ -153,21 +107,23 @@ function Kitchen({ setErrorMessage }) {
       })
       .catch(err => {
         console.error('Error calculating:', err);
-        setErrorMessage(err.response?.data?.error || 'Error calculating nutrition. Please try again.');
-      });
+        setErrorMessage(err.response?.data?.error || t('kitchen.error.calculate'));
+      })
+      .finally(() => setIsLoading(false));
 
-    const selectedIngredients = Object.keys(numericSelected).filter(key => numericSelected[key] > 0);
+    const selectedIngredients = Object.keys(numericSelected).filter(key => key !== 'currency' && numericSelected[key] > 0);
     axios.post(`${BASE_URL}/recipes`, { 
       ingredients: selectedIngredients,
       dietary: dietaryFilter,
-      complexity: complexityFilter
+      complexity: complexityFilter,
+      currency
     })
       .then(res => {
         setRecipes(res.data);
       })
       .catch(err => {
         console.error('Error fetching recipes:', err);
-        setErrorMessage(err.response?.data?.error || 'Error fetching recipes. Please try again.');
+        setErrorMessage(err.response?.data?.error || t('kitchen.error.fetchRecipes'));
       });
   };
 
@@ -181,15 +137,19 @@ function Kitchen({ setErrorMessage }) {
     setErrorMessage('');
     setDietaryFilter('');
     setComplexityFilter('');
+    setMaxCalories('');
+    setMinProtein('');
     setMaxFat('');
     setOpenAccordions([]);
+    setCurrency('Toman');
   };
 
   const handleUpdatePrice = () => {
     if (!updateIngredient || !purchaseCost || !purchaseAmount) {
-      setUpdateMessage('Please fill all price update fields');
+      setUpdateMessage(t('kitchen.error.updatePriceFields'));
       return;
     }
+    setIsLoading(true);
     setErrorMessage('');
     axios.post(`${BASE_URL}/update_price`, {
       ingredient_name: updateIngredient,
@@ -205,21 +165,26 @@ function Kitchen({ setErrorMessage }) {
           })
           .catch(err => {
             console.error('Error refreshing ingredients:', err);
-            setErrorMessage('Failed to refresh ingredients after price update.');
+            setErrorMessage(t('kitchen.error.refreshIngredients'));
           });
       })
       .catch(err => {
         console.error('Error updating price:', err);
-        setUpdateMessage(err.response?.data?.error || 'Error updating price. Please try again.');
-      });
+        setUpdateMessage(err.response?.data?.error || t('kitchen.error.updatePrice'));
+      })
+      .finally(() => setIsLoading(false));
   };
 
   const handleExport = () => {
     if (!results) return;
-    const csvRows = ['Nutrient,Value'];
-    Object.entries(results).forEach(([nutrient, value]) => {
-      csvRows.push(`${nutrient.replace(/([A-Z])/g, ' $1').trim()},${Math.floor(value)}`);
+    const csvRows = ['Nutrient,Value,Unit,DV Percentage'];
+    Object.entries(results).forEach(([nutrient, data]) => {
+      if (nutrient !== 'Cost') {
+        const dv = data.percent_dv !== null ? `${data.percent_dv.toFixed(2)}%` : 'N/A';
+        csvRows.push(`${nutrient},${data.value},${data.unit},${dv}`);
+      }
     });
+    csvRows.push(`Cost,${results.Cost.value},${results.Cost.unit},N/A`);
     const csvContent = csvRows.join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -246,67 +211,85 @@ function Kitchen({ setErrorMessage }) {
 
   return (
     <div className="container mt-4" style={styles.container}>
-      <h1 className="mb-4 text-center" style={{ fontSize: '1.8rem' }}>Kitchen</h1>
-      <h2 className="mb-3" style={{ fontSize: '1.5rem' }}>Ingredients</h2>
+      <h1 className="mb-4 text-center" style={{ fontSize: '1.8rem' }}>{t('kitchen.title')}</h1>
+      {isLoading && (
+        <div className="text-center mb-3">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      )}
+      <div className="mb-3">
+        <label className="form-label me-2">{t('kitchen.currency')}:</label>
+        <select
+          value={currency}
+          onChange={e => setCurrency(e.target.value)}
+          style={styles.currencySelect}
+          className="form-select d-inline-block"
+        >
+          <option value="Toman">{t('kitchen.currencyOptions.toman')}</option>
+          <option value="IRR">{t('kitchen.currencyOptions.irr')}</option>
+        </select>
+      </div>
       <div className="row mb-3 g-2">
         <div className="col-12 col-md-3">
-          <label className="form-label">Max Calories:</label>
+          <label className="form-label">{t('kitchen.maxCalories')}:</label>
           <input
             type="number"
             min="0"
             className="form-control"
-            placeholder="Enter max calories"
+            placeholder={t('kitchen.maxCalories')}
             value={maxCalories}
             onChange={e => setMaxCalories(e.target.value)}
             style={styles.input}
           />
         </div>
         <div className="col-12 col-md-3">
-          <label className="form-label">Min Protein (g):</label>
+          <label className="form-label">{t('kitchen.minProtein')}:</label>
           <input
             type="number"
             min="0"
             className="form-control"
-            placeholder="Enter min protein"
+            placeholder={t('kitchen.minProtein')}
             value={minProtein}
             onChange={e => setMinProtein(e.target.value)}
             style={styles.input}
           />
         </div>
         <div className="col-12 col-md-3">
-          <label className="form-label">Max Fat (g):</label>
+          <label className="form-label">{t('kitchen.maxFat')}:</label>
           <input
             type="number"
             min="0"
             className="form-control"
-            placeholder="Enter max fat"
+            placeholder={t('kitchen.maxFat')}
             value={maxFat}
             onChange={e => setMaxFat(e.target.value)}
             style={styles.input}
           />
         </div>
         <div className="col-12 col-md-3">
-          <label className="form-label">Dietary:</label>
+          <label className="form-label">{t('kitchen.dietary')}:</label>
           <select
             className="form-select"
             value={dietaryFilter}
             onChange={e => setDietaryFilter(e.target.value)}
             style={styles.input}
           >
-            <option value="">All</option>
-            <option value="omnivore">Omnivore</option>
-            <option value="vegetarian">Vegetarian</option>
-            <option value="vegan">Vegan</option>
+            <option value="">{t('kitchen.dietaryOptions.all')}</option>
+            <option value="omnivore">{t('kitchen.dietaryOptions.omnivore')}</option>
+            <option value="vegetarian">{t('kitchen.dietaryOptions.vegetarian')}</option>
+            <option value="vegan">{t('kitchen.dietaryOptions.vegan')}</option>
           </select>
         </div>
       </div>
       <div className="row mb-3 g-2">
         <div className="col-12">
-          <label className="form-label">Search Ingredient:</label>
+          <label className="form-label">{t('kitchen.search')}:</label>
           <input
             type="text"
             className="form-control"
-            placeholder="Enter ingredient name"
+            placeholder={t('kitchen.search')}
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             style={styles.input}
@@ -315,7 +298,7 @@ function Kitchen({ setErrorMessage }) {
       </div>
       <div className="row mb-3 g-2">
         <div className="col-12">
-          <h3 className="mb-2" style={{ fontSize: '1.3rem' }}>Update Ingredient Price</h3>
+          <h3 className="mb-2" style={{ fontSize: '1.3rem' }}>{t('kitchen.updatePrice')}</h3>
           <div className="d-flex flex-column flex-sm-row gap-2">
             <select
               className="form-select"
@@ -323,10 +306,10 @@ function Kitchen({ setErrorMessage }) {
               onChange={e => setUpdateIngredient(e.target.value)}
               style={styles.input}
             >
-              <option value="">Select ingredient</option>
+              <option value="">{t('kitchen.selectIngredient')}</option>
               {ingredients.map(ing => (
                 <option key={ing.ingredient_name} value={ing.ingredient_name}>
-                  {ing.ingredient_name.replace(/\./g, ' ')} ({ing.persian_name})
+                  {ing.ingredient_name.replace(/\./g, ' ')} ({ing.persian_name || ''})
                 </option>
               ))}
             </select>
@@ -334,7 +317,7 @@ function Kitchen({ setErrorMessage }) {
               type="number"
               min="0"
               className="form-control"
-              placeholder="Purchase cost (T)"
+              placeholder={`${t('kitchen.purchaseCost')} (${currency})`}
               value={purchaseCost}
               onChange={e => setPurchaseCost(e.target.value)}
               style={styles.input}
@@ -343,13 +326,18 @@ function Kitchen({ setErrorMessage }) {
               type="number"
               min="0"
               className="form-control"
-              placeholder="Purchase amount (grams)"
+              placeholder={t('kitchen.purchaseAmount')}
               value={purchaseAmount}
               onChange={e => setPurchaseAmount(e.target.value)}
               style={styles.input}
             />
-            <button className="btn btn-outline-primary" onClick={handleUpdatePrice} style={styles.button}>
-              Update Price
+            <button 
+              className="btn btn-outline-primary" 
+              onClick={handleUpdatePrice} 
+              style={styles.button}
+              disabled={isLoading}
+            >
+              {t('kitchen.updateButton')}
             </button>
           </div>
           {updateMessage && (
@@ -359,6 +347,31 @@ function Kitchen({ setErrorMessage }) {
           )}
         </div>
       </div>
+      {Object.keys(selected).length > 0 && (
+        <div className="mt-3">
+          <h3 style={{ fontSize: '1.3rem' }}>{t('kitchen.selectedIngredients')}</h3>
+          <ul className="list-group mb-3">
+            {Object.entries(selected).map(([name, qty]) => (
+              qty > 0 && (
+                <li key={name} className="list-group-item d-flex justify-content-between align-items-center">
+                  {name.replace(/\./g, ' ')} ({ingredients.find(item => item.ingredient_name === name)?.persian_name || ''}): {qty} g
+                  <button
+                    className="btn btn-outline-danger btn-sm"
+                    onClick={() => setSelected(prev => {
+                      const updated = { ...prev };
+                      delete updated[name];
+                      localStorage.setItem('selectedIngredients', JSON.stringify(updated));
+                      return updated;
+                    })}
+                  >
+                    {t('kitchen.remove')}
+                  </button>
+                </li>
+              )
+            ))}
+          </ul>
+        </div>
+      )}
       <div className="accordion" id="ingredientAccordion">
         {categories.map(category => (
           groupedIngredients[category]?.length > 0 && (
@@ -390,11 +403,12 @@ function Kitchen({ setErrorMessage }) {
                       <div key={ing.ingredient_name} className="col-12 col-md-4">
                         <div className="card">
                           <div className="card-body">
-                            <label className="form-label">{ing.ingredient_name.replace(/\./g, ' ')} ({ing.persian_name})</label>
+                            <label className="form-label">{ing.ingredient_name.replace(/\./g, ' ')} ({ing.persian_name || ''})</label>
                             <input
                               type="number"
                               min="0"
                               className="form-control"
+                              placeholder={t('kitchen.quantity')}
                               value={selected[ing.ingredient_name] || ''}
                               onChange={e => setSelected({ ...selected, [ing.ingredient_name]: e.target.value })}
                               style={styles.input}
@@ -411,72 +425,90 @@ function Kitchen({ setErrorMessage }) {
         ))}
       </div>
       <div className="mt-3">
-        <button className="btn btn-primary" style={styles.button} onClick={handleCalculate}>Calculate</button>
-        <button className="btn btn-outline-success" style={styles.button} onClick={handleExport}>Export to CSV</button>
-        <button className="btn btn-secondary" style={styles.button} onClick={handleReset}>Reset</button>
+        <button 
+          className="btn btn-primary" 
+          style={styles.button} 
+          onClick={handleCalculate}
+          disabled={isLoading}
+        >
+          {isLoading ? t('kitchen.calculating') : t('kitchen.calculate')}
+        </button>
+        <button 
+          className="btn btn-outline-success" 
+          style={styles.button} 
+          onClick={handleExport}
+          disabled={!results || isLoading}
+        >
+          {t('kitchen.export')}
+        </button>
+        <button 
+          className="btn btn-secondary" 
+          style={styles.button} 
+          onClick={handleReset}
+          disabled={isLoading}
+        >
+          {t('kitchen.reset')}
+        </button>
       </div>
       {results && (
         <div className="mt-4">
-          <h2 className="text-center" style={{ fontSize: '1.5rem' }}>Results</h2>
-          {results.Cost !== undefined && (
+          <h2 className="text-center" style={{ fontSize: '1.5rem' }}>{t('kitchen.nutritionResults')}</h2>
+          {results.Cost && (
             <div className="alert alert-info mb-3">
-              <strong>Total Cost:</strong> {Math.floor(results.Cost)} T
+              <strong>{t('kitchen.totalCost')}:</strong> {results.Cost.value} {results.Cost.unit}
             </div>
           )}
-          <ul className="list-group mb-4">
+          <div className="row">
             {Object.entries(results)
-              .filter(([nutrient]) => nutrient !== 'Cost' && nutrient !== 'PurchaseCost' && nutrient !== 'PurchaseAmt')
-              .map(([nutrient, value]) => (
-                <li key={nutrient} className="list-group-item">
-                  {nutrient.replace(/([A-Z])/g, ' $1').trim()}: {Math.floor(value)}
-                </li>
+              .filter(([nutrient]) => nutrient !== 'Cost')
+              .map(([nutrient, data]) => (
+                <div key={nutrient} className="col-12 col-md-4 mb-2">
+                  <div className="card">
+                    <div className="card-body">
+                      <strong>{nutrient}:</strong> {data.value} {data.unit}
+                      {data.percent_dv !== null && ` (${data.percent_dv}% DV)`}
+                    </div>
+                  </div>
+                </div>
               ))}
-          </ul>
-          <div className="card">
-            {/* Uncomment if you want to re-enable the Pie chart */}
+          </div>
+          <div className="card mt-3">
             {/* <div className="card-body">
-              <h3 className="card-title" style={{ fontSize: '1.3rem' }}>Nutrition Chart</h3>
+              <h3 className="card-title" style={{ fontSize: '1.3rem' }}>{t('kitchen.nutritionChart')}</h3>
               <Pie
                 data={{
-                  labels: Object.keys(results)
-                    .filter(n => n !== 'Cost' && n !== 'PurchaseCost' && n !== 'PurchaseAmt')
-                    .map(n => n.replace(/([A-Z])/g, ' $1').trim()),
+                  labels: Object.keys(results).filter(n => n !== 'Cost'),
                   datasets: [
                     {
-                      label: 'Nutrition (per 100g)',
-                      data: Object.values(results).filter((_, i) => 
-                        Object.keys(results)[i] !== 'Cost' && 
-                        Object.keys(results)[i] !== 'PurchaseCost' && 
-                        Object.keys(results)[i] !== 'PurchaseAmt'
-                      ),
+                      label: t('kitchen.nutrition'),
+                      data: Object.values(results).filter((_, i) => Object.keys(results)[i] !== 'Cost').map(d => d.value),
                       backgroundColor: [
-                        'rgba(40, 167, 69, 0.6)',
-                        'rgba(255, 99, 132, 0.6)',
-                        'rgba(54, 162, 235, 0.6)',
-                        'rgba(255, 206, 86, 0.6)',
-                        'rgba(75, 192, 192, 0.6)',
-                        'rgba(153, 102, 255, 0.6)'
+                        'rgba(40, 167, 69, 0.6)', 'rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)',
+                        'rgba(255, 206, 86, 0.6)', 'rgba(75, 192, 192, 0.6)', 'rgba(153, 102, 255, 0.6)',
+                        'rgba(255, 159, 64, 0.6)', 'rgba(255, 99, 132, 0.4)', 'rgba(54, 162, 235, 0.4)',
+                        'rgba(255, 206, 86, 0.4)', 'rgba(75, 192, 192, 0.4)', 'rgba(153, 102, 255, 0.4)',
+                        'rgba(255, 159, 64, 0.4)', 'rgba(40, 167, 69, 0.4)', 'rgba(255, 99, 132, 0.8)',
+                        'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)', 'rgba(75, 192, 192, 0.8)',
+                        'rgba(153, 102, 255, 0.8)', 'rgba(255, 159, 64, 0.8)'
                       ],
                       borderColor: [
-                        'rgba(40, 167, 69, 1)',
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)'
+                        'rgba(40, 167, 69, 1)', 'rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)', 'rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)', 'rgba(40, 167, 69, 1)', 'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)'
                       ],
-                      borderWidth: 1,
-                    },
-                  ],
+                      borderWidth: 1
+                    }
+                  ]
                 }}
                 options={{
                   responsive: true,
                   maintainAspectRatio: false,
-                  plugins: { 
-                    legend: { 
-                      position: 'right',
-                      labels: { font: { size: 12 } }
-                    }
+                  plugins: {
+                    legend: { position: 'right', labels: { font: { size: 12 } } }
                   }
                 }}
                 height={250}
@@ -487,17 +519,19 @@ function Kitchen({ setErrorMessage }) {
       )}
       {recipes.length > 0 && (
         <div className="mt-4">
-          <h2 className="text-center" style={{ fontSize: '1.5rem' }}>Suggested Recipes</h2>
+          <h2 className="text-center" style={{ fontSize: '1.5rem' }}>{t('kitchen.suggestedRecipes')}</h2>
           {recipes.map(recipe => (
             <div key={recipe.recipe_name} className="card mb-2">
               <div className="card-body">
                 <h5 className="card-title">{recipe.recipe_name}</h5>
-                <p className="card-text"><strong>Ingredients:</strong> {recipe.ingredient_list.map(ing => `${ing.ingredient} (${ing.quantity}g)`).join(', ')}</p>
-                <p className="card-text"><strong>Instructions:</strong> {recipe.instructions}</p>
-                <p className="card-text"><strong>Prep Time:</strong> {recipe.prep_time} minutes</p>
-                <p className="card-text"><strong>Dietary:</strong> {recipe.dietary}</p>
-                <p className="card-text"><strong>Complexity:</strong> {recipe.complexity}</p>
-                <Link to="/cookbook" className="btn btn-outline-info" style={styles.button}>View in Cookbook</Link>
+                <p className="card-text"><strong>{t('kitchen.recipeDetails.ingredients')}:</strong> {recipe.ingredient_list.map(ing => `${ing.ingredient} (${ing.quantity}g)`).join(', ')}</p>
+                <p className="card-text"><strong>{t('kitchen.recipeDetails.instructions')}:</strong> {recipe.instructions}</p>
+                <p className="card-text"><strong>{t('kitchen.recipeDetails.prepTime')}:</strong> {recipe.prep_time} {t('kitchen.minutes')}</p>
+                <p className="card-text"><strong>{t('kitchen.recipeDetails.dietary')}:</strong> {recipe.dietary}</p>
+                <p className="card-text"><strong>{t('kitchen.recipeDetails.complexity')}:</strong> {recipe.complexity}</p>
+                <p className="card-text"><strong>{t('kitchen.recipeDetails.totalCalories')}:</strong> {recipe.total_calories} kcal</p>
+                <p className="card-text"><strong>{t('kitchen.recipeDetails.totalCost')}:</strong> {recipe.total_cost} {currency}</p>
+                <Link to="/cookbook" className="btn btn-outline-info" style={styles.button}>{t('kitchen.viewInCookbook')}</Link>
               </div>
             </div>
           ))}

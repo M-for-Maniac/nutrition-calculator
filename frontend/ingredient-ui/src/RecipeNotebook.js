@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Select from 'react-select';
+import { useTranslation } from 'react-i18next';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function RecipeNotebook({ setErrorMessage }) {
+  const { t } = useTranslation();
   const [ingredients, setIngredients] = useState([]);
   const [allRecipes, setAllRecipes] = useState([]);
   const [recipeMaxCalories, setRecipeMaxCalories] = useState('');
@@ -22,38 +24,22 @@ function RecipeNotebook({ setErrorMessage }) {
   const [editRecipe, setEditRecipe] = useState(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [scaleFactor, setScaleFactor] = useState(1.0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currency, setCurrency] = useState('Toman');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const BASE_URL = 'https://maniac.pythonanywhere.com';
+  const BASE_URL = process.env.NODE_ENV === 'production' ? 'https://mformaniac.pythonanywhere.com' : 'http://localhost:5000';
 
   const styles = {
-    container: { 
-      backgroundColor: '#f8f9fa', 
-      padding: '20px', 
-      borderRadius: '8px',
-      minHeight: '100vh'
-    },
-    button: { 
-      marginRight: '10px', 
-      padding: '12px 24px', 
-      fontSize: '1.1rem',
-      backgroundColor: '#28a745',
-      color: '#fff',
-      border: 'none',
-      borderRadius: '6px',
-      transition: 'background-color 0.2s ease'
-    },
-    input: {
-      fontSize: '1rem',
-      padding: '14px',
-      minHeight: '48px'
-    },
-    modal: {
-      maxWidth: '90vw',
-      margin: 'auto'
-    }
+    container: { backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '8px', minHeight: '100vh' },
+    button: { marginRight: '10px', padding: '12px 24px', fontSize: '1.1rem', backgroundColor: '#28a745', color: '#fff', border: 'none', borderRadius: '6px', transition: 'background-color 0.2s ease' },
+    input: { fontSize: '1rem', padding: '14px', minHeight: '48px' },
+    modal: { maxWidth: '90vw', margin: 'auto' },
+    currencySelect: { fontSize: '1rem', padding: '10px', width: '120px' }
   };
 
   useEffect(() => {
+    setIsLoading(true);
     axios.get(`${BASE_URL}/ingredients`)
       .then(res => {
         setIngredients(res.data);
@@ -61,18 +47,21 @@ function RecipeNotebook({ setErrorMessage }) {
       })
       .catch(err => {
         console.error('Error fetching ingredients:', err);
-        setErrorMessage('Failed to load ingredients. Please try again.');
-      });
-  }, [setErrorMessage]);
+        setErrorMessage(err.response?.data?.error || t('cookbook.error.fetchIngredients'));
+      })
+      .finally(() => setIsLoading(false));
+  }, [setErrorMessage, t]);
 
   useEffect(() => {
     if (ingredients.length === 0) return;
+    setIsLoading(true);
     let url = `${BASE_URL}/get_recipes`;
     const params = [];
     if (recipeMaxCalories) params.push(`max_calories=${recipeMaxCalories}`);
     if (recipeMaxCost) params.push(`max_cost=${recipeMaxCost}`);
     if (dietaryFilter) params.push(`dietary=${dietaryFilter}`);
     if (complexityFilter) params.push(`complexity=${complexityFilter}`);
+    if (currency) params.push(`currency=${currency}`);
     if (params.length) url += `?${params.join('&')}`;
     axios.get(url)
       .then(res => {
@@ -81,15 +70,17 @@ function RecipeNotebook({ setErrorMessage }) {
       })
       .catch(err => {
         console.error('Error fetching recipes:', err);
-        setErrorMessage('Failed to load recipes. Please try again.');
-      });
-  }, [recipeMaxCalories, recipeMaxCost, dietaryFilter, complexityFilter, ingredients, setErrorMessage]);
+        setErrorMessage(err.response?.data?.error || t('cookbook.error.fetchRecipes'));
+      })
+      .finally(() => setIsLoading(false));
+  }, [recipeMaxCalories, recipeMaxCost, dietaryFilter, complexityFilter, currency, ingredients, setErrorMessage, t]);
 
   const handleAddRecipe = () => {
     if (!newRecipeName || !newRecipeIngredients.length || !newRecipePrepTime) {
-      setRecipeMessage('Please fill recipe name, ingredients, and prep time');
+      setRecipeMessage(t('cookbook.error.addRecipeFields'));
       return;
     }
+    setIsLoading(true);
     const ingredientList = newRecipeIngredients.map(opt => ({
       ingredient: opt.value,
       quantity: parseFloat(ingredientQuantities[opt.value]) || 100
@@ -105,9 +96,9 @@ function RecipeNotebook({ setErrorMessage }) {
     })
       .then(res => {
         setRecipeMessage(res.data.message);
-        axios.get(`${BASE_URL}/get_recipes`)
+        axios.get(`${BASE_URL}/get_recipes?currency=${currency}`)
           .then(res => setAllRecipes(res.data))
-          .catch(err => setErrorMessage(err.response?.data?.error || 'Error fetching recipes'));
+          .catch(err => setErrorMessage(err.response?.data?.error || t('cookbook.error.fetchRecipes')));
         setNewRecipeName('');
         setNewRecipeIngredients([]);
         setNewRecipeInstructions('');
@@ -118,35 +109,40 @@ function RecipeNotebook({ setErrorMessage }) {
       })
       .catch(err => {
         console.error('Error adding recipe:', err);
-        setRecipeMessage(err.response?.data?.error || 'Error adding recipe. Please try again.');
-      });
+        setRecipeMessage(err.response?.data?.error || t('cookbook.error.addRecipe'));
+      })
+      .finally(() => setIsLoading(false));
   };
 
   const handleCalculateRecipeNutrition = (ingredient_list, recipe_name) => {
     if (!ingredient_list || !Array.isArray(ingredient_list)) {
-      setErrorMessage('Invalid ingredient list for recipe');
+      setErrorMessage(t('cookbook.error.invalidIngredientList'));
       return;
     }
+    setIsLoading(true);
     axios.post(`${BASE_URL}/recipe_nutrition`, { 
       ingredient_list, 
-      scale_factor: parseFloat(scaleFactor) || 1.0 
+      scale_factor: parseFloat(scaleFactor) || 1.0,
+      currency
     })
       .then(res => {
         setRecipeNutrition(prev => ({ ...prev, [recipe_name]: res.data }));
       })
       .catch(err => {
         console.error('Error calculating recipe nutrition:', err);
-        setErrorMessage(err.response?.data?.error || 'Error calculating recipe nutrition.');
-      });
+        setErrorMessage(err.response?.data?.error || t('cookbook.error.calculateNutrition'));
+      })
+      .finally(() => setIsLoading(false));
   };
 
   const handleDeleteRecipe = (recipe_name) => {
-    if (!window.confirm(`Are you sure you want to delete ${recipe_name}?`)) return;
+    if (!window.confirm(t('cookbook.confirmDelete', { recipe_name }))) return;
+    setIsLoading(true);
     setErrorMessage('');
     axios.post(`${BASE_URL}/delete_recipe`, { recipe_name })
       .then(res => {
         setRecipeMessage(res.data.message);
-        axios.get(`${BASE_URL}/get_recipes`)
+        axios.get(`${BASE_URL}/get_recipes?currency=${currency}`)
           .then(res => {
             setAllRecipes(res.data);
             setRecipeNutrition(prev => {
@@ -155,12 +151,16 @@ function RecipeNotebook({ setErrorMessage }) {
               return updated;
             });
           })
-          .catch(err => setErrorMessage(err.response?.data?.error || 'Error fetching recipes'));
+          .catch(err => {
+            console.error('Error fetching recipes:', err);
+            setErrorMessage(err.response?.data?.error || t('cookbook.error.fetchRecipesAfterDelete'));
+          });
       })
       .catch(err => {
         console.error('Error deleting recipe:', err);
-        setRecipeMessage(err.response?.data?.error || 'Error deleting recipe. Please try again.');
-      });
+        setRecipeMessage(err.response?.data?.error || t('cookbook.error.deleteRecipe'));
+      })
+      .finally(() => setIsLoading(false));
   };
 
   const handleEditRecipe = (recipe) => {
@@ -192,9 +192,10 @@ function RecipeNotebook({ setErrorMessage }) {
 
   const handleUpdateRecipe = () => {
     if (!newRecipeName || !newRecipeIngredients.length || !newRecipePrepTime) {
-      setRecipeMessage('Please fill recipe name, ingredients, and prep time');
+      setRecipeMessage(t('cookbook.error.updateRecipeFields'));
       return;
     }
+    setIsLoading(true);
     const ingredientList = newRecipeIngredients.map(opt => ({
       ingredient: opt.value,
       quantity: parseFloat(ingredientQuantities[opt.value]) || 100
@@ -210,7 +211,7 @@ function RecipeNotebook({ setErrorMessage }) {
     })
       .then(res => {
         setRecipeMessage(res.data.message);
-        axios.get(`${BASE_URL}/get_recipes`)
+        axios.get(`${BASE_URL}/get_recipes?currency=${currency}`)
           .then(res => {
             setAllRecipes(res.data);
             setEditModalOpen(false);
@@ -223,12 +224,16 @@ function RecipeNotebook({ setErrorMessage }) {
             setIngredientQuantities({});
             setEditRecipe(null);
           })
-          .catch(err => setErrorMessage(err.response?.data?.error || 'Error fetching recipes'));
+          .catch(err => {
+            console.error('Error fetching recipes:', err);
+            setErrorMessage(err.response?.data?.error || t('cookbook.error.fetchRecipesAfterUpdate'));
+          });
       })
       .catch(err => {
         console.error('Error updating recipe:', err);
-        setRecipeMessage(err.response?.data?.error || 'Error updating recipe. Please try again.');
-      });
+        setRecipeMessage(err.response?.data?.error || t('cookbook.error.updateRecipe'));
+      })
+      .finally(() => setIsLoading(false));
   };
 
   const handleCloseModal = () => {
@@ -244,101 +249,161 @@ function RecipeNotebook({ setErrorMessage }) {
     setRecipeMessage('');
   };
 
+  const handleExportRecipeNutrition = (recipeName) => {
+    if (!recipeNutrition[recipeName]) return;
+    const nutrition = recipeNutrition[recipeName];
+    const csvRows = ['Nutrient,Value,Unit,DV Percentage'];
+    Object.entries(nutrition).forEach(([nutrient, data]) => {
+      if (nutrient !== 'Cost') {
+        const dv = data.percent_dv !== null ? `${data.percent_dv.toFixed(2)}%` : 'N/A';
+        csvRows.push(`${nutrient},${data.value},${data.unit},${dv}`);
+      }
+    });
+    csvRows.push(`Cost,${nutrition.Cost.value},${nutrition.Cost.unit},N/A`);
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${recipeName}_nutrition.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const ingredientOptions = ingredients.map(ing => ({
     value: ing.ingredient_name,
-    label: `${ing.ingredient_name.replace(/\./g, ' ')} (${ing.persian_name})`
+    label: `${ing.ingredient_name.replace(/\./g, ' ')} (${ing.persian_name || ''})`
   }));
+
+  const filteredRecipes = allRecipes.filter(recipe =>
+    recipe.recipe_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    recipe.ingredient_list.some(ing =>
+      ing.ingredient.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      ingredients.find(i => i.ingredient_name === ing.ingredient)?.persian_name?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  );
 
   return (
     <div className="container mt-4" style={styles.container}>
-      <h1 className="mb-4 text-center" style={{ fontSize: '1.8rem' }}>Cookbook</h1>
+      <h1 className="mb-4 text-center" style={{ fontSize: '1.8rem' }}>{t('cookbook.title')}</h1>
+      {isLoading && (
+        <div className="text-center mb-3">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      )}
+      <div className="mb-3">
+        <label className="form-label me-2">{t('cookbook.currency')}:</label>
+        <select
+          value={currency}
+          onChange={e => setCurrency(e.target.value)}
+          style={styles.currencySelect}
+          className="form-select d-inline-block"
+        >
+          <option value="Toman">{t('cookbook.currencyOptions.toman')}</option>
+          <option value="IRR">{t('cookbook.currencyOptions.irr')}</option>
+        </select>
+      </div>
       <div className="row mb-3 g-2">
         <div className="col-12 col-md-3">
-          <label className="form-label">Max Calories:</label>
+          <label className="form-label">{t('cookbook.maxCalories')}:</label>
           <input
             type="number"
             min="0"
             className="form-control"
-            placeholder="Enter max calories"
+            placeholder={t('cookbook.maxCalories')}
             value={recipeMaxCalories}
             onChange={e => setRecipeMaxCalories(e.target.value)}
             style={styles.input}
           />
         </div>
         <div className="col-12 col-md-3">
-          <label className="form-label">Max Cost:</label>
+          <label className="form-label">{t('cookbook.maxCost')}:</label>
           <input
             type="number"
             min="0"
-            className="form-control"
-            placeholder="Enter max cost"
+            className="form-control"        
+            placeholder={`(${currency})`}
             value={recipeMaxCost}
             onChange={e => setRecipeMaxCost(e.target.value)}
             style={styles.input}
           />
         </div>
         <div className="col-12 col-md-3">
-          <label className="form-label">Dietary:</label>
+          <label className="form-label">{t('cookbook.dietary')}:</label>
           <select
             className="form-select"
             value={dietaryFilter}
             onChange={e => setDietaryFilter(e.target.value)}
             style={styles.input}
           >
-            <option value="">All</option>
-            <option value="omnivore">Omnivore</option>
-            <option value="vegetarian">Vegetarian</option>
-            <option value="vegan">Vegan</option>
+            <option value="">{t('cookbook.dietaryOptions.all')}</option>
+            <option value="omnivore">{t('cookbook.dietaryOptions.omnivore')}</option>
+            <option value="vegetarian">{t('cookbook.dietaryOptions.vegetarian')}</option>
+            <option value="vegan">{t('cookbook.dietaryOptions.vegan')}</option>
           </select>
         </div>
         <div className="col-12 col-md-3">
-          <label className="form-label">Complexity:</label>
+          <label className="form-label">{t('cookbook.complexity')}:</label>
           <select
             className="form-select"
             value={complexityFilter}
             onChange={e => setComplexityFilter(e.target.value)}
             style={styles.input}
           >
-            <option value="">All</option>
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
+            <option value="">{t('cookbook.complexityOptions.all')}</option>
+            <option value="easy">{t('cookbook.complexityOptions.easy')}</option>
+            <option value="medium">{t('cookbook.complexityOptions.medium')}</option>
+            <option value="hard">{t('cookbook.complexityOptions.hard')}</option>
           </select>
         </div>
       </div>
+      <div className="mb-3">
+        <label className="form-label">{t('cookbook.search')}:</label>
+        <input
+          type="text"
+          className="form-control"
+          placeholder={t('cookbook.search')}
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          style={styles.input}
+        />
+      </div>
       <div className="row mb-3 g-2">
         <div className="col-12">
-          <h3 className="mb-2" style={{ fontSize: '1.3rem' }}>Add New Recipe</h3>
+          <h3 className="mb-2" style={{ fontSize: '1.3rem' }}>{t('cookbook.addRecipe')}</h3>
           <div className="input-group mb-2">
             <input
               type="text"
               className="form-control"
-              placeholder="Recipe name"
+              placeholder={t('cookbook.recipeName')}
               value={newRecipeName}
               onChange={e => setNewRecipeName(e.target.value)}
               style={styles.input}
             />
           </div>
           <div className="mb-2">
-            <label className="form-label">Select Ingredients:</label>
+            <label className="form-label">{t('cookbook.selectIngredients')}:</label>
             <Select
               isMulti
               options={ingredientOptions}
               value={newRecipeIngredients}
               onChange={setNewRecipeIngredients}
-              placeholder="Search and select ingredients..."
+              placeholder={t('cookbook.selectIngredients')}
               className="basic-multi-select"
               classNamePrefix="select"
             />
           </div>
           {newRecipeIngredients.map(ing => (
             <div key={ing.value} className="input-group mb-2">
-              <label className="form-label">{ing.label} Quantity (g):</label>
+              <label className="form-label">{ing.label} {t('cookbook.quantity')}:</label>
               <input
                 type="number"
                 min="0"
                 className="form-control"
-                placeholder="Quantity in grams"
+                placeholder={t('cookbook.quantity')}
                 value={ingredientQuantities[ing.value] || ''}
                 onChange={e => setIngredientQuantities({
                   ...ingredientQuantities,
@@ -351,7 +416,7 @@ function RecipeNotebook({ setErrorMessage }) {
           <div className="input-group mb-2">
             <textarea
               className="form-control"
-              placeholder="Instructions"
+              placeholder={t('cookbook.instructions')}
               value={newRecipeInstructions}
               onChange={e => setNewRecipeInstructions(e.target.value)}
               style={styles.input}
@@ -362,7 +427,7 @@ function RecipeNotebook({ setErrorMessage }) {
               type="number"
               min="0"
               className="form-control"
-              placeholder="Prep time (minutes)"
+              placeholder={t('cookbook.prepTime')}
               value={newRecipePrepTime}
               onChange={e => setNewRecipePrepTime(e.target.value)}
               style={styles.input}
@@ -375,10 +440,10 @@ function RecipeNotebook({ setErrorMessage }) {
               onChange={e => setNewRecipeDietary(e.target.value)}
               style={styles.input}
             >
-              <option value="">Select dietary</option>
-              <option value="omnivore">Omnivore</option>
-              <option value="vegetarian">Vegetarian</option>
-              <option value="vegan">Vegan</option>
+              <option value="">{t('cookbook.dietaryOptions.select')}</option>
+              <option value="omnivore">{t('cookbook.dietaryOptions.omnivore')}</option>
+              <option value="vegetarian">{t('cookbook.dietaryOptions.vegetarian')}</option>
+              <option value="vegan">{t('cookbook.dietaryOptions.vegan')}</option>
             </select>
             <select
               className="form-select"
@@ -386,14 +451,19 @@ function RecipeNotebook({ setErrorMessage }) {
               onChange={e => setNewRecipeComplexity(e.target.value)}
               style={styles.input}
             >
-              <option value="">Select complexity</option>
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
+              <option value="">{t('cookbook.complexityOptions.select')}</option>
+              <option value="easy">{t('cookbook.complexityOptions.easy')}</option>
+              <option value="medium">{t('cookbook.complexityOptions.medium')}</option>
+              <option value="hard">{t('cookbook.complexityOptions.hard')}</option>
             </select>
           </div>
-          <button className="btn btn-outline-primary" onClick={handleAddRecipe} style={styles.button}>
-            Add Recipe
+          <button 
+            className="btn btn-outline-primary" 
+            onClick={handleAddRecipe} 
+            style={styles.button}
+            disabled={isLoading}
+          >
+            {isLoading ? t('cookbook.adding') : t('cookbook.addButton')}
           </button>
           {recipeMessage && !editModalOpen && (
             <div className={`alert ${recipeMessage.includes('Error') ? 'alert-danger' : 'alert-success'} mt-2`}>
@@ -402,24 +472,24 @@ function RecipeNotebook({ setErrorMessage }) {
           )}
         </div>
       </div>
-      <h3 className="mb-2" style={{ fontSize: '1.3rem' }}>All Recipes</h3>
+      <h3 className="mb-2" style={{ fontSize: '1.3rem' }}>{t('cookbook.allRecipes')}</h3>
       <div className="table-responsive">
         <table className="table table-striped">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Ingredients</th>
-              <th>Instructions</th>
-              <th>Prep Time (min)</th>
-              <th>Dietary</th>
-              <th>Complexity</th>
-              <th>Calories</th>
-              <th>Cost (T)</th>
-              <th>Actions</th>
+              <th>{t('cookbook.table.name')}</th>
+              <th>{t('cookbook.table.ingredients')}</th>
+              <th>{t('cookbook.table.instructions')}</th>
+              <th>{t('cookbook.table.prepTime')}</th>
+              <th>{t('cookbook.table.dietary')}</th>
+              <th>{t('cookbook.table.complexity')}</th>
+              <th>{t('cookbook.table.calories')}</th>
+              <th>{t('cookbook.table.cost', { currency })}</th>
+              <th>{t('cookbook.table.actions')}</th>
             </tr>
           </thead>
           <tbody>
-            {allRecipes.map(recipe => (
+            {filteredRecipes.map(recipe => (
               <tr key={recipe.recipe_name}>
                 <td>{recipe.recipe_name}</td>
                 <td>{recipe.ingredient_list.map(ing => `${ing.ingredient} (${ing.quantity}g)`).join(', ')}</td>
@@ -427,16 +497,16 @@ function RecipeNotebook({ setErrorMessage }) {
                 <td>{recipe.prep_time}</td>
                 <td>{recipe.dietary}</td>
                 <td>{recipe.complexity}</td>
-                <td>{Math.floor(recipe.total_calories)}</td>
-                <td>{Math.floor(recipe.total_cost)}</td>
+                <td>{recipe.total_calories}</td>
+                <td>{recipe.total_cost}</td>
                 <td>
                   <div className="d-flex flex-column flex-sm-row gap-2 align-items-sm-center">
                     <input
-                      type="number Bose number"
+                      type="number"
                       min="0.1"
                       step="0.1"
                       className="form-control"
-                      placeholder="Scale (e.g., 2)"
+                      placeholder={t('cookbook.scale')}
                       value={scaleFactor}
                       onChange={e => setScaleFactor(e.target.value)}
                       style={{ ...styles.input, width: '100px' }}
@@ -445,22 +515,33 @@ function RecipeNotebook({ setErrorMessage }) {
                       className="btn btn-outline-info"
                       onClick={() => handleCalculateRecipeNutrition(recipe.ingredient_list, recipe.recipe_name)}
                       style={styles.button}
+                      disabled={isLoading}
                     >
-                      Calculate
+                      {isLoading ? t('cookbook.calculating') : t('cookbook.calculate')}
                     </button>
                     <button
                       className="btn btn-outline-primary"
                       onClick={() => handleEditRecipe(recipe)}
                       style={styles.button}
+                      disabled={isLoading}
                     >
-                      Edit
+                      {t('cookbook.edit')}
                     </button>
                     <button
                       className="btn btn-outline-danger"
                       onClick={() => handleDeleteRecipe(recipe.recipe_name)}
                       style={styles.button}
+                      disabled={isLoading}
                     >
-                      Delete
+                      {t('cookbook.delete')}
+                    </button>
+                    <button
+                      className="btn btn-outline-success"
+                      onClick={() => handleExportRecipeNutrition(recipe.recipe_name)}
+                      style={styles.button}
+                      disabled={!recipeNutrition[recipe.recipe_name] || isLoading}
+                    >
+                      {t('cookbook.export')}
                     </button>
                   </div>
                 </td>
@@ -472,21 +553,26 @@ function RecipeNotebook({ setErrorMessage }) {
       {Object.keys(recipeNutrition).map(recipeName => (
         recipeNutrition[recipeName] && (
           <div key={recipeName} className="mt-3">
-            <h4 style={{ fontSize: '1.2rem' }}>{recipeName} Nutrition (Scale: {scaleFactor}x)</h4>
-            {recipeNutrition[recipeName].Cost !== undefined && (
+            <h4 style={{ fontSize: '1.2rem' }}>{recipeName} {t('cookbook.nutrition')} (Scale: {scaleFactor}x)</h4>
+            {recipeNutrition[recipeName].Cost && (
               <div className="alert alert-info mb-2">
-                <strong>Total Cost:</strong> {Math.floor(recipeNutrition[recipeName].Cost)} T
+                <strong>{t('cookbook.totalCost')}:</strong> {recipeNutrition[recipeName].Cost.value} {recipeNutrition[recipeName].Cost.unit}
               </div>
             )}
-            <ul className="list-group">
+            <div className="row">
               {Object.entries(recipeNutrition[recipeName])
-                .filter(([nutrient]) => nutrient !== 'Cost' && nutrient !== 'PurchaseCost' && nutrient !== 'PurchaseAmt')
-                .map(([nutrient, value]) => (
-                  <li key={nutrient} className="list-group-item">
-                    {nutrient.replace(/([A-Z])/g, ' $1').trim()}: {Math.floor(value)}
-                  </li>
+                .filter(([nutrient]) => nutrient !== 'Cost')
+                .map(([nutrient, data]) => (
+                  <div key={nutrient} className="col-12 col-md-4 mb-2">
+                    <div className="card">
+                      <div className="card-body">
+                        <strong>{nutrient}:</strong> {data.value} {data.unit}
+                        {data.percent_dv !== null && ` (${data.percent_dv}% DV)`}
+                      </div>
+                    </div>
+                  </div>
                 ))}
-            </ul>
+            </div>
           </div>
         )
       ))}
@@ -494,12 +580,12 @@ function RecipeNotebook({ setErrorMessage }) {
         <div className="modal-dialog" style={styles.modal}>
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title">Edit Recipe: {editRecipe?.recipe_name}</h5>
+              <h5 className="modal-title">{t('cookbook.editModal.title')}: {editRecipe?.recipe_name}</h5>
               <button type="button" className="btn-close" onClick={handleCloseModal}></button>
             </div>
             <div className="modal-body">
               <div className="mb-2">
-                <label className="form-label">Recipe Name:</label>
+                <label className="form-label">{t('cookbook.recipeName')}:</label>
                 <input
                   type="text"
                   className="form-control"
@@ -510,25 +596,25 @@ function RecipeNotebook({ setErrorMessage }) {
                 />
               </div>
               <div className="mb-2">
-                <label className="form-label">Select Ingredients:</label>
+                <label className="form-label">{t('cookbook.selectIngredients')}:</label>
                 <Select
                   isMulti
                   options={ingredientOptions}
                   value={newRecipeIngredients}
                   onChange={setNewRecipeIngredients}
-                  placeholder="Search and select ingredients..."
+                  placeholder={t('cookbook.selectIngredients')}
                   className="basic-multi-select"
                   classNamePrefix="select"
                 />
               </div>
               {newRecipeIngredients.map(ing => (
                 <div key={ing.value} className="input-group mb-2">
-                  <label className="form-label">{ing.label} Quantity (g):</label>
+                  <label className="form-label">{ing.label} {t('cookbook.quantity')}:</label>
                   <input
                     type="number"
                     min="0"
                     className="form-control"
-                    placeholder="Quantity in grams"
+                    placeholder={t('cookbook.quantity')}
                     value={ingredientQuantities[ing.value] || ''}
                     onChange={e => setIngredientQuantities({
                       ...ingredientQuantities,
@@ -539,69 +625,80 @@ function RecipeNotebook({ setErrorMessage }) {
                 </div>
               ))}
               <div className="mb-2">
-                <label className="form-label">Instructions:</label>
+                <label className="form-label">{t('cookbook.instructions')}:</label>
                 <textarea
                   className="form-control"
+                  placeholder={t('cookbook.instructions')}
                   value={newRecipeInstructions}
                   onChange={e => setNewRecipeInstructions(e.target.value)}
                   style={styles.input}
                 />
               </div>
               <div className="mb-2">
-                <label className="form-label">Prep Time (minutes):</label>
+                <label className="form-label">{t('cookbook.prepTime')}:</label>
                 <input
                   type="number"
                   min="0"
                   className="form-control"
+                  placeholder={t('cookbook.prepTime')}
                   value={newRecipePrepTime}
                   onChange={e => setNewRecipePrepTime(e.target.value)}
                   style={styles.input}
                 />
               </div>
-              <div className="row g-2">
-                <div className="col-12 col-md-6">
-                  <label className="form-label">Dietary:</label>
-                  <select
-                    className="form-select"
-                    value={newRecipeDietary}
-                    onChange={e => setNewRecipeDietary(e.target.value)}
-                    style={styles.input}
-                  >
-                    <option value="">Select dietary</option>
-                    <option value="omnivore">Omnivore</option>
-                    <option value="vegetarian">Vegetarian</option>
-                    <option value="vegan">Vegan</option>
-                  </select>
-                </div>
-                <div className="col-12 col-md-6">
-                  <label className="form-label">Complexity:</label>
-                  <select
-                    className="form-select"
-                    value={newRecipeComplexity}
-                    onChange={e => setNewRecipeComplexity(e.target.value)}
-                    style={styles.input}
-                  >
-                    <option value="">Select complexity</option>
-                    <option value="easy">Easy</option>
-                    <option value="medium">Medium</option>
-                    <option value="hard">Hard</option>
-                  </select>
-                </div>
+              <div className="mb-2">
+                <label className="form-label">{t('cookbook.dietary')}:</label>
+                <select
+                  className="form-select"
+                  value={newRecipeDietary}
+                  onChange={e => setNewRecipeDietary(e.target.value)}
+                  style={styles.input}
+                >
+                  <option value="">{t('cookbook.dietaryOptions.select')}</option>
+                  <option value="omnivore">{t('cookbook.dietaryOptions.omnivore')}</option>
+                  <option value="vegetarian">{t('cookbook.dietaryOptions.vegetarian')}</option>
+                  <option value="vegan">{t('cookbook.dietaryOptions.vegan')}</option>
+                </select>
               </div>
-              {recipeMessage && (
-                <div className={`alert ${recipeMessage.includes('Error') ? 'alert-danger' : 'alert-success'} mt-2`}>
-                  {recipeMessage}
-                </div>
-              )}
+              <div className="mb-2">
+                <label className="form-label">{t('cookbook.complexity')}:</label>
+                <select
+                  className="form-select"
+                  value={newRecipeComplexity}
+                  onChange={e => setNewRecipeComplexity(e.target.value)}
+                  style={styles.input}
+                >
+                  <option value="">{t('cookbook.complexityOptions.select')}</option>
+                  <option value="easy">{t('cookbook.complexityOptions.easy')}</option>
+                  <option value="medium">{t('cookbook.complexityOptions.medium')}</option>
+                  <option value="hard">{t('cookbook.complexityOptions.hard')}</option>
+                </select>
+              </div>
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" onClick={handleCloseModal} style={styles.button}>
-                Cancel
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={handleCloseModal}
+                style={styles.button}
+              >
+                {t('cookbook.editModal.cancel')}
               </button>
-              <button type="button" className="btn btn-primary" onClick={handleUpdateRecipe} style={styles.button}>
-                Update Recipe
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleUpdateRecipe}
+                style={styles.button}
+                disabled={isLoading}
+              >
+                {isLoading ? t('cookbook.editModal.updating') : t('cookbook.editModal.update')}
               </button>
             </div>
+            {recipeMessage && editModalOpen && (
+              <div className={`alert ${recipeMessage.includes('Error') ? 'alert-danger' : 'alert-success'} mt-2`}>
+                {recipeMessage}
+              </div>
+            )}
           </div>
         </div>
       </div>
