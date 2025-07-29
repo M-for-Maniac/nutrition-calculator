@@ -30,19 +30,6 @@
     "complexity":"medium"
   },
   {
-    "recipe_name":"MeatManiac",
-    "ingredient_list":[
-      {
-        "ingredient":"Beef.Flank(Raw)",
-        "quantity":250
-      }
-    ],
-    "instructions":"Fry and Garnish with vegetables",
-    "prep_time":40,
-    "dietary":"omnivore",
-    "complexity":"medium"
-  },
-  {
     "recipe_name":"Bomb",
     "ingredient_list":[
       {
@@ -58,5 +45,39 @@
     "prep_time":5,
     "dietary":"vegan",
     "complexity":"easy"
+  },
+  {
+    "recipe_name":"Morning Trio",
+    "ingredient_list":[
+      {
+        "ingredient":"Iranian Cheese",
+        "quantity":30
+      },
+      {
+        "ingredient":"Butter",
+        "quantity":10
+      },
+      {
+        "ingredient":"Milk Chocolate",
+        "quantity":50
+      }
+    ],
+    "instructions":"Enjoy along with bread and coffee",
+    "prep_time":10,
+    "dietary":"vegetarian",
+    "complexity":"easy"
+  },
+  {
+    "recipe_name":"MeatManiac",
+    "ingredient_list":[
+      {
+        "ingredient":"Beef.Flank(Raw)",
+        "quantity":250
+      }
+    ],
+    "instructions":"\u0633\u0631\u062e \u06a9\u0646\u06cc\u062f \u062f\u0631 \u06a9\u0646\u0627\u0631 \u0633\u0628\u0632\u06cc\u062c\u0627\u062a \u0645\u06cc\u0644 \u06a9\u0646\u06cc\u062f",
+    "prep_time":40,
+    "dietary":"omnivore",
+    "complexity":"medium"
   }
 ]
