@@ -79,5 +79,26 @@
     "prep_time":40,
     "dietary":"omnivore",
     "complexity":"medium"
+  },
+  {
+    "recipe_name":"\u062a\u0631\u06a9\u06cc\u0628\u06cc",
+    "ingredient_list":[
+      {
+        "ingredient":"Alcoholic.All(Vodka.\u2026).Proof 100",
+        "quantity":30
+      },
+      {
+        "ingredient":"Alcoholic.All(Vodka.\u2026).Proof 80",
+        "quantity":30
+      },
+      {
+        "ingredient":"Alcoholic.All(Vodka.\u2026).Proof 94",
+        "quantity":30
+      }
+    ],
+    "instructions":"\u062e\u0646\u06a9 \u0628\u0646\u0648\u0634\u06cc\u062f",
+    "prep_time":5,
+    "dietary":"vegetarian",
+    "complexity":"easy"
   }
 ]
