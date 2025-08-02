@@ -20,7 +20,7 @@ function App() {
       <div className="App" dir={i18n.language === 'fa' ? 'rtl' : 'ltr'}>
         <nav className="navbar navbar-expand-lg navbar-light bg-white">
           <div className="container-fluid">
-            <Link className="navbar-brand" to="/">{t('app.title')}</Link>
+            <Link className="navbar-brand" to="/nutrition-calculator">{t('app.title')}</Link>
             <button
               className="navbar-toggler"
               type="button"
@@ -35,7 +35,7 @@ function App() {
             <div className="collapse navbar-collapse" id="navbarNav">
               <ul className="navbar-nav me-auto">
                 <li className="nav-item">
-                  <Link className="nav-link" to="/">{t('app.home')}</Link>
+                  <Link className="nav-link" to="/nutrition-calculator">{t('app.home')}</Link>
                 </li>
                 <li className="nav-item">
                   <Link className="nav-link" to="/kitchen">{t('app.kitchen')}</Link>
