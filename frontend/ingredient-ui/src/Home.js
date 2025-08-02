@@ -9,12 +9,12 @@ function Home({ setErrorMessage }) {
 
   const styles = {
     hero: {
-      background: 'linear-gradient(120deg, #3a846a, #2b604b)', // Updated to palette colors
-      color: '#d6c5ac',
+      background: 'linear-gradient(120deg, #295241, #1f3e31)', // Updated to new green palette
+      color: '#f1f1f1', // Text on green
       padding: '60px 20px',
-      borderRadius: '10px',
+      borderRadius: '12px',
       textAlign: 'center',
-      marginBottom: '40px',
+      marginBottom: '40px'
     },
     card: {
       transition: 'transform 0.2s, box-shadow 0.2s',
@@ -22,12 +22,13 @@ function Home({ setErrorMessage }) {
       display: 'flex',
       flexDirection: 'column',
       borderRadius: '12px',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-      backgroundColor: '#d6c5ac' // Neutral background
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)',
+      backgroundColor: '#e9e2d6', // Text on red (beige) for cards
+      border: '1px solid #295241' // Main green border
     },
     cardHover: {
-      transform: 'scale(1.05)',
-      boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)'
+      transform: 'scale(1.03)',
+      boxShadow: '0 8px 16px rgba(0, 0, 0, 0.25)'
     },
     carousel: {
       maxWidth: '800px',
@@ -35,24 +36,26 @@ function Home({ setErrorMessage }) {
       marginBottom: '40px'
     },
     tour: {
-      background: 'linear-gradient(135deg, #f8f9fa, #d6c5ac)', // Updated with palette
+      background: 'linear-gradient(135deg, #f8f9fa, #e9e2d6)', // Updated to beige
       padding: '40px 20px',
       borderRadius: '12px',
-      marginBottom: '40px'
+      marginBottom: '40px',
+      border: '1px solid #295241' // Main green border
     },
     tourCard: {
       transition: 'transform 0.2s, box-shadow 0.2s',
       borderRadius: '12px',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-      backgroundColor: '#fff'
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)',
+      backgroundColor: '#fff',
+      border: '1px solid #1f3e31' // Darker green border
     },
     tourCardHover: {
       transform: 'translateY(-5px)',
-      boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)'
+      boxShadow: '0 10px 20px rgba(0, 0, 0, 0.25)'
     },
     footer: {
-      backgroundColor: '#2b604b', // Dark green for footer
-      color: '#d6c5ac',
+      backgroundColor: '#295241', // Main green
+      color: '#f1f1f1', // Text on green
       padding: '20px 0',
       textAlign: 'center'
     }
@@ -65,18 +68,18 @@ function Home({ setErrorMessage }) {
         <div style={styles.hero} className="hero">
           <h1 className="display-4 mb-3">{t('home.hero.title')}</h1>
           <p className="lead mb-4">{t('home.hero.subtitle')}</p>
-          <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
+          {/* <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
             <Link to="/kitchen" className="btn btn-primary-custom btn-lg w-100 w-sm-auto" onClick={() => setErrorMessage('')}>
               {t('home.hero.kitchenCTA')}
             </Link>
             <Link to="/cookbook" className="btn btn-secondary-custom btn-lg w-100 w-sm-auto" onClick={() => setErrorMessage('')}>
               {t('home.hero.cookbookCTA')}
             </Link>
-          </div>
+          </div> */}
         </div>
 
         {/* Feature Cards */}
-        <div className="row mb-5">
+        <div className="row mb-5 features">
           <div className="col-md-6 mb-4">
             <div
               className="card shadow-sm h-100"
@@ -126,51 +129,51 @@ function Home({ setErrorMessage }) {
         </div>
 
         {/* Quick Tips Carousel */}
-        <div style={styles.carousel}>
+        <div style={styles.carousel} className="tips">
           <h2 className="text-center mb-4">{t('home.tips.title')}</h2>
           <div id="tipsCarousel" className="carousel slide" data-bs-ride="carousel">
             <div className="carousel-inner">
               <div className="carousel-item active">
-                <div className="card text-center">
+                <div className="card text-center" style={{ backgroundColor: '#e9e2d6', border: '1px solid #295241' }}>
                   <div className="card-body">
                     <p className="card-text">{t('home.tips.tip1')}</p>
                   </div>
                 </div>
               </div>
               <div className="carousel-item">
-                <div className="card text-center">
+                <div className="card text-center" style={{ backgroundColor: '#e9e2d6', border: '1px solid #295241' }}>
                   <div className="card-body">
                     <p className="card-text">{t('home.tips.tip2')}</p>
                   </div>
                 </div>
               </div>
               <div className="carousel-item">
-                <div className="card text-center">
+                <div className="card text-center" style={{ backgroundColor: '#e9e2d6', border: '1px solid #295241' }}>
                   <div className="card-body">
                     <p className="card-text">{t('home.tips.tip3')}</p>
                   </div>
                 </div>
               </div>
               <div className="carousel-item">
-                <div className="card text-center">
+                <div className="card text-center" style={{ backgroundColor: '#e9e2d6', border: '1px solid #295241' }}>
                   <div className="card-body">
                     <p className="card-text">{t('home.tips.tip4')}</p>
                   </div>
                 </div>
               </div>
               <div className="carousel-item">
-                <div className="card text-center">
+                <div className="card text-center" style={{ backgroundColor: '#e9e2d6', border: '1px solid #295241' }}>
                   <div className="card-body">
                     <p className="card-text">{t('home.tips.tip5')}</p>
                   </div>
                 </div>
               </div>
             </div>
-            <button className="carousel-control-prev" type="button" data-bs-target="#tipsCarousel" data-bs-slide="prev">
+            <button className="carousel-control-prev carousel-control-accent" type="button" data-bs-target="#tipsCarousel" data-bs-slide="prev">
               <span className="carousel-control-prev-icon" aria-hidden="true"></span>
               <span className="visually-hidden">Previous</span>
             </button>
-            <button className="carousel-control-next" type="button" data-bs-target="#tipsCarousel" data-bs-slide="next">
+            <button className="carousel-control-next carousel-control-accent" type="button" data-bs-target="#tipsCarousel" data-bs-slide="next">
               <span className="carousel-control-next-icon" aria-hidden="true"></span>
               <span className="visually-hidden">Next</span>
             </button>
@@ -232,8 +235,8 @@ function Home({ setErrorMessage }) {
         </div>
 
         {/* Sample Recipe CTA */}
-        <div className="text-center mb-5">
-          <h2>{t('home.sampleRecipe.title')}</h2>
+        <div className="text-center mb-5 cta">
+          <h2 className="text-accent">{t('home.sampleRecipe.title')}</h2>
           <p>{t('home.sampleRecipe.description')}</p>
           <Link to="/cookbook" className="btn btn-accent-custom btn-lg" onClick={() => setErrorMessage('')}>
             {t('home.sampleRecipe.button')}
@@ -245,8 +248,8 @@ function Home({ setErrorMessage }) {
       <footer style={styles.footer} className="w-100">
         <div className="container-fluid py-3">
           <p>{t('home.footer.text')}</p>
-          <a href="https://github.com/m-for-maniac" className="text-white" target="_blank" rel="noopener noreferrer">
-            <i className="fab fa-github fa-lg me-2"></i>
+          <a href="https://github.com/m-for-maniac" className="text-footer" target="_blank" rel="noopener noreferrer">
+            <i className="fab fa-github fa-lg me-2 icon-accent"></i>
             {t('home.footer.github')}
           </a>
         </div>

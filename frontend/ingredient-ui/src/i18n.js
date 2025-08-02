@@ -5,7 +5,7 @@ const resources = {
   en: {
     translation: {
       app: {
-        title: 'Nutrition Calculator',
+        title: 'Nutrino',
         home: 'Home',
         kitchen: 'Kitchen',
         cookbook: 'Cookbook',
@@ -15,7 +15,7 @@ const resources = {
       },
       home: {
         hero: {
-          title: 'Welcome to Your Nutrition Journey!',
+          title: 'Welcome to Nutrino, Your Nutritious Journey!',
           subtitle: 'Easily plan meals, track nutrition, and create delicious recipes with us.',
           kitchenCTA: 'Explore Kitchen',
           cookbookCTA: 'Discover Cookbook'
@@ -71,7 +71,7 @@ const resources = {
         quantity: 'Quantity (g)',
         calculate: 'Calculate Nutrition',
         calculating: 'Calculating...',
-        export: 'Export to CSV',
+        export: 'Export Label',
         reset: 'Start Over',
         currency: 'Currency',
         maxCalories: 'Max Calories',
@@ -111,6 +111,15 @@ const resources = {
           vegetarian: 'Vegetarian',
           vegan: 'Vegan'
         },
+        notes: {
+          title: 'How to Use the Kitchen',
+          purposeTitle: 'Why Use the Kitchen?',
+          purpose: 'The Kitchen helps you plan meals by calculating the nutritional content and cost of your selected ingredients. It’s perfect for health-conscious individuals, those managing budgets, or anyone with dietary restrictions like vegan or vegetarian diets.',
+          nutritionTitle: 'Understanding Nutrition',
+          nutritionInfo: 'Understanding nutrition is key to a balanced diet. Macronutrients (carbs, proteins, fats) provide energy, while micronutrients (vitamins, minerals) support bodily functions. Use the filters to find ingredients that meet your calorie, protein, or fat goals, and check the % Daily Value (DV) to stay within recommended limits.',
+          usageTitle: 'How to Get Started',
+          usage: 'Select ingredients, set quantities, and click "Calculate Nutrition" to see a detailed breakdown. Use filters to narrow down options by dietary needs or nutritional goals. Update prices to keep your budget in check, and export results to track your meal plans.'
+        },
         error: {
           fetchIngredients: 'Oops! Couldn’t fetch ingredients. Try again?',
           calculate: 'Something went wrong calculating nutrition.',
@@ -118,7 +127,9 @@ const resources = {
           updatePrice: 'Error updating price. Check your inputs.',
           updatePriceFields: 'Please fill in all fields to update the price.',
           refreshIngredients: 'Error refreshing ingredients.'
-        }
+        },
+        exportPrompt: 'Export? Click OK for Image.',
+        nutritionLabelTitle: 'Nutrition Facts: Selected Ingredients'
       },
       cookbook: {
         title: 'Cookbook',
@@ -142,7 +153,7 @@ const resources = {
         calculating: 'Calculating...',
         edit: 'Edit',
         delete: 'Delete',
-        export: 'Export Nutrition',
+        export: 'Export Nutrition Label',
         adding: 'Adding...',
         addButton: 'Add Recipe',
         confirmDelete: 'Are you sure you want to delete {recipe_name}?',
@@ -172,10 +183,20 @@ const resources = {
           dietary: 'Dietary',
           complexity: 'Complexity',
           calories: 'Calories',
-          cost: 'Cost ({currency})',
+          cost: 'Cost',
           actions: 'Actions'
         },
+        notes: {
+          title: 'How to Use the Cookbook',
+          purposeTitle: 'Why Use the Cookbook?',
+          purpose: 'The Cookbook allows you to create, manage, and analyze recipes tailored to your dietary preferences and budget. It’s ideal for saving favorite recipes, planning meals, and ensuring nutritional balance.',
+          nutritionTitle: 'Understanding Recipe Nutrition',
+          nutritionInfo: 'Recipes provide a snapshot of nutritional content based on their ingredients. Monitor calories, macronutrients (carbs, proteins, fats), and micronutrients (vitamins, minerals) to meet your health goals. Use the scale factor to adjust portion sizes and update nutrition and cost accordingly.',
+          usageTitle: 'How to Get Started',
+          usage: 'Add a new recipe by entering its name, ingredients, instructions, and details like prep time and dietary preferences. Use the table to view, edit, or delete recipes. Calculate nutrition for any recipe, apply a scale factor for portion control, and export results to save or share.'
+        },
         error: {
+          exportImage: 'Failed to export nutrition label image',
           addRecipeFields: 'Please fill in the recipe name, ingredients, and prep time.',
           fetchIngredients: 'Couldn’t load ingredients. Try again?',
           fetchRecipes: 'Error loading recipes. Please try again.',
@@ -200,7 +221,7 @@ const resources = {
   fa: {
     translation: {
       app: {
-        title: 'ماشین حساب تغذیه',
+        title: 'نوترینو',
         home: 'خانه',
         kitchen: 'آشپزخانه',
         cookbook: 'کتاب آشپزی',
@@ -210,22 +231,22 @@ const resources = {
       },
       home: {
         hero: {
-          title: 'به سفر تغذیه‌ای خود خوش آمدید!',
+          title: 'به نوترینو خوش اومدی!',
           subtitle: 'با ما به‌راحتی وعده‌های غذایی خود را برنامه‌ریزی کنید، تغذیه را ردیابی کنید و دستورهای پخت خوشمزه بسازید.',
-          kitchenCTA: 'کاوش در آشپزخانه',
-          cookbookCTA: 'کشف کتاب آشپزی'
+          kitchenCTA: 'بریم تو آشپزخانه',
+          cookbookCTA: 'مشاهده کتاب آشپزی'
         },
         features: {
           title: 'چرا اپلیکیشن ما را دوست خواهید داشت',
           kitchen: {
             title: 'ردیابی تغذیه',
-            description: 'ارزش تغذیه‌ای مواد اولیه و وعده‌های غذایی خود را به‌سرعت محاسبه کنید.',
-            button: 'حالا آشپزخانه را امتحان کنید'
+            description: 'ارزش غذایی مواد اولیه و وعده‌های غذایی خود را به‌سرعت محاسبه کنید.',
+            button: 'به آشپزخانه برید'
           },
           cookbook: {
             title: 'مدیریت دستور پخت',
             description: 'دستورهای پخت خود را با فیلترهای رژیم غذایی و پیچیدگی بسازید، ویرایش کنید و سازمان‌دهی کنید.',
-            button: 'حالا کتاب آشپزی را امتحان کنید'
+            button: 'کتاب آشپزی را مشاهده کنید'
           }
         },
         tips: {
@@ -237,16 +258,16 @@ const resources = {
           tip5: 'با ادویه‌ها آزمایش کنید تا بدون کالری اضافی طعم غذا را بهتر کنید.'
         },
         tour: {
-          title: 'یک تور سریع بگیرید!',
+          title: 'یک تور سریع!',
           intro: 'با اپلیکیشن ما تازه‌کار هستید؟ بیایید باهم ببینیم چطور می‌توانید از آن بهترین استفاده را ببرید!',
           kitchen: {
             title: 'آشپزخانه: مرکز تغذیه شما',
-            description: 'در آشپزخانه می‌توانید مواد اولیه را انتخاب کنید، مقدارشان را تعیین کنید و ارزش‌های تغذیه‌ای مثل کالری، پروتئین و چربی را محاسبه کنید. با فیلترهای رژیم غذایی یا جستجوی مواد اولیه، غذای ایده‌آل خود را برنامه‌ریزی کنید. حتی می‌توانید قیمت مواد اولیه را به‌روزرسانی کنید و نتایج را صادر کنید!',
+            description: 'در آشپزخانه می‌توانید مواد اولیه را انتخاب کنید، مقدارشان را تعیین کنید و ارزش‌های تغذیه‌ای مثل کالری، پروتئین و چربی را محاسبه کنید. با فیلترهای رژیم غذایی یا جستجوی مواد اولیه، غذای ایده‌آل خود را برنامه‌ریزی کنید. حتی می‌توانید قیمت مواد اولیه را به‌روزرسانی کنید و لیبل ارزش غذایی را دانلود کنید!',
             button: 'برو به آشپزخانه'
           },
           cookbook: {
             title: 'کتاب آشپزی: زمین بازی دستورهای پخت شما',
-            description: 'کتاب آشپزی به شما امکان می‌دهد دستورهای پخت را بسازید، ویرایش کنید و مدیریت کنید. مواد اولیه را اضافه کنید، دستورالعمل‌ها را بنویسید و فیلترهای رژیم غذایی یا پیچیدگی را تنظیم کنید. تغذیه هر دستور پخت را محاسبه کنید و آن را به دلخواه افزایش یا کاهش دهید. دستورهای مورد علاقه‌تان را ذخیره کنید و به اشتراک بگذارید!',
+            description: 'کتاب آشپزی به شما امکان می‌دهد دستورهای پخت را ذخیره، ویرایش کنید و مدیریت کنید. مواد اولیه را اضافه کنید، دستورالعمل‌ها را بنویسید و فیلترهای رژیم غذایی یا پیچیدگی را تنظیم کنید. ارزش غذایی هر دستور پخت را محاسبه کنید و آن را به دلخواه افزایش یا کاهش دهید. دستورهای مورد علاقه‌تان را ذخیره کنید و به اشتراک بگذارید!',
             button: 'برو به کتاب آشپزی'
           }
         },
@@ -256,8 +277,8 @@ const resources = {
           button: 'کاوش در کتاب آشپزی'
         },
         footer: {
-          text: 'با ❤️ توسط m-for-maniac ساخته شده است',
-          github: 'ما را در گیت‌هاب ببینید'
+          text: 'نوشته شده توسط m-for-maniac',
+          github: 'من را در گیت‌هاب ببینید'
         }
       },
       kitchen: {
@@ -266,7 +287,7 @@ const resources = {
         quantity: 'مقدار (گرم)',
         calculate: 'محاسبه تغذیه',
         calculating: 'در حال محاسبه...',
-        export: 'صادر کردن به CSV',
+        export: 'دانلود لیبل',
         reset: 'از نو شروع کنید',
         currency: 'ارز',
         maxCalories: 'حداکثر کالری',
@@ -306,6 +327,15 @@ const resources = {
           vegetarian: 'گیاه‌خوار',
           vegan: 'وگان'
         },
+        notes: {
+          title: 'چگونه از آشپزخانه استفاده کنید',
+          purposeTitle: 'چرا از آشپزخانه استفاده کنید؟',
+          purpose: 'آشپزخانه به شما کمک می‌کند تا با محاسبه محتوای تغذیه‌ای و هزینه مواد اولیه انتخاب‌شده، وعده‌های غذایی خود را برنامه‌ریزی کنید. این ابزار برای افرادی که به سلامت خود اهمیت می‌دهند، بودجه خود را مدیریت می‌کنند یا محدودیت‌های غذایی مانند رژیم گیاه‌خواری یا وگان دارند، ایده‌آل است.',
+          nutritionTitle: 'درک تغذیه',
+          nutritionInfo: 'درک تغذیه برای یک رژیم غذایی متعادل ضروری است. درشت‌مغذی‌ها (کربوهیدرات‌ها، پروتئین‌ها، چربی‌ها) انرژی را تأمین می‌کنند، در حالی که ریزمغذی‌ها (ویتامین‌ها، مواد معدنی) از عملکردهای بدن پشتیبانی می‌کنند. از فیلترها برای یافتن مواد اولیه‌ای که با اهداف کالری، پروتئین یا چربی شما مطابقت دارند استفاده کنید و درصد ارزش روزانه (DV) را بررسی کنید تا در محدوده توصیه‌شده بمانید.',
+          usageTitle: 'چگونه شروع کنید',
+          usage: 'مواد اولیه را انتخاب کنید، مقادیر را تنظیم کنید و روی "محاسبه تغذیه" کلیک کنید تا تجزیه و تحلیل دقیقی ببینید. از فیلترها برای محدود کردن گزینه‌ها بر اساس نیازهای غذایی یا اهداف تغذیه‌ای استفاده کنید. قیمت‌ها را به‌روزرسانی کنید تا بودجه خود را کنترل کنید و نتایج را صادر کنید تا برنامه‌های غذایی خود را ردیابی کنید.'
+        },
         error: {
           fetchIngredients: 'اوه! نمی‌تونیم مواد اولیه رو بارگیری کنیم. دوباره امتحان کنید؟',
           calculate: 'مشکلی در محاسبه تغذیه پیش اومد.',
@@ -313,7 +343,9 @@ const resources = {
           updatePrice: 'خطا در به‌روزرسانی قیمت. ورودی‌ها رو بررسی کنید.',
           updatePriceFields: 'لطفاً همه فیلدها رو برای به‌روزرسانی قیمت پر کنید.',
           refreshIngredients: 'خطا در تازه‌سازی مواد اولیه.'
-        }
+        },
+        exportPrompt: 'برای دانلود لیبل روی تأیید کلیک کنید .',
+        nutritionLabelTitle: 'حقایق تغذیه‌ای: مواد غذایی انتخاب‌شده'
       },
       cookbook: {
         title: 'کتاب آشپزی',
@@ -337,7 +369,7 @@ const resources = {
         calculating: 'در حال محاسبه...',
         edit: 'ویرایش',
         delete: 'حذف',
-        export: 'صادر کردن اطلاعات تغذیه',
+        export: 'دانلود لیبل تغذیه',
         adding: 'در حال افزودن...',
         addButton: 'افزودن دستور پخت',
         confirmDelete: 'مطمئن هستید که می‌خواهید {recipe_name} را حذف کنید؟',
@@ -367,10 +399,20 @@ const resources = {
           dietary: 'رژیم غذایی',
           complexity: 'پیچیدگی',
           calories: 'کالری',
-          cost: 'هزینه ({currency})',
+          cost: 'هزینه',
           actions: 'عملیات'
         },
+        notes: {
+          title: 'چگونه از کتاب آشپزی استفاده کنید',
+          purposeTitle: 'چرا از کتاب آشپزی استفاده کنید؟',
+          purpose: 'کتاب آشپزی به شما امکان می‌دهد دستورهای پخت متناسب با رژیم غذایی و بودجه خود را بسازید، مدیریت کنید و تحلیل کنید. این ابزار برای ذخیره دستورهای پخت مورد علاقه، برنامه‌ریزی وعده‌های غذایی و اطمینان از تعادل تغذیه‌ای ایده‌آل است.',
+          nutritionTitle: 'درک تغذیه دستورهای پخت',
+          nutritionInfo: 'دستورهای پخت تصویری از محتوای تغذیه‌ای بر اساس مواد اولیه ارائه می‌دهند. کالری‌ها، درشت‌مغذی‌ها (کربوهیدرات‌ها، پروتئین‌ها، چربی‌ها) و ریزمغذی‌ها (ویتامین‌ها، مواد معدنی) را برای رسیدن به اهداف سلامتی خود بررسی کنید. از ضریب مقیاس برای تنظیم اندازه وعده‌ها و به‌روزرسانی تغذیه و هزینه استفاده کنید.',
+          usageTitle: 'چگونه شروع کنید',
+          usage: 'یک دستور پخت جدید با وارد کردن نام، مواد اولیه، دستورالعمل‌ها و جزئیاتی مانند زمان آماده‌سازی و رژیم غذایی اضافه کنید. از جدول برای مشاهده، ویرایش یا حذف دستورهای پخت استفاده کنید. تغذیه هر دستور پخت را محاسبه کنید، ضریب مقیاس را برای کنترل اندازه وعده اعمال کنید و نتایج را برای ذخیره یا اشتراک صادر کنید.'
+        },
         error: {
+          exportImage: 'خطا در صادر کردن تصویر برچسب تغذیه',
           addRecipeFields: 'لطفاً نام دستور پخت، مواد اولیه و زمان آماده‌سازی رو پر کنید.',
           fetchIngredients: 'نمی‌تونیم مواد اولیه رو بارگیری کنیم. دوباره امتحان کنید؟',
           fetchRecipes: 'خطا در بارگیری دستورهای پخت. لطفاً دوباره امتحان کنید.',

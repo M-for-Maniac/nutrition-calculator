@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-// import { Pie } from 'react-chartjs-2';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import 'chart.js/auto';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
@@ -27,17 +25,38 @@ function Kitchen({ setErrorMessage }) {
   const [openAccordions, setOpenAccordions] = useState([]);
   const [currency, setCurrency] = useState('Toman');
   const [isLoading, setIsLoading] = useState(false);
+  const [openNotes, setOpenNotes] = useState({ purpose: false, nutrition: false, usage: false });
 
   const BASE_URL = process.env.NODE_ENV === 'production' ? 'https://mformaniac.pythonanywhere.com' : 'http://localhost:5000';
 
   const styles = {
     container: { backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '8px', minHeight: '100vh' },
-    button: { marginRight: '10px', padding: '12px 24px', fontSize: '1.1rem', backgroundColor: '#28a745', color: '#fff', border: 'none', borderRadius: '6px', transition: 'background-color 0.2s ease' },
-    accordionButton: { fontSize: '1.1rem', padding: '15px', backgroundColor: '#e9ecef', color: '#333', transition: 'background-color 0.2s ease', display: 'flex', alignItems: 'center' },
-    accordionButtonCollapsed: { backgroundColor: '#dee2e6' },
-    input: { fontSize: '1rem', padding: '14px', minHeight: '48px' },
-    icon: { fontSize: '1rem', marginRight: '10px', color: '#28a745' },
-    currencySelect: { fontSize: '1rem', padding: '10px', width: '120px' }
+    button: { margin: '10px', padding: '12px 24px', fontSize: '1.1rem', backgroundColor: '#295241', color: '#fff', border: 'none', borderRadius: '6px', transition: 'background-color 0.2s ease' },
+    buttonRemove: { margin: '10px', padding: '12px 24px', fontSize: '1.1rem', backgroundColor: '#bb0d14', color: '#fff', border: 'none', borderRadius: '6px', transition: 'background-color 0.2s ease' },
+    input: { fontSize: '1rem', padding: '14px', minHeight: '48px', borderColor: '#295241' },
+    select: { fontSize: '1rem', padding: '10px', borderColor: '#295241' },
+    heading: { color: '#295241', fontSize: '1.8rem', marginBottom: '1rem' },
+    subheading: { color: '#295241', fontSize: '1.3rem' },
+    label: { color: '#295241', fontWeight: '500' },
+    icon: { color: '#295241', marginRight: '5px' },
+    iconRemove: { color: '#bb0d14', marginRight: '5px' },
+    accordionButton: {
+      backgroundColor: '#fff',
+      color: '#295241',
+      fontWeight: '500',
+      fontSize: '1rem',
+      padding: '10px 15px'
+    },
+    accordionButtonCollapsed: {
+      backgroundColor: '#f8f9fa',
+      color: '#295241'
+    },
+    noteCard: {
+      backgroundColor: '#fff',
+      border: '1px solid #295241',
+      borderRadius: '4px',
+      padding: '10px'
+    }
   };
 
   const categories = [
@@ -110,7 +129,6 @@ function Kitchen({ setErrorMessage }) {
         setErrorMessage(err.response?.data?.error || t('kitchen.error.calculate'));
       })
       .finally(() => setIsLoading(false));
-
     const selectedIngredients = Object.keys(numericSelected).filter(key => key !== 'currency' && numericSelected[key] > 0);
     axios.post(`${BASE_URL}/recipes`, { 
       ingredients: selectedIngredients,
@@ -142,6 +160,7 @@ function Kitchen({ setErrorMessage }) {
     setMaxFat('');
     setOpenAccordions([]);
     setCurrency('Toman');
+    setOpenNotes({ purpose: false, nutrition: false, usage: false });
   };
 
   const handleUpdatePrice = () => {
@@ -175,26 +194,42 @@ function Kitchen({ setErrorMessage }) {
       .finally(() => setIsLoading(false));
   };
 
-  const handleExport = () => {
-    if (!results) return;
-    const csvRows = ['Nutrient,Value,Unit,DV Percentage'];
-    Object.entries(results).forEach(([nutrient, data]) => {
-      if (nutrient !== 'Cost') {
-        const dv = data.percent_dv !== null ? `${data.percent_dv.toFixed(2)}%` : 'N/A';
-        csvRows.push(`${nutrient},${data.value},${data.unit},${dv}`);
-      }
+  const handleExport = async () => {
+  if (!results) return;
+
+  try {
+    setIsLoading(true);
+    const ingredientList = Object.entries(selected)
+      .filter(([_, qty]) => parseFloat(qty) > 0)
+      .map(([ingredient, quantity]) => ({
+        ingredient,
+        quantity: parseFloat(quantity) || 100
+      }));
+    if (!ingredientList.length) {
+      setErrorMessage(t('kitchen.error.noIngredients'));
+      return;
+    }
+    const response = await axios.post(`${BASE_URL}/export_nutrition_image`, {
+      ingredient_list: ingredientList,
+      scale_factor: 1.0, // No scaling in Kitchen.js
+      currency,
+      title: t('kitchen.nutritionLabelTitle', { defaultValue: 'Nutrition Facts: Selected Ingredients' })
     });
-    csvRows.push(`Cost,${results.Cost.value},${results.Cost.unit},N/A`);
-    const csvContent = csvRows.join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
+    const { image } = response.data;
     const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'nutrition_results.csv');
+    link.href = image; // Base64 data URL
+    link.download = 'kitchen_nutrition_label.png';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  };
+    setErrorMessage('');
+  } catch (err) {
+    console.error('Error exporting nutrition image:', err);
+    setErrorMessage(err.response?.data?.error || t('kitchen.error.exportImage'));
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const toggleAccordion = (category) => {
     setOpenAccordions(prev =>
@@ -204,6 +239,13 @@ function Kitchen({ setErrorMessage }) {
     );
   };
 
+  const toggleNote = (note) => {
+    setOpenNotes(prev => ({
+      ...prev,
+      [note]: !prev[note]
+    }));
+  };
+
   const groupedIngredients = categories.reduce((acc, category) => {
     acc[category] = filteredIngredients.filter(ing => ing.category === category);
     return acc;
@@ -211,7 +253,98 @@ function Kitchen({ setErrorMessage }) {
 
   return (
     <div className="container mt-4" style={styles.container}>
-      <h1 className="mb-4 text-center" style={{ fontSize: '1.8rem' }}>{t('kitchen.title')}</h1>
+      <h1 className="mb-4 text-center" style={styles.heading}>
+        <i className="fas fa-utensils" style={styles.icon}></i> {t('kitchen.title')}
+      </h1>
+
+      {/* Informational Notes */}
+      <div className="mb-4">
+        <h3 style={styles.subheading}>{t('kitchen.notes.title', { defaultValue: 'How to Use the Kitchen' })}</h3>
+        <div className="accordion" id="notesAccordion">
+          <div className="accordion-item">
+            <h2 className="accordion-header" id="notePurpose">
+              <button
+                className="accordion-button"
+                type="button"
+                onClick={() => toggleNote('purpose')}
+                aria-expanded={openNotes.purpose}
+                aria-controls="collapsePurpose"
+                style={{
+                  ...styles.accordionButton,
+                  ...(openNotes.purpose ? {} : styles.accordionButtonCollapsed)
+                }}
+              >
+                <i className="fas fa-info-circle" style={styles.icon}></i>
+                {t('kitchen.notes.purposeTitle', { defaultValue: 'Why Use the Kitchen?' })}
+              </button>
+            </h2>
+            <div
+              id="collapsePurpose"
+              className={`accordion-collapse collapse ${openNotes.purpose ? 'show' : ''}`}
+              aria-labelledby="notePurpose"
+            >
+              <div className="accordion-body" style={styles.noteCard}>
+                <p>{t('kitchen.notes.purpose')}</p>
+              </div>
+            </div>
+          </div>
+          <div className="accordion-item">
+            <h2 className="accordion-header" id="noteNutrition">
+              <button
+                className="accordion-button"
+                type="button"
+                onClick={() => toggleNote('nutrition')}
+                aria-expanded={openNotes.nutrition}
+                aria-controls="collapseNutrition"
+                style={{
+                  ...styles.accordionButton,
+                  ...(openNotes.nutrition ? {} : styles.accordionButtonCollapsed)
+                }}
+              >
+                <i className="fas fa-heart" style={styles.icon}></i>
+                {t('kitchen.notes.nutritionTitle', { defaultValue: 'Understanding Nutrition' })}
+              </button>
+            </h2>
+            <div
+              id="collapseNutrition"
+              className={`accordion-collapse collapse ${openNotes.nutrition ? 'show' : ''}`}
+              aria-labelledby="noteNutrition"
+            >
+              <div className="accordion-body" style={styles.noteCard}>
+                <p>{t('kitchen.notes.nutritionInfo')}</p>
+              </div>
+            </div>
+          </div>
+          <div className="accordion-item">
+            <h2 className="accordion-header" id="noteUsage">
+              <button
+                className="accordion-button"
+                type="button"
+                onClick={() => toggleNote('usage')}
+                aria-expanded={openNotes.usage}
+                aria-controls="collapseUsage"
+                style={{
+                  ...styles.accordionButton,
+                  ...(openNotes.usage ? {} : styles.accordionButtonCollapsed)
+                }}
+              >
+                <i className="fas fa-utensils" style={styles.icon}></i>
+                {t('kitchen.notes.usageTitle', { defaultValue: 'How to Get Started' })}
+              </button>
+            </h2>
+            <div
+              id="collapseUsage"
+              className={`accordion-collapse collapse ${openNotes.usage ? 'show' : ''}`}
+              aria-labelledby="noteUsage"
+            >
+              <div className="accordion-body" style={styles.noteCard}>
+                <p>{t('kitchen.notes.usage')}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {isLoading && (
         <div className="text-center mb-3">
           <div className="spinner-border text-primary" role="status">
@@ -220,11 +353,13 @@ function Kitchen({ setErrorMessage }) {
         </div>
       )}
       <div className="mb-3">
-        <label className="form-label me-2">{t('kitchen.currency')}:</label>
+        <label className="form-label me-2" style={styles.label}>
+          <i className="bi bi-currency-exchange" style={styles.icon}></i> {t('kitchen.currency')}:
+        </label>
         <select
           value={currency}
           onChange={e => setCurrency(e.target.value)}
-          style={styles.currencySelect}
+          style={styles.select}
           className="form-select d-inline-block"
         >
           <option value="Toman">{t('kitchen.currencyOptions.toman')}</option>
@@ -233,7 +368,9 @@ function Kitchen({ setErrorMessage }) {
       </div>
       <div className="row mb-3 g-2">
         <div className="col-12 col-md-3">
-          <label className="form-label">{t('kitchen.maxCalories')}:</label>
+          <label className="form-label" style={styles.label}>
+            <i className="bi bi-fire" style={styles.icon}></i> {t('kitchen.maxCalories')}:
+          </label>
           <input
             type="number"
             min="0"
@@ -245,7 +382,9 @@ function Kitchen({ setErrorMessage }) {
           />
         </div>
         <div className="col-12 col-md-3">
-          <label className="form-label">{t('kitchen.minProtein')}:</label>
+          <label className="form-label" style={styles.label}>
+            <i className="bi bi-egg-fried" style={styles.icon}></i> {t('kitchen.minProtein')}:
+          </label>
           <input
             type="number"
             min="0"
@@ -257,7 +396,9 @@ function Kitchen({ setErrorMessage }) {
           />
         </div>
         <div className="col-12 col-md-3">
-          <label className="form-label">{t('kitchen.maxFat')}:</label>
+          <label className="form-label" style={styles.label}>
+            <i className="bi bi-droplet" style={styles.icon}></i> {t('kitchen.maxFat')}:
+          </label>
           <input
             type="number"
             min="0"
@@ -269,12 +410,14 @@ function Kitchen({ setErrorMessage }) {
           />
         </div>
         <div className="col-12 col-md-3">
-          <label className="form-label">{t('kitchen.dietary')}:</label>
+          <label className="form-label" style={styles.label}>
+            <i className="bi bi-egg" style={styles.icon}></i> {t('kitchen.dietary')}:
+          </label>
           <select
             className="form-select"
             value={dietaryFilter}
             onChange={e => setDietaryFilter(e.target.value)}
-            style={styles.input}
+            style={styles.select}
           >
             <option value="">{t('kitchen.dietaryOptions.all')}</option>
             <option value="omnivore">{t('kitchen.dietaryOptions.omnivore')}</option>
@@ -285,7 +428,9 @@ function Kitchen({ setErrorMessage }) {
       </div>
       <div className="row mb-3 g-2">
         <div className="col-12">
-          <label className="form-label">{t('kitchen.search')}:</label>
+          <label className="form-label" style={styles.label}>
+            <i className="bi bi-search" style={styles.icon}></i> {t('kitchen.search')}:
+          </label>
           <input
             type="text"
             className="form-control"
@@ -298,13 +443,15 @@ function Kitchen({ setErrorMessage }) {
       </div>
       <div className="row mb-3 g-2">
         <div className="col-12">
-          <h3 className="mb-2" style={{ fontSize: '1.3rem' }}>{t('kitchen.updatePrice')}</h3>
+          <h3 className="mb-2" style={styles.subheading}>
+            <i className="bi bi-currency-exchange" style={styles.icon}></i> {t('kitchen.updatePrice')}
+          </h3>
           <div className="d-flex flex-column flex-sm-row gap-2">
             <select
               className="form-select"
               value={updateIngredient}
               onChange={e => setUpdateIngredient(e.target.value)}
-              style={styles.input}
+              style={styles.select}
             >
               <option value="">{t('kitchen.selectIngredient')}</option>
               {ingredients.map(ing => (
@@ -332,12 +479,12 @@ function Kitchen({ setErrorMessage }) {
               style={styles.input}
             />
             <button 
-              className="btn btn-outline-primary" 
+              className="btn" 
               onClick={handleUpdatePrice} 
               style={styles.button}
               disabled={isLoading}
             >
-              {t('kitchen.updateButton')}
+              <i className="bi bi-arrow-repeat" style={styles.icon}></i> {t('kitchen.updateButton')}
             </button>
           </div>
           {updateMessage && (
@@ -349,7 +496,9 @@ function Kitchen({ setErrorMessage }) {
       </div>
       {Object.keys(selected).length > 0 && (
         <div className="mt-3">
-          <h3 style={{ fontSize: '1.3rem' }}>{t('kitchen.selectedIngredients')}</h3>
+          <h3 style={styles.subheading}>
+            <i className="bi bi-list-check" style={styles.icon}></i> {t('kitchen.selectedIngredients')}
+          </h3>
           <ul className="list-group mb-3">
             {Object.entries(selected).map(([name, qty]) => (
               qty > 0 && (
@@ -363,8 +512,9 @@ function Kitchen({ setErrorMessage }) {
                       localStorage.setItem('selectedIngredients', JSON.stringify(updated));
                       return updated;
                     })}
+                    style={styles.buttonRemove}
                   >
-                    {t('kitchen.remove')}
+                    <i className="bi bi-trash" style={styles.iconRemove}></i> {t('kitchen.remove')}
                   </button>
                 </li>
               )
@@ -401,9 +551,11 @@ function Kitchen({ setErrorMessage }) {
                   <div className="row g-2">
                     {groupedIngredients[category].map(ing => (
                       <div key={ing.ingredient_name} className="col-12 col-md-4">
-                        <div className="card">
+                        <div className="card" style={{ backgroundColor: '#e9e2d6', border: '1px solid #295241' }}>
                           <div className="card-body">
-                            <label className="form-label">{ing.ingredient_name.replace(/\./g, ' ')} ({ing.persian_name || ''})</label>
+                            <label className="form-label" style={styles.label}>
+                              {ing.ingredient_name.replace(/\./g, ' ')} ({ing.persian_name || ''})
+                            </label>
                             <input
                               type="number"
                               min="0"
@@ -424,37 +576,39 @@ function Kitchen({ setErrorMessage }) {
           )
         ))}
       </div>
-      <div className="mt-3">
+      <div className="mx-3 my-3">
         <button 
-          className="btn btn-primary" 
+          className="btn" 
           style={styles.button} 
           onClick={handleCalculate}
           disabled={isLoading}
         >
-          {isLoading ? t('kitchen.calculating') : t('kitchen.calculate')}
+          <i className="bi bi-calculator" style={styles.icon}></i> {isLoading ? t('kitchen.calculating') : t('kitchen.calculate')}
         </button>
         <button 
-          className="btn btn-outline-success" 
+          className="btn" 
           style={styles.button} 
           onClick={handleExport}
           disabled={!results || isLoading}
         >
-          {t('kitchen.export')}
+          <i className="bi bi-download" style={styles.icon}></i> {t('kitchen.export')}
         </button>
         <button 
-          className="btn btn-secondary" 
-          style={styles.button} 
+          className="btn" 
+          style={{ ...styles.button, backgroundColor: '#e9e2d6', color: '#295241' }} 
           onClick={handleReset}
           disabled={isLoading}
         >
-          {t('kitchen.reset')}
+          <i className="bi bi-arrow-repeat" style={styles.icon}></i> {t('kitchen.reset')}
         </button>
       </div>
       {results && (
         <div className="mt-4">
-          <h2 className="text-center" style={{ fontSize: '1.5rem' }}>{t('kitchen.nutritionResults')}</h2>
+          <h2 className="text-center" style={styles.subheading}>
+            <i className="bi bi-bar-chart" style={styles.icon}></i> {t('kitchen.nutritionResults')}
+          </h2>
           {results.Cost && (
-            <div className="alert alert-info mb-3">
+            <div className="alert alert-info mb-3" style={{ backgroundColor: '#e9e2d6', borderColor: '#295241', color: '#295241' }}>
               <strong>{t('kitchen.totalCost')}:</strong> {results.Cost.value} {results.Cost.unit}
             </div>
           )}
@@ -463,7 +617,7 @@ function Kitchen({ setErrorMessage }) {
               .filter(([nutrient]) => nutrient !== 'Cost')
               .map(([nutrient, data]) => (
                 <div key={nutrient} className="col-12 col-md-4 mb-2">
-                  <div className="card">
+                  <div className="card" style={{ backgroundColor: '#e9e2d6', border: '1px solid #295241' }}>
                     <div className="card-body">
                       <strong>{nutrient}:</strong> {data.value} {data.unit}
                       {data.percent_dv !== null && ` (${data.percent_dv}% DV)`}
@@ -472,56 +626,15 @@ function Kitchen({ setErrorMessage }) {
                 </div>
               ))}
           </div>
-          <div className="card mt-3">
-            {/* <div className="card-body">
-              <h3 className="card-title" style={{ fontSize: '1.3rem' }}>{t('kitchen.nutritionChart')}</h3>
-              <Pie
-                data={{
-                  labels: Object.keys(results).filter(n => n !== 'Cost'),
-                  datasets: [
-                    {
-                      label: t('kitchen.nutrition'),
-                      data: Object.values(results).filter((_, i) => Object.keys(results)[i] !== 'Cost').map(d => d.value),
-                      backgroundColor: [
-                        'rgba(40, 167, 69, 0.6)', 'rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)',
-                        'rgba(255, 206, 86, 0.6)', 'rgba(75, 192, 192, 0.6)', 'rgba(153, 102, 255, 0.6)',
-                        'rgba(255, 159, 64, 0.6)', 'rgba(255, 99, 132, 0.4)', 'rgba(54, 162, 235, 0.4)',
-                        'rgba(255, 206, 86, 0.4)', 'rgba(75, 192, 192, 0.4)', 'rgba(153, 102, 255, 0.4)',
-                        'rgba(255, 159, 64, 0.4)', 'rgba(40, 167, 69, 0.4)', 'rgba(255, 99, 132, 0.8)',
-                        'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)', 'rgba(75, 192, 192, 0.8)',
-                        'rgba(153, 102, 255, 0.8)', 'rgba(255, 159, 64, 0.8)'
-                      ],
-                      borderColor: [
-                        'rgba(40, 167, 69, 1)', 'rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)', 'rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)', 'rgba(40, 167, 69, 1)', 'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)'
-                      ],
-                      borderWidth: 1
-                    }
-                  ]
-                }}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: {
-                    legend: { position: 'right', labels: { font: { size: 12 } } }
-                  }
-                }}
-                height={250}
-              />
-            </div> */}
-          </div>
         </div>
       )}
       {recipes.length > 0 && (
         <div className="mt-4">
-          <h2 className="text-center" style={{ fontSize: '1.5rem' }}>{t('kitchen.suggestedRecipes')}</h2>
+          <h2 className="text-center" style={styles.subheading}>
+            <i className="bi bi-journal-text" style={styles.icon}></i> {t('kitchen.suggestedRecipes')}
+          </h2>
           {recipes.map(recipe => (
-            <div key={recipe.recipe_name} className="card mb-2">
+            <div key={recipe.recipe_name} className="card mb-2" style={{ backgroundColor: '#e9e2d6', border: '1px solid #295241' }}>
               <div className="card-body">
                 <h5 className="card-title">{recipe.recipe_name}</h5>
                 <p className="card-text"><strong>{t('kitchen.recipeDetails.ingredients')}:</strong> {recipe.ingredient_list.map(ing => `${ing.ingredient} (${ing.quantity}g)`).join(', ')}</p>
@@ -531,7 +644,9 @@ function Kitchen({ setErrorMessage }) {
                 <p className="card-text"><strong>{t('kitchen.recipeDetails.complexity')}:</strong> {recipe.complexity}</p>
                 <p className="card-text"><strong>{t('kitchen.recipeDetails.totalCalories')}:</strong> {recipe.total_calories} kcal</p>
                 <p className="card-text"><strong>{t('kitchen.recipeDetails.totalCost')}:</strong> {recipe.total_cost} {currency}</p>
-                <Link to="/cookbook" className="btn btn-outline-info" style={styles.button}>{t('kitchen.viewInCookbook')}</Link>
+                <Link to="/cookbook" className="btn" style={{ ...styles.button, backgroundColor: 'transparent', borderColor: '#295241', color: '#295241' }}>
+                  <i className="bi bi-book" style={styles.icon}></i> {t('kitchen.viewInCookbook')}
+                </Link>
               </div>
             </div>
           ))}
