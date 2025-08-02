@@ -76,7 +76,7 @@ function App() {
           </div>
         )}
         <Routes>
-          <Route path="/" element={<Home setErrorMessage={setErrorMessage} />} />
+          <Route path="/nutrition-calculator" element={<Home setErrorMessage={setErrorMessage} />} />
           <Route path="/kitchen" element={<Kitchen setErrorMessage={setErrorMessage} />} />
           <Route path="/cookbook" element={<RecipeNotebook setErrorMessage={setErrorMessage} />} />
         </Routes>
