@@ -1,4 +1,4 @@
-// src/serviceWorker.js
+/* eslint-disable no-restricted-globals */
 const CACHE_NAME = 'nutrino-cache-v1';
 const urlsToCache = [
   '/nutrition-calculator/',
