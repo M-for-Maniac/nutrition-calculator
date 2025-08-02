@@ -34,7 +34,7 @@ function RecipeNotebook({ setErrorMessage }) {
     usage: false
   });
 
-  const BASE_URL = process.env.NODE_ENV === 'production' ? 'https://mformaniac.pythonanywhere.com' : 'http://localhost:5000';
+  const BASE_URL = process.env.NODE_ENV === 'production' ? 'https://maniac.pythonanywhere.com' : 'http://localhost:5000';
 
   const styles = {
     container: { backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '8px', minHeight: '100vh' },
