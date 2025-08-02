@@ -13,8 +13,8 @@ code {
     monospace;
 }
 
-button:hover {
-  background-color: #2b604b; /* Dark green on hover */
+.card-text {
+  text-align: center;
 }
 
 .hero {
@@ -41,7 +41,7 @@ button:hover {
   max-width: 250px;
   margin-bottom: 0.5rem;
   padding: 0.5rem 1rem;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.3s ease;
 }
 
 .hero .btn:hover {
@@ -67,18 +67,43 @@ button:hover {
 
 .features .card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
 }
 
 .tips .carousel-item {
   padding: 1rem;
   border-radius: 12px;
+  text-align: center;
+}
+
+.carousel-control-accent .carousel-control-prev-icon,
+.carousel-control-accent .carousel-control-next-icon {
+  background: none; /* Remove default background */
+  font-size: 1.5rem;
+  color: #bb0d14; /* Accent red */
+}
+
+.carousel-control-accent .carousel-control-prev-icon::before {
+  content: '\f053'; /* FontAwesome fa-circle-chevron-left */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.carousel-control-accent .carousel-control-next-icon::before {
+  content: '\f054'; /* FontAwesome fa-circle-chevron-right */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+.carousel-control-accent:hover .carousel-control-prev-icon,
+.carousel-control-accent:hover .carousel-control-next-icon {
+  color: #a0070d; /* Darker red on hover */
 }
 
 .tour {
   padding: 2rem;
   border-radius: 12px;
-  background: linear-gradient(135deg, #f8f9fa, #d6c5ac);
+  background: linear-gradient(135deg, #f8f9fa, #e9e2d6); /* Updated to use beige */
 }
 
 .tour .card {
@@ -89,20 +114,28 @@ button:hover {
 
 .tour .card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
 }
 
 .tour .btn {
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.3s ease;
 }
 
 .tour .btn:hover {
   transform: scale(1.05);
 }
 
+.cta {
+  padding: 2rem;
+}
+
+.cta h2 {
+  color: #bb0d14; /* Accent red */
+}
+
 .cta .btn {
   padding: 0.75rem 1.5rem;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.3s ease;
 }
 
 .cta .btn:hover {
@@ -145,58 +178,105 @@ button:hover {
   text-align: right;
 }
 
-[dir="rtl"] .carousel-control-prev {
+[dir="rtl"] .carousel-control-next {
   right: 0;
   left: auto;
 }
 
-[dir="rtl"] .carousel-control-next {
+[dir="rtl"] .carousel-control-prev {
   left: 0;
   right: auto;
 }
 
 /* Custom Button Styles */
 .btn-primary-custom {
-  background-color: #3a846a; /* Teal green */
-  border-color: #3a846a;
-  color: #d6c5ac; /* Light beige text */
+  background-color: #295241; /* Main green */
+  border-color: #295241;
+  color: #f1f1f1; /* Text on green */
 }
 
-.btn-primary-custom:hover {
-  background-color: #2b604b; /* Dark green on hover */
-  border-color: #2b604b;
-  color: #d6c5ac;
+.btn-primary-custom:hover,
+.btn-primary-custom:focus,
+.btn-primary-custom:active {
+  background-color: #1f3e31; /* Darker green on hover */
+  border-color: #1f3e31;
+  color: #f1f1f1;
 }
 
 .btn-secondary-custom {
   background-color: transparent;
-  border-color: #3a846a; /* Teal green outline */
-  color: #3a846a;
+  border-color: #295241; /* Main green outline */
+  color: #295241;
 }
 
-.btn-secondary-custom:hover {
-  background-color: #2b604b; /* Dark green on hover */
-  border-color: #2b604b;
-  color: #d6c5ac;
+.btn-secondary-custom:hover,
+.btn-secondary-custom:focus,
+.btn-secondary-custom:active {
+  background-color: #1f3e31; /* Darker green on hover */
+  border-color: #1f3e31;
+  color: #f1f1f1;
 }
 
 .btn-accent-custom {
-  background-color: #bf0811; /* Bold red for emphasis */
-  border-color: #bf0811;
-  color: #d6c5ac;
+  background-color: #bb0d14 !important; /* Accent red */
+  border-color: #bb0d14 !important;
+  color: #e9e2d6 !important; /* Text on red */
+  margin: 0.5rem;
 }
 
-.btn-accent-custom:hover {
-  background-color: #a0070d; /* Slightly darker red */
-  border-color: #a0070d;
-  color: #d6c5ac;
+.btn-accent-custom:hover,
+.btn-accent-custom:focus,
+.btn-accent-custom:active {
+  background-color: #a0070d !important; /* Darker red on hover */
+  border-color: #a0070d !important;
+  color: #e9e2d6 !important;
 }
 
-/* Custom Icon Styles */
+/* Custom Icon and Text Styles */
 .icon-primary {
-  color: #3a846a; /* Teal green */
+  color: #295241; /* Main green */
 }
 
 .icon-secondary {
-  color: #2b604b; /* Dark green */
+  color: #1f3e31; /* Darker green */
+}
+
+.icon-accent {
+  color: #bb0d14; /* Accent red */
+}
+
+.text-accent {
+  color: #bb0d14; /* Accent red */
+}
+
+/* Accordion Styles */
+.accordion-item {
+  background-color: #fff !important; /* White background for accordion item */
+  border: 1px solid #295241; /* Main green border */
+}
+
+.accordion-button {
+  background-color: #fff !important; /* White background for button */
+  color: #295241 !important; /* Main green text */
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: #fff !important; /* White when expanded */
+  color: #295241 !important;
+}
+
+.accordion-button:focus {
+  box-shadow: none; /* Remove Bootstrap's default focus shadow */
+  border-color: #295241; /* Main green border on focus */
+}
+
+.accordion-body {
+  background-color: #fff !important; /* White background for body */
+  border: 1px solid #295241; /* Main green border */
+  border-radius: 4px;
+}
+
+.text-footer{
+  color: #f1f1f1 !important;
+  text-decoration: none;
 }

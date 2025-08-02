@@ -27,17 +27,56 @@ function RecipeNotebook({ setErrorMessage }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [currency, setCurrency] = useState('Toman');
   const [isLoading, setIsLoading] = useState(false);
+  // Add state for accordion
+  const [openNotes, setOpenNotes] = useState({
+    purpose: false,
+    nutrition: false,
+    usage: false
+  });
 
   const BASE_URL = process.env.NODE_ENV === 'production' ? 'https://mformaniac.pythonanywhere.com' : 'http://localhost:5000';
 
   const styles = {
     container: { backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '8px', minHeight: '100vh' },
-    button: { marginRight: '10px', padding: '12px 24px', fontSize: '1.1rem', backgroundColor: '#28a745', color: '#fff', border: 'none', borderRadius: '6px', transition: 'background-color 0.2s ease' },
-    input: { fontSize: '1rem', padding: '14px', minHeight: '48px' },
+    button: { marginRight: '10px', padding: '12px 24px', fontSize: '1.1rem', backgroundColor: '#295241', color: '#fff', border: 'none', borderRadius: '6px', transition: 'background-color 0.2s ease' },
+    buttonRemove: { marginRight: '10px', padding: '12px 24px', fontSize: '1.1rem', backgroundColor: '#bb0d14', color: '#fff', border: 'none', borderRadius: '6px', transition: 'background-color 0.2s ease' },
+    input: { fontSize: '1rem', padding: '14px', minHeight: '48px', borderColor: '#295241' },
+    select: { fontSize: '1rem', padding: '10px', borderColor: '#295241' },
     modal: { maxWidth: '90vw', margin: 'auto' },
-    currencySelect: { fontSize: '1rem', padding: '10px', width: '120px' }
+    currencySelect: { fontSize: '1rem', padding: '10px', width: '120px', borderColor: '#295241' },
+    heading: { color: '#295241', fontSize: '1.8rem' },
+    subheading: { color: '#295241', fontSize: '1.3rem' },
+    label: { color: '#295241', fontWeight: '500' },
+    icon: { color: '#295241', marginRight: '5px' },
+    iconRemove: { color: '#bb0d14', marginRight: '5px' },
+    accordionButton: {
+      backgroundColor: '#fff',
+      color: '#295241',
+      fontWeight: '500',
+      fontSize: '1rem',
+      padding: '10px 15px'
+    },
+    accordionButtonCollapsed: {
+      backgroundColor: '#f8f9fa',
+      color: '#295241'
+    },
+    noteCard: {
+      backgroundColor: '#fff',
+      border: '1px solid #295241',
+      borderRadius: '4px',
+      padding: '10px'
+    }
   };
 
+  // Function to toggle accordion items
+  const toggleNote = (note) => {
+    setOpenNotes((prev) => ({
+      ...prev,
+      [note]: !prev[note]
+    }));
+  };
+
+  // Fetch ingredients on mount
   useEffect(() => {
     setIsLoading(true);
     axios.get(`${BASE_URL}/ingredients`)
@@ -52,6 +91,7 @@ function RecipeNotebook({ setErrorMessage }) {
       .finally(() => setIsLoading(false));
   }, [setErrorMessage, t]);
 
+  // Fetch recipes when filters or currency change
   useEffect(() => {
     if (ingredients.length === 0) return;
     setIsLoading(true);
@@ -85,14 +125,14 @@ function RecipeNotebook({ setErrorMessage }) {
       ingredient: opt.value,
       quantity: parseFloat(ingredientQuantities[opt.value]) || 100
     }));
-    setErrorMessage('');
     axios.post(`${BASE_URL}/add_recipe`, {
       recipe_name: newRecipeName,
       ingredient_list: ingredientList,
       instructions: newRecipeInstructions,
       prep_time: parseInt(newRecipePrepTime),
       dietary: newRecipeDietary,
-      complexity: newRecipeComplexity
+      complexity: newRecipeComplexity,
+      currency
     })
       .then(res => {
         setRecipeMessage(res.data.message);
@@ -120,8 +160,8 @@ function RecipeNotebook({ setErrorMessage }) {
       return;
     }
     setIsLoading(true);
-    axios.post(`${BASE_URL}/recipe_nutrition`, { 
-      ingredient_list, 
+    axios.post(`${BASE_URL}/recipe_nutrition`, {
+      ingredient_list,
       scale_factor: parseFloat(scaleFactor) || 1.0,
       currency
     })
@@ -138,7 +178,6 @@ function RecipeNotebook({ setErrorMessage }) {
   const handleDeleteRecipe = (recipe_name) => {
     if (!window.confirm(t('cookbook.confirmDelete', { recipe_name }))) return;
     setIsLoading(true);
-    setErrorMessage('');
     axios.post(`${BASE_URL}/delete_recipe`, { recipe_name })
       .then(res => {
         setRecipeMessage(res.data.message);
@@ -200,14 +239,14 @@ function RecipeNotebook({ setErrorMessage }) {
       ingredient: opt.value,
       quantity: parseFloat(ingredientQuantities[opt.value]) || 100
     }));
-    setErrorMessage('');
     axios.post(`${BASE_URL}/update_recipe`, {
       recipe_name: newRecipeName,
       ingredient_list: ingredientList,
       instructions: newRecipeInstructions,
       prep_time: parseInt(newRecipePrepTime),
       dietary: newRecipeDietary,
-      complexity: newRecipeComplexity
+      complexity: newRecipeComplexity,
+      currency
     })
       .then(res => {
         setRecipeMessage(res.data.message);
@@ -249,27 +288,34 @@ function RecipeNotebook({ setErrorMessage }) {
     setRecipeMessage('');
   };
 
-  const handleExportRecipeNutrition = (recipeName) => {
-    if (!recipeNutrition[recipeName]) return;
-    const nutrition = recipeNutrition[recipeName];
-    const csvRows = ['Nutrient,Value,Unit,DV Percentage'];
-    Object.entries(nutrition).forEach(([nutrient, data]) => {
-      if (nutrient !== 'Cost') {
-        const dv = data.percent_dv !== null ? `${data.percent_dv.toFixed(2)}%` : 'N/A';
-        csvRows.push(`${nutrient},${data.value},${data.unit},${dv}`);
-      }
+  const handleExportRecipeNutrition = async (recipeName) => {
+  if (!recipeNutrition[recipeName]) return;
+
+  const ingredientList = allRecipes.find(r => r.recipe_name === recipeName)?.ingredient_list || [];
+
+  try {
+    setIsLoading(true);
+    const response = await axios.post(`${BASE_URL}/export_nutrition_image`, {
+      ingredient_list: ingredientList,
+      scale_factor: parseFloat(scaleFactor) || 1.0,
+      currency,
+      title: `Nutrition Facts: ${recipeName}`
     });
-    csvRows.push(`Cost,${nutrition.Cost.value},${nutrition.Cost.unit},N/A`);
-    const csvContent = csvRows.join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
+    const { image } = response.data;
     const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `${recipeName}_nutrition.csv`);
+    link.href = image; // Base64 data URL
+    link.download = `${recipeName}_nutrition_label.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  };
+    setErrorMessage('');
+  } catch (err) {
+    console.error('Error exporting nutrition image:', err);
+    setErrorMessage(err.response?.data?.error || t('cookbook.error.exportImage'));
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const ingredientOptions = ingredients.map(ing => ({
     value: ing.ingredient_name,
@@ -286,16 +332,106 @@ function RecipeNotebook({ setErrorMessage }) {
 
   return (
     <div className="container mt-4" style={styles.container}>
-      <h1 className="mb-4 text-center" style={{ fontSize: '1.8rem' }}>{t('cookbook.title')}</h1>
+      <h1 className="mb-4 text-center" style={styles.heading}>
+        <i className="bi bi-book" style={styles.icon}></i> {t('cookbook.title')}
+      </h1>
+      <div className="mb-4">
+        <h3 style={styles.subheading}>{t('cookbook.notes.title', { defaultValue: 'How to Use the Cookbook' })}</h3>
+        <div className="accordion" id="cookbookNotesAccordion">
+          <div className="accordion-item">
+            <h2 className="accordion-header" id="cookbookNotePurpose">
+              <button
+                className="accordion-button"
+                type="button"
+                onClick={() => toggleNote('purpose')}
+                aria-expanded={openNotes.purpose}
+                aria-controls="collapseCookbookPurpose"
+                style={{
+                  ...styles.accordionButton,
+                  ...(openNotes.purpose ? {} : styles.accordionButtonCollapsed)
+                }}
+              >
+                <i className="fas fa-info-circle" style={styles.icon}></i>
+                {t('cookbook.notes.purposeTitle', { defaultValue: 'Why Use the Cookbook?' })}
+              </button>
+            </h2>
+            <div
+              id="collapseCookbookPurpose"
+              className={`accordion-collapse collapse ${openNotes.purpose ? 'show' : ''}`}
+              aria-labelledby="cookbookNotePurpose"
+            >
+              <div className="accordion-body" style={styles.noteCard}>
+                <p>{t('cookbook.notes.purpose', { defaultValue: 'The Cookbook allows you to create, manage, and analyze recipes tailored to your dietary preferences and budget. It’s ideal for saving favorite recipes, planning meals, and ensuring nutritional balance.' })}</p>
+              </div>
+            </div>
+          </div>
+          <div className="accordion-item">
+            <h2 className="accordion-header" id="cookbookNoteNutrition">
+              <button
+                className="accordion-button"
+                type="button"
+                onClick={() => toggleNote('nutrition')}
+                aria-expanded={openNotes.nutrition}
+                aria-controls="collapseCookbookNutrition"
+                style={{
+                  ...styles.accordionButton,
+                  ...(openNotes.nutrition ? {} : styles.accordionButtonCollapsed)
+                }}
+              >
+                <i className="fas fa-heart" style={styles.icon}></i>
+                {t('cookbook.notes.nutritionTitle', { defaultValue: 'Understanding Recipe Nutrition' })}
+              </button>
+            </h2>
+            <div
+              id="collapseCookbookNutrition"
+              className={`accordion-collapse collapse ${openNotes.nutrition ? 'show' : ''}`}
+              aria-labelledby="cookbookNoteNutrition"
+            >
+              <div className="accordion-body" style={styles.noteCard}>
+                <p>{t('cookbook.notes.nutritionInfo', { defaultValue: 'Recipes provide a snapshot of nutritional content based on their ingredients. Monitor calories, macronutrients (carbs, proteins, fats), and micronutrients (vitamins, minerals) to meet your health goals. Use the scale factor to adjust portion sizes and update nutrition and cost accordingly.' })}</p>
+              </div>
+            </div>
+          </div>
+          <div className="accordion-item">
+            <h2 className="accordion-header" id="cookbookNoteUsage">
+              <button
+                className="accordion-button"
+                type="button"
+                onClick={() => toggleNote('usage')}
+                aria-expanded={openNotes.usage}
+                aria-controls="collapseCookbookUsage"
+                style={{
+                  ...styles.accordionButton,
+                  ...(openNotes.usage ? {} : styles.accordionButtonCollapsed)
+                }}
+              >
+                <i className="fas fa-utensils" style={styles.icon}></i>
+                {t('cookbook.notes.usageTitle', { defaultValue: 'How to Get Started' })}
+              </button>
+            </h2>
+            <div
+              id="collapseCookbookUsage"
+              className={`accordion-collapse collapse ${openNotes.usage ? 'show' : ''}`}
+              aria-labelledby="cookbookNoteUsage"
+            >
+              <div className="accordion-body" style={styles.noteCard}>
+                <p>{t('cookbook.notes.usage', { defaultValue: 'Add a new recipe by entering its name, ingredients, instructions, and details like prep time and dietary preferences. Use the table to view, edit, or delete recipes. Calculate nutrition for any recipe, apply a scale factor for portion control, and export results to save or share.' })}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       {isLoading && (
         <div className="text-center mb-3">
-          <div className="spinner-border text-primary" role="status">
+          <div className="spinner-border text-success" role="status" style={styles.icon}>
             <span className="visually-hidden">Loading...</span>
           </div>
         </div>
       )}
       <div className="mb-3">
-        <label className="form-label me-2">{t('cookbook.currency')}:</label>
+        <label className="form-label me-2" style={styles.label}>
+          <i className="bi bi-currency-exchange" style={styles.icon}></i> {t('cookbook.currency')}:
+        </label>
         <select
           value={currency}
           onChange={e => setCurrency(e.target.value)}
@@ -308,7 +444,9 @@ function RecipeNotebook({ setErrorMessage }) {
       </div>
       <div className="row mb-3 g-2">
         <div className="col-12 col-md-3">
-          <label className="form-label">{t('cookbook.maxCalories')}:</label>
+          <label className="form-label" style={styles.label}>
+            <i className="bi bi-fire" style={styles.icon}></i> {t('cookbook.maxCalories')}:
+          </label>
           <input
             type="number"
             min="0"
@@ -320,11 +458,13 @@ function RecipeNotebook({ setErrorMessage }) {
           />
         </div>
         <div className="col-12 col-md-3">
-          <label className="form-label">{t('cookbook.maxCost')}:</label>
+          <label className="form-label" style={styles.label}>
+            <i className="bi bi-wallet" style={styles.icon}></i> {t('cookbook.maxCost')}:
+          </label>
           <input
             type="number"
             min="0"
-            className="form-control"        
+            className="form-control"
             placeholder={`(${currency})`}
             value={recipeMaxCost}
             onChange={e => setRecipeMaxCost(e.target.value)}
@@ -332,12 +472,14 @@ function RecipeNotebook({ setErrorMessage }) {
           />
         </div>
         <div className="col-12 col-md-3">
-          <label className="form-label">{t('cookbook.dietary')}:</label>
+          <label className="form-label" style={styles.label}>
+            <i className="bi bi-egg" style={styles.icon}></i> {t('cookbook.dietary')}:
+          </label>
           <select
             className="form-select"
             value={dietaryFilter}
             onChange={e => setDietaryFilter(e.target.value)}
-            style={styles.input}
+            style={styles.select}
           >
             <option value="">{t('cookbook.dietaryOptions.all')}</option>
             <option value="omnivore">{t('cookbook.dietaryOptions.omnivore')}</option>
@@ -346,12 +488,14 @@ function RecipeNotebook({ setErrorMessage }) {
           </select>
         </div>
         <div className="col-12 col-md-3">
-          <label className="form-label">{t('cookbook.complexity')}:</label>
+          <label className="form-label" style={styles.label}>
+            <i className="bi bi-gear" style={styles.icon}></i> {t('cookbook.complexity')}:
+          </label>
           <select
             className="form-select"
             value={complexityFilter}
             onChange={e => setComplexityFilter(e.target.value)}
-            style={styles.input}
+            style={styles.select}
           >
             <option value="">{t('cookbook.complexityOptions.all')}</option>
             <option value="easy">{t('cookbook.complexityOptions.easy')}</option>
@@ -361,7 +505,9 @@ function RecipeNotebook({ setErrorMessage }) {
         </div>
       </div>
       <div className="mb-3">
-        <label className="form-label">{t('cookbook.search')}:</label>
+        <label className="form-label" style={styles.label}>
+          <i className="bi bi-search" style={styles.icon}></i> {t('cookbook.search')}:
+        </label>
         <input
           type="text"
           className="form-control"
@@ -373,7 +519,9 @@ function RecipeNotebook({ setErrorMessage }) {
       </div>
       <div className="row mb-3 g-2">
         <div className="col-12">
-          <h3 className="mb-2" style={{ fontSize: '1.3rem' }}>{t('cookbook.addRecipe')}</h3>
+          <h3 className="mb-2" style={styles.subheading}>
+            <i className="bi bi-plus-circle" style={styles.icon}></i> {t('cookbook.addRecipe')}
+          </h3>
           <div className="input-group mb-2">
             <input
               type="text"
@@ -385,7 +533,9 @@ function RecipeNotebook({ setErrorMessage }) {
             />
           </div>
           <div className="mb-2">
-            <label className="form-label">{t('cookbook.selectIngredients')}:</label>
+            <label className="form-label" style={styles.label}>
+              <i className="bi bi-list-ul" style={styles.icon}></i> {t('cookbook.selectIngredients')}:
+            </label>
             <Select
               isMulti
               options={ingredientOptions}
@@ -398,7 +548,9 @@ function RecipeNotebook({ setErrorMessage }) {
           </div>
           {newRecipeIngredients.map(ing => (
             <div key={ing.value} className="input-group mb-2">
-              <label className="form-label">{ing.label} {t('cookbook.quantity')}:</label>
+              <label className="form-label" style={styles.label}>
+                <i className="bi bi-egg-fried" style={styles.icon}></i> {ing.label} {t('cookbook.quantity')}:
+              </label>
               <input
                 type="number"
                 min="0"
@@ -438,7 +590,7 @@ function RecipeNotebook({ setErrorMessage }) {
               className="form-select"
               value={newRecipeDietary}
               onChange={e => setNewRecipeDietary(e.target.value)}
-              style={styles.input}
+              style={styles.select}
             >
               <option value="">{t('cookbook.dietaryOptions.select')}</option>
               <option value="omnivore">{t('cookbook.dietaryOptions.omnivore')}</option>
@@ -449,7 +601,7 @@ function RecipeNotebook({ setErrorMessage }) {
               className="form-select"
               value={newRecipeComplexity}
               onChange={e => setNewRecipeComplexity(e.target.value)}
-              style={styles.input}
+              style={styles.select}
             >
               <option value="">{t('cookbook.complexityOptions.select')}</option>
               <option value="easy">{t('cookbook.complexityOptions.easy')}</option>
@@ -457,12 +609,13 @@ function RecipeNotebook({ setErrorMessage }) {
               <option value="hard">{t('cookbook.complexityOptions.hard')}</option>
             </select>
           </div>
-          <button 
-            className="btn btn-outline-primary" 
-            onClick={handleAddRecipe} 
+          <button
+            className="btn"
+            onClick={handleAddRecipe}
             style={styles.button}
             disabled={isLoading}
           >
+            <i className="bi bi-plus-circle" style={styles.icon}></i>
             {isLoading ? t('cookbook.adding') : t('cookbook.addButton')}
           </button>
           {recipeMessage && !editModalOpen && (
@@ -472,7 +625,9 @@ function RecipeNotebook({ setErrorMessage }) {
           )}
         </div>
       </div>
-      <h3 className="mb-2" style={{ fontSize: '1.3rem' }}>{t('cookbook.allRecipes')}</h3>
+      <h3 className="mb-2" style={styles.subheading}>
+        <i className="bi bi-journal-text" style={styles.icon}></i> {t('cookbook.allRecipes')}
+      </h3>
       <div className="table-responsive">
         <table className="table table-striped">
           <thead>
@@ -484,7 +639,7 @@ function RecipeNotebook({ setErrorMessage }) {
               <th>{t('cookbook.table.dietary')}</th>
               <th>{t('cookbook.table.complexity')}</th>
               <th>{t('cookbook.table.calories')}</th>
-              <th>{t('cookbook.table.cost', { currency })}</th>
+              <th>{t('cookbook.table.cost')}</th>
               <th>{t('cookbook.table.actions')}</th>
             </tr>
           </thead>
@@ -512,35 +667,39 @@ function RecipeNotebook({ setErrorMessage }) {
                       style={{ ...styles.input, width: '100px' }}
                     />
                     <button
-                      className="btn btn-outline-info"
+                      className="btn"
                       onClick={() => handleCalculateRecipeNutrition(recipe.ingredient_list, recipe.recipe_name)}
                       style={styles.button}
                       disabled={isLoading}
                     >
+                      <i className="bi bi-calculator" style={styles.icon}></i>
                       {isLoading ? t('cookbook.calculating') : t('cookbook.calculate')}
                     </button>
                     <button
-                      className="btn btn-outline-primary"
+                      className="btn"
                       onClick={() => handleEditRecipe(recipe)}
                       style={styles.button}
                       disabled={isLoading}
                     >
+                      <i className="bi bi-pencil" style={styles.icon}></i>
                       {t('cookbook.edit')}
                     </button>
                     <button
-                      className="btn btn-outline-danger"
+                      className="btn"
                       onClick={() => handleDeleteRecipe(recipe.recipe_name)}
-                      style={styles.button}
+                      style={styles.buttonRemove}
                       disabled={isLoading}
                     >
+                      <i className="bi bi-trash" style={styles.iconRemove}></i>
                       {t('cookbook.delete')}
                     </button>
                     <button
-                      className="btn btn-outline-success"
+                      className="btn"
                       onClick={() => handleExportRecipeNutrition(recipe.recipe_name)}
                       style={styles.button}
                       disabled={!recipeNutrition[recipe.recipe_name] || isLoading}
                     >
+                      <i className="bi bi-download" style={styles.icon}></i>
                       {t('cookbook.export')}
                     </button>
                   </div>
@@ -553,9 +712,12 @@ function RecipeNotebook({ setErrorMessage }) {
       {Object.keys(recipeNutrition).map(recipeName => (
         recipeNutrition[recipeName] && (
           <div key={recipeName} className="mt-3">
-            <h4 style={{ fontSize: '1.2rem' }}>{recipeName} {t('cookbook.nutrition')} (Scale: {scaleFactor}x)</h4>
+            <h4 style={styles.subheading}>
+              <i className="bi bi-bar-chart" style={styles.icon}></i>
+              {recipeName} {t('cookbook.nutrition')} (Scale: {scaleFactor}x)
+            </h4>
             {recipeNutrition[recipeName].Cost && (
-              <div className="alert alert-info mb-2">
+              <div className="alert alert-success mb-2">
                 <strong>{t('cookbook.totalCost')}:</strong> {recipeNutrition[recipeName].Cost.value} {recipeNutrition[recipeName].Cost.unit}
               </div>
             )}
@@ -580,23 +742,28 @@ function RecipeNotebook({ setErrorMessage }) {
         <div className="modal-dialog" style={styles.modal}>
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title">{t('cookbook.editModal.title')}: {editRecipe?.recipe_name}</h5>
+              <h5 className="modal-title" style={styles.heading}>
+                <i className="bi bi-pencil-square" style={styles.icon}></i> {t('cookbook.editModal.title')}: {editRecipe?.recipe_name}
+              </h5>
               <button type="button" className="btn-close" onClick={handleCloseModal}></button>
             </div>
             <div className="modal-body">
               <div className="mb-2">
-                <label className="form-label">{t('cookbook.recipeName')}:</label>
+                <label className="form-label" style={styles.label}>
+                  <i className="bi bi-type" style={styles.icon}></i> {t('cookbook.recipeName')}:
+                </label>
                 <input
                   type="text"
                   className="form-control"
                   value={newRecipeName}
                   onChange={e => setNewRecipeName(e.target.value)}
                   style={styles.input}
-                  disabled
                 />
               </div>
               <div className="mb-2">
-                <label className="form-label">{t('cookbook.selectIngredients')}:</label>
+                <label className="form-label" style={styles.label}>
+                  <i className="bi bi-list-ul" style={styles.icon}></i> {t('cookbook.selectIngredients')}:
+                </label>
                 <Select
                   isMulti
                   options={ingredientOptions}
@@ -609,7 +776,9 @@ function RecipeNotebook({ setErrorMessage }) {
               </div>
               {newRecipeIngredients.map(ing => (
                 <div key={ing.value} className="input-group mb-2">
-                  <label className="form-label">{ing.label} {t('cookbook.quantity')}:</label>
+                  <label className="form-label" style={styles.label}>
+                    <i className="bi bi-egg-fried" style={styles.icon}></i> {ing.label} {t('cookbook.quantity')}:
+                  </label>
                   <input
                     type="number"
                     min="0"
@@ -625,7 +794,9 @@ function RecipeNotebook({ setErrorMessage }) {
                 </div>
               ))}
               <div className="mb-2">
-                <label className="form-label">{t('cookbook.instructions')}:</label>
+                <label className="form-label" style={styles.label}>
+                  <i className="bi bi-list-check" style={styles.icon}></i> {t('cookbook.instructions')}:
+                </label>
                 <textarea
                   className="form-control"
                   placeholder={t('cookbook.instructions')}
@@ -635,7 +806,9 @@ function RecipeNotebook({ setErrorMessage }) {
                 />
               </div>
               <div className="mb-2">
-                <label className="form-label">{t('cookbook.prepTime')}:</label>
+                <label className="form-label" style={styles.label}>
+                  <i className="bi bi-clock" style={styles.icon}></i> {t('cookbook.prepTime')}:
+                </label>
                 <input
                   type="number"
                   min="0"
@@ -647,12 +820,14 @@ function RecipeNotebook({ setErrorMessage }) {
                 />
               </div>
               <div className="mb-2">
-                <label className="form-label">{t('cookbook.dietary')}:</label>
+                <label className="form-label" style={styles.label}>
+                  <i className="bi bi-egg" style={styles.icon}></i> {t('cookbook.dietary')}:
+                </label>
                 <select
                   className="form-select"
                   value={newRecipeDietary}
                   onChange={e => setNewRecipeDietary(e.target.value)}
-                  style={styles.input}
+                  style={styles.select}
                 >
                   <option value="">{t('cookbook.dietaryOptions.select')}</option>
                   <option value="omnivore">{t('cookbook.dietaryOptions.omnivore')}</option>
@@ -661,12 +836,14 @@ function RecipeNotebook({ setErrorMessage }) {
                 </select>
               </div>
               <div className="mb-2">
-                <label className="form-label">{t('cookbook.complexity')}:</label>
+                <label className="form-label" style={styles.label}>
+                  <i className="bi bi-gear" style={styles.icon}></i> {t('cookbook.complexity')}:
+                </label>
                 <select
                   className="form-select"
                   value={newRecipeComplexity}
                   onChange={e => setNewRecipeComplexity(e.target.value)}
-                  style={styles.input}
+                  style={styles.select}
                 >
                   <option value="">{t('cookbook.complexityOptions.select')}</option>
                   <option value="easy">{t('cookbook.complexityOptions.easy')}</option>
@@ -678,19 +855,20 @@ function RecipeNotebook({ setErrorMessage }) {
             <div className="modal-footer">
               <button
                 type="button"
-                className="btn btn-secondary"
+                className="btn"
                 onClick={handleCloseModal}
-                style={styles.button}
+                style={styles.buttonRemove}
               >
-                {t('cookbook.editModal.cancel')}
+                <i className="bi bi-x-circle" style={styles.iconRemove}></i> {t('cookbook.editModal.cancel')}
               </button>
               <button
                 type="button"
-                className="btn btn-primary"
+                className="btn"
                 onClick={handleUpdateRecipe}
                 style={styles.button}
                 disabled={isLoading}
               >
+                <i className="bi bi-check-circle" style={styles.icon}></i>
                 {isLoading ? t('cookbook.editModal.updating') : t('cookbook.editModal.update')}
               </button>
             </div>
