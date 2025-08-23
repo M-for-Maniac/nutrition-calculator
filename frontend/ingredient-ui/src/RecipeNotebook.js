@@ -647,7 +647,13 @@ function RecipeNotebook({ setErrorMessage }) {
             {filteredRecipes.map(recipe => (
               <tr key={recipe.recipe_name}>
                 <td>{recipe.recipe_name}</td>
-                <td>{recipe.ingredient_list.map(ing => `${ing.ingredient} (${ing.quantity}g)`).join(', ')}</td>
+                <td>
+                  {recipe.ingredient_list.map(ing => {
+                    const ingredientData = ingredients.find(i => i.ingredient_name === ing.ingredient);
+                    const persianName = ingredientData?.persian_name || 'N/A';
+                    return `${ing.ingredient} (${persianName}) (${ing.quantity}g)`;
+                  }).join(', ')}
+                </td>
                 <td>{recipe.instructions}</td>
                 <td>{recipe.prep_time}</td>
                 <td>{recipe.dietary}</td>
