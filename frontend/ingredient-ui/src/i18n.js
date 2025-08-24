@@ -90,6 +90,19 @@ const resources = {
         totalCost: 'Total Cost',
         nutritionChart: 'Nutrition Chart',
         suggestedRecipes: 'Recipes You Might Like',
+        addIngredient: "Add New Ingredient",
+        addIngredientButton: "Add Ingredient",
+        ingredientName: "Ingredient Name (English)",
+        persianName: "Persian Name",
+        calories: "Calories",
+        totalFat: "Total Fat",
+        cholesterol: "Cholesterol",
+        sodium: "Sodium",
+        potassium: "Potassium",
+        totalCarbohydrate: "Total Carbohydrate",
+        protein: "Protein",
+        showOptionalFields: "Show Optional Nutritional Fields",
+        hideOptionalFields: "Hide Optional Nutritional Fields",
         recipeDetails: {
           ingredients: 'Ingredients',
           instructions: 'Instructions',
@@ -126,7 +139,9 @@ const resources = {
           fetchRecipes: 'Couldn’t load recipes. Please try again.',
           updatePrice: 'Error updating price. Check your inputs.',
           updatePriceFields: 'Please fill in all fields to update the price.',
-          refreshIngredients: 'Error refreshing ingredients.'
+          refreshIngredients: 'Error refreshing ingredients.',
+          addIngredientFields: "Please fill all required fields for the new ingredient.",
+          addIngredient: "Failed to add ingredient. Please try again."
         },
         exportPrompt: 'Export? Click OK for Image.',
         nutritionLabelTitle: 'Nutrition Facts: Selected Ingredients'
@@ -306,6 +321,19 @@ const resources = {
         totalCost: 'هزینه کل',
         nutritionChart: 'نمودار تغذیه',
         suggestedRecipes: 'دستورهای پخت پیشنهادی',
+        "addIngredient": "افزودن ماده غذایی جدید",
+        "addIngredientButton": "افزودن ماده غذایی",
+        "ingredientName": "نام ماده غذایی (انگلیسی)",
+        "persianName": "نام پارسی",
+        "calories": "کالری",
+        "totalFat": "چربی کل",
+        "cholesterol": "کلسترول",
+        "sodium": "سدیم",
+        "potassium": "پتاسیم",
+        "totalCarbohydrate": "کربوهیدرات کل",
+        "protein": "پروتئین",
+        "showOptionalFields": "نمایش فیلدهای تغذیه‌ای اختیاری",
+        "hideOptionalFields": "مخفی کردن فیلدهای تغذیه‌ای اختیاری",
         recipeDetails: {
           ingredients: 'مواد اولیه',
           instructions: 'دستورالعمل‌ها',
@@ -342,7 +370,9 @@ const resources = {
           fetchRecipes: 'نمی‌تونیم دستورهای پخت رو بارگیری کنیم. لطفاً دوباره امتحان کنید.',
           updatePrice: 'خطا در به‌روزرسانی قیمت. ورودی‌ها رو بررسی کنید.',
           updatePriceFields: 'لطفاً همه فیلدها رو برای به‌روزرسانی قیمت پر کنید.',
-          refreshIngredients: 'خطا در تازه‌سازی مواد اولیه.'
+          refreshIngredients: 'خطا در تازه‌سازی مواد اولیه.',
+          addIngredientFields: "لطفاً تمام فیلدهای مورد نیاز برای ماده غذایی جدید را پر کنید.",
+          addIngredient: "افزودن ماده غذایی ناموفق بود. لطفاً دوباره امتحان کنید."
         },
         exportPrompt: 'برای دانلود لیبل روی تأیید کلیک کنید .',
         nutritionLabelTitle: 'حقایق تغذیه‌ای: مواد غذایی انتخاب‌شده'

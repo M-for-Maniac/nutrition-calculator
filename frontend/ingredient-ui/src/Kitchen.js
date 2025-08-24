@@ -26,6 +26,53 @@ function Kitchen({ setErrorMessage }) {
   const [currency, setCurrency] = useState('Toman');
   const [isLoading, setIsLoading] = useState(false);
   const [openNotes, setOpenNotes] = useState({ purpose: false, nutrition: false, usage: false });
+  // New state for adding ingredients
+  const [newIngredient, setNewIngredient] = useState({
+    ingredient_name: '',
+    persian_name: '',
+    Calories: '',
+    Fats: '',
+    Cholestrols: '',
+    Na: '',
+    'Potassium(K)': '',
+    Carb: '',
+    Proteins: '',
+    PurchaseCost: '',
+    PurchaseAmt: '',
+    dietary: '',
+    category: '',
+    Zn: '',
+    Se: '',
+    'Phosphorus(P)': '',
+    'Manganese(Mn)': '',
+    'Magnesium(Mg)': '',
+    'Iron(Fe)': '',
+    'Fluoride(F)': '',
+    'Copper(Cu)': '',
+    'Calcium(Ca)': '',
+    VitaminK: '',
+    VitaminE: '',
+    VitaminD: '',
+    VitaminC: '',
+    VitaminB6: '',
+    VitaminB12: '',
+    VitaminA: '',
+    'Thiamin(B1)': '',
+    'Ribofavin(B2)': '',
+    'PantothenicAcid(B5)': '',
+    'Niacin(B3)': '',
+    Cholines: '',
+    SaturatedFattyacid: '',
+    TransFattyacid: '',
+    'Alcohol(ethyl)': '',
+    'Fiber(F)': '',
+    Sugars: '',
+    Caffeines: '',
+    'Water(H2O)': '',
+    Ashes: ''
+  });
+  const [addIngredientMessage, setAddIngredientMessage] = useState('');
+  const [showOptionalFields, setShowOptionalFields] = useState(false);
 
   const BASE_URL = process.env.NODE_ENV === 'production' ? 'https://maniac.pythonanywhere.com' : 'http://localhost:5000';
 
@@ -152,6 +199,7 @@ function Kitchen({ setErrorMessage }) {
     setRecipes([]);
     setSearchTerm('');
     setUpdateMessage('');
+    setAddIngredientMessage('');
     setErrorMessage('');
     setDietaryFilter('');
     setComplexityFilter('');
@@ -161,6 +209,51 @@ function Kitchen({ setErrorMessage }) {
     setOpenAccordions([]);
     setCurrency('Toman');
     setOpenNotes({ purpose: false, nutrition: false, usage: false });
+    setNewIngredient({
+      ingredient_name: '',
+      persian_name: '',
+      Calories: '',
+      Fats: '',
+      Cholestrols: '',
+      Na: '',
+      'Potassium(K)': '',
+      Carb: '',
+      Proteins: '',
+      PurchaseCost: '',
+      PurchaseAmt: '',
+      dietary: '',
+      category: '',
+      Zn: '',
+      Se: '',
+      'Phosphorus(P)': '',
+      'Manganese(Mn)': '',
+      'Magnesium(Mg)': '',
+      'Iron(Fe)': '',
+      'Fluoride(F)': '',
+      'Copper(Cu)': '',
+      'Calcium(Ca)': '',
+      VitaminK: '',
+      VitaminE: '',
+      VitaminD: '',
+      VitaminC: '',
+      VitaminB6: '',
+      VitaminB12: '',
+      VitaminA: '',
+      'Thiamin(B1)': '',
+      'Ribofavin(B2)': '',
+      'PantothenicAcid(B5)': '',
+      'Niacin(B3)': '',
+      Cholines: '',
+      SaturatedFattyacid: '',
+      TransFattyacid: '',
+      'Alcohol(ethyl)': '',
+      'Fiber(F)': '',
+      Sugars: '',
+      Caffeines: '',
+      'Water(H2O)': '',
+      Ashes: ''
+    });
+    setShowOptionalFields(false);
   };
 
   const handleUpdatePrice = () => {
@@ -194,42 +287,118 @@ function Kitchen({ setErrorMessage }) {
       .finally(() => setIsLoading(false));
   };
 
-  const handleExport = async () => {
-  if (!results) return;
-
-  try {
-    setIsLoading(true);
-    const ingredientList = Object.entries(selected)
-      .filter(([_, qty]) => parseFloat(qty) > 0)
-      .map(([ingredient, quantity]) => ({
-        ingredient,
-        quantity: parseFloat(quantity) || 100
-      }));
-    if (!ingredientList.length) {
-      setErrorMessage(t('kitchen.error.noIngredients'));
+  const handleAddIngredient = () => {
+    const requiredFields = [
+      'ingredient_name', 'persian_name', 'Calories', 'Fats', 'Cholestrols', 'Na',
+      'Potassium(K)', 'Carb', 'Proteins', 'PurchaseCost', 'PurchaseAmt', 'dietary', 'category'
+    ];
+    if (requiredFields.some(field => !newIngredient[field])) {
+      setAddIngredientMessage(t('kitchen.error.addIngredientFields'));
       return;
     }
-    const response = await axios.post(`${BASE_URL}/export_nutrition_image`, {
-      ingredient_list: ingredientList,
-      scale_factor: 1.0, // No scaling in Kitchen.js
-      currency,
-      title: t('kitchen.nutritionLabelTitle', { defaultValue: 'Nutrition Facts: Selected Ingredients' })
-    });
-    const { image } = response.data;
-    const link = document.createElement('a');
-    link.href = image; // Base64 data URL
-    link.download = 'kitchen_nutrition_label.png';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    setIsLoading(true);
     setErrorMessage('');
-  } catch (err) {
-    console.error('Error exporting nutrition image:', err);
-    setErrorMessage(err.response?.data?.error || t('kitchen.error.exportImage'));
-  } finally {
-    setIsLoading(false);
-  }
-};
+    axios.post(`${BASE_URL}/add_ingredient`, newIngredient)
+      .then(res => {
+        setAddIngredientMessage(res.data.message);
+        axios.get(`${BASE_URL}/ingredients`)
+          .then(res => {
+            setIngredients(res.data);
+            setFilteredIngredients(res.data);
+            setNewIngredient({
+              ingredient_name: '',
+              persian_name: '',
+              Calories: '',
+              Fats: '',
+              Cholestrols: '',
+              Na: '',
+              'Potassium(K)': '',
+              Carb: '',
+              Proteins: '',
+              PurchaseCost: '',
+              PurchaseAmt: '',
+              dietary: '',
+              category: '',
+              Zn: '',
+              Se: '',
+              'Phosphorus(P)': '',
+              'Manganese(Mn)': '',
+              'Magnesium(Mg)': '',
+              'Iron(Fe)': '',
+              'Fluoride(F)': '',
+              'Copper(Cu)': '',
+              'Calcium(Ca)': '',
+              VitaminK: '',
+              VitaminE: '',
+              VitaminD: '',
+              VitaminC: '',
+              VitaminB6: '',
+              VitaminB12: '',
+              VitaminA: '',
+              'Thiamin(B1)': '',
+              'Ribofavin(B2)': '',
+              'PantothenicAcid(B5)': '',
+              'Niacin(B3)': '',
+              Cholines: '',
+              SaturatedFattyacid: '',
+              TransFattyacid: '',
+              'Alcohol(ethyl)': '',
+              'Fiber(F)': '',
+              Sugars: '',
+              Caffeines: '',
+              'Water(H2O)': '',
+              Ashes: ''
+            });
+            setShowOptionalFields(false);
+          })
+          .catch(err => {
+            console.error('Error refreshing ingredients:', err);
+            setErrorMessage(t('kitchen.error.refreshIngredients'));
+          });
+      })
+      .catch(err => {
+        console.error('Error adding ingredient:', err);
+        setAddIngredientMessage(err.response?.data?.error || t('kitchen.error.addIngredient'));
+      })
+      .finally(() => setIsLoading(false));
+  };
+
+  const handleExport = async () => {
+    if (!results) return;
+
+    try {
+      setIsLoading(true);
+      const ingredientList = Object.entries(selected)
+        .filter(([_, qty]) => parseFloat(qty) > 0)
+        .map(([ingredient, quantity]) => ({
+          ingredient,
+          quantity: parseFloat(quantity) || 100
+        }));
+      if (!ingredientList.length) {
+        setErrorMessage(t('kitchen.error.noIngredients'));
+        return;
+      }
+      const response = await axios.post(`${BASE_URL}/export_nutrition_image`, {
+        ingredient_list: ingredientList,
+        scale_factor: 1.0,
+        currency,
+        title: t('kitchen.nutritionLabelTitle', { defaultValue: 'Nutrition Facts: Selected Ingredients' })
+      });
+      const { image } = response.data;
+      const link = document.createElement('a');
+      link.href = image;
+      link.download = 'kitchen_nutrition_label.png';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setErrorMessage('');
+    } catch (err) {
+      console.error('Error exporting nutrition image:', err);
+      setErrorMessage(err.response?.data?.error || t('kitchen.error.exportImage'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const toggleAccordion = (category) => {
     setOpenAccordions(prev =>
@@ -490,6 +659,264 @@ function Kitchen({ setErrorMessage }) {
           {updateMessage && (
             <div className={`alert ${updateMessage.includes('Error') ? 'alert-danger' : 'alert-success'} mt-2`}>
               {updateMessage}
+            </div>
+          )}
+        </div>
+      </div>
+      {/* New Add Ingredient Section */}
+      <div className="row mb-3 g-2">
+        <div className="col-12">
+          <h3 className="mb-2" style={styles.subheading}>
+            <i className="bi bi-plus-circle" style={styles.icon}></i> {t('kitchen.addIngredient')}
+          </h3>
+          <div className="row g-2">
+            <div className="col-12 col-md-4">
+              <label className="form-label" style={styles.label}>
+                <i className="bi bi-type" style={styles.icon}></i> {t('kitchen.ingredientName')} *
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                placeholder={t('kitchen.ingredientName')}
+                value={newIngredient.ingredient_name}
+                onChange={e => setNewIngredient({ ...newIngredient, ingredient_name: e.target.value })}
+                style={styles.input}
+                required
+              />
+            </div>
+            <div className="col-12 col-md-4">
+              <label className="form-label" style={styles.label}>
+                <i className="bi bi-type" style={styles.icon}></i> {t('kitchen.persianName')} *
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                placeholder={t('kitchen.persianName')}
+                value={newIngredient.persian_name}
+                onChange={e => setNewIngredient({ ...newIngredient, persian_name: e.target.value })}
+                style={styles.input}
+                required
+              />
+            </div>
+            <div className="col-12 col-md-4">
+              <label className="form-label" style={styles.label}>
+                <i className="bi bi-egg" style={styles.icon}></i> {t('kitchen.dietary')} *
+              </label>
+              <select
+                className="form-select"
+                value={newIngredient.dietary}
+                onChange={e => setNewIngredient({ ...newIngredient, dietary: e.target.value })}
+                style={styles.select}
+                required
+              >
+                <option value="">{t('kitchen.dietaryOptions.select')}</option>
+                <option value="omnivore">{t('kitchen.dietaryOptions.omnivore')}</option>
+                <option value="vegetarian">{t('kitchen.dietaryOptions.vegetarian')}</option>
+                <option value="vegan">{t('kitchen.dietaryOptions.vegan')}</option>
+              </select>
+            </div>
+            <div className="col-12 col-md-4">
+              <label className="form-label" style={styles.label}>
+                <i className="bi bi-list-ul" style={styles.icon}></i> {t('kitchen.category')} *
+              </label>
+              <select
+                className="form-select"
+                value={newIngredient.category}
+                onChange={e => setNewIngredient({ ...newIngredient, category: e.target.value })}
+                style={styles.select}
+                required
+              >
+                <option value="">{t('kitchen.selectCategory')}</option>
+                {categories.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+            <div className="col-12 col-md-4">
+              <label className="form-label" style={styles.label}>
+                <i className="bi bi-wallet" style={styles.icon}></i> {t('kitchen.purchaseCost')} ({currency}) *
+              </label>
+              <input
+                type="number"
+                min="0"
+                className="form-control"
+                placeholder={`${t('kitchen.purchaseCost')} (${currency})`}
+                value={newIngredient.PurchaseCost}
+                onChange={e => setNewIngredient({ ...newIngredient, PurchaseCost: e.target.value })}
+                style={styles.input}
+                required
+              />
+            </div>
+            <div className="col-12 col-md-4">
+              <label className="form-label" style={styles.label}>
+                <i className="bi bi-box" style={styles.icon}></i> {t('kitchen.purchaseAmount')} (g) *
+              </label>
+              <input
+                type="number"
+                min="0"
+                className="form-control"
+                placeholder={t('kitchen.purchaseAmount')}
+                value={newIngredient.PurchaseAmt}
+                onChange={e => setNewIngredient({ ...newIngredient, PurchaseAmt: e.target.value })}
+                style={styles.input}
+                required
+              />
+            </div>
+            <div className="col-12 col-md-4">
+              <label className="form-label" style={styles.label}>
+                <i className="bi bi-fire" style={styles.icon}></i> {t('kitchen.calories')} (kcal/100g) *
+              </label>
+              <input
+                type="number"
+                min="0"
+                className="form-control"
+                placeholder={t('kitchen.calories')}
+                value={newIngredient.Calories}
+                onChange={e => setNewIngredient({ ...newIngredient, Calories: e.target.value })}
+                style={styles.input}
+                required
+              />
+            </div>
+            <div className="col-12 col-md-4">
+              <label className="form-label" style={styles.label}>
+                <i className="bi bi-droplet" style={styles.icon}></i> {t('kitchen.totalFat')} (g/100g) *
+              </label>
+              <input
+                type="number"
+                min="0"
+                className="form-control"
+                placeholder={t('kitchen.totalFat')}
+                value={newIngredient.Fats}
+                onChange={e => setNewIngredient({ ...newIngredient, Fats: e.target.value })}
+                style={styles.input}
+                required
+              />
+            </div>
+            <div className="col-12 col-md-4">
+              <label className="form-label" style={styles.label}>
+                <i className="bi bi-heart" style={styles.icon}></i> {t('kitchen.cholesterol')} (mg/100g) *
+              </label>
+              <input
+                type="number"
+                min="0"
+                className="form-control"
+                placeholder={t('kitchen.cholesterol')}
+                value={newIngredient.Cholestrols}
+                onChange={e => setNewIngredient({ ...newIngredient, Cholestrols: e.target.value })}
+                style={styles.input}
+                required
+              />
+            </div>
+            <div className="col-12 col-md-4">
+              <label className="form-label" style={styles.label}>
+                <i className="bi bi-droplet-fill" style={styles.icon}></i> {t('kitchen.sodium')} (mg/100g) *
+              </label>
+              <input
+                type="number"
+                min="0"
+                className="form-control"
+                placeholder={t('kitchen.sodium')}
+                value={newIngredient.Na}
+                onChange={e => setNewIngredient({ ...newIngredient, Na: e.target.value })}
+                style={styles.input}
+                required
+              />
+            </div>
+            <div className="col-12 col-md-4">
+              <label className="form-label" style={styles.label}>
+                <i className="bi bi-droplet-half" style={styles.icon}></i> {t('kitchen.potassium')} (mg/100g) *
+              </label>
+              <input
+                type="number"
+                min="0"
+                className="form-control"
+                placeholder={t('kitchen.potassium')}
+                value={newIngredient['Potassium(K)']}
+                onChange={e => setNewIngredient({ ...newIngredient, 'Potassium(K)': e.target.value })}
+                style={styles.input}
+                required
+              />
+            </div>
+            <div className="col-12 col-md-4">
+              <label className="form-label" style={styles.label}>
+                <i className="bi bi-bread" style={styles.icon}></i> {t('kitchen.totalCarbohydrate')} (g/100g) *
+              </label>
+              <input
+                type="number"
+                min="0"
+                className="form-control"
+                placeholder={t('kitchen.totalCarbohydrate')}
+                value={newIngredient.Carb}
+                onChange={e => setNewIngredient({ ...newIngredient, Carb: e.target.value })}
+                style={styles.input}
+                required
+              />
+            </div>
+            <div className="col-12 col-md-4">
+              <label className="form-label" style={styles.label}>
+                <i className="bi bi-egg-fried" style={styles.icon}></i> {t('kitchen.protein')} (g/100g) *
+              </label>
+              <input
+                type="number"
+                min="0"
+                className="form-control"
+                placeholder={t('kitchen.protein')}
+                value={newIngredient.Proteins}
+                onChange={e => setNewIngredient({ ...newIngredient, Proteins: e.target.value })}
+                style={styles.input}
+                required
+              />
+            </div>
+          </div>
+          <div className="mt-3">
+            <button
+              className="btn"
+              onClick={() => setShowOptionalFields(!showOptionalFields)}
+              style={{ ...styles.button, backgroundColor: '#e9e2d6', color: '#295241' }}
+            >
+              <i className={`bi bi-chevron-${showOptionalFields ? 'up' : 'down'}`} style={styles.icon}></i>
+              {showOptionalFields ? t('kitchen.hideOptionalFields') : t('kitchen.showOptionalFields')}
+            </button>
+          </div>
+          {showOptionalFields && (
+            <div className="row g-2 mt-2">
+              {[
+                'Zn', 'Se', 'Phosphorus(P)', 'Manganese(Mn)', 'Magnesium(Mg)', 'Iron(Fe)', 'Fluoride(F)',
+                'Copper(Cu)', 'Calcium(Ca)', 'VitaminK', 'VitaminE', 'VitaminD', 'VitaminC', 'VitaminB6',
+                'VitaminB12', 'VitaminA', 'Thiamin(B1)', 'Ribofavin(B2)', 'PantothenicAcid(B5)', 'Niacin(B3)',
+                'Cholines', 'SaturatedFattyacid', 'TransFattyacid', 'Alcohol(ethyl)', 'Fiber(F)', 'Sugars',
+                'Caffeines', 'Water(H2O)', 'Ashes'
+              ].map(field => (
+                <div key={field} className="col-12 col-md-4">
+                  <label className="form-label" style={styles.label}>
+                    <i className="bi bi-info-circle" style={styles.icon}></i> {field.replace(/\(.*\)/, '')}
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    className="form-control"
+                    placeholder={field}
+                    value={newIngredient[field]}
+                    onChange={e => setNewIngredient({ ...newIngredient, [field]: e.target.value })}
+                    style={styles.input}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="mt-3">
+            <button
+              className="btn"
+              onClick={handleAddIngredient}
+              style={styles.button}
+              disabled={isLoading}
+            >
+              <i className="bi bi-plus-circle" style={styles.icon}></i> {t('kitchen.addIngredientButton')}
+            </button>
+          </div>
+          {addIngredientMessage && (
+            <div className={`alert ${addIngredientMessage.includes('Error') ? 'alert-danger' : 'alert-success'} mt-2`}>
+              {addIngredientMessage}
             </div>
           )}
         </div>
