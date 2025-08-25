@@ -104,6 +104,7 @@ const resources = {
         showOptionalFields: "Show Optional Nutritional Fields",
         hideOptionalFields: "Hide Optional Nutritional Fields",
         selectCategory: "Category",
+        "category": "Category",
         recipeDetails: {
           ingredients: 'Ingredients',
           instructions: 'Instructions',
@@ -337,6 +338,7 @@ const resources = {
         "showOptionalFields": "نمایش فیلدهای تغذیه‌ای اختیاری",
         "hideOptionalFields": "مخفی کردن فیلدهای تغذیه‌ای اختیاری",
         selectCategory: "دسته بندی",
+        "category": "دسته‌بندی",
         recipeDetails: {
           ingredients: 'مواد اولیه',
           instructions: 'دستورالعمل‌ها',

@@ -749,7 +749,7 @@ function Kitchen({ setErrorMessage }) {
             </div>
             <div className="col-12 col-md-4">
               <label className="form-label" style={styles.label}>
-                <i className="bi bi-box" style={styles.icon}></i> {t('kitchen.purchaseAmount')} (g) *
+                <i className="bi bi-box" style={styles.icon}></i> {t('kitchen.purchaseAmount')} *
               </label>
               <input
                 type="number"
