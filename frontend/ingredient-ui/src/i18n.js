@@ -103,6 +103,7 @@ const resources = {
         protein: "Protein",
         showOptionalFields: "Show Optional Nutritional Fields",
         hideOptionalFields: "Hide Optional Nutritional Fields",
+        selectCategory: "Category",
         recipeDetails: {
           ingredients: 'Ingredients',
           instructions: 'Instructions',
@@ -122,7 +123,8 @@ const resources = {
           all: 'All',
           omnivore: 'Omnivore',
           vegetarian: 'Vegetarian',
-          vegan: 'Vegan'
+          vegan: 'Vegan',
+          select: 'Dietary Preference',
         },
         notes: {
           title: 'How to Use the Kitchen',
@@ -334,6 +336,7 @@ const resources = {
         "protein": "پروتئین",
         "showOptionalFields": "نمایش فیلدهای تغذیه‌ای اختیاری",
         "hideOptionalFields": "مخفی کردن فیلدهای تغذیه‌ای اختیاری",
+        selectCategory: "دسته بندی",
         recipeDetails: {
           ingredients: 'مواد اولیه',
           instructions: 'دستورالعمل‌ها',
@@ -353,7 +356,8 @@ const resources = {
           all: 'همه',
           omnivore: 'همه‌چیزخوار',
           vegetarian: 'گیاه‌خوار',
-          vegan: 'وگان'
+          vegan: 'وگان',
+          select: 'رژیم غذایی',
         },
         notes: {
           title: 'چگونه از آشپزخانه استفاده کنید',
