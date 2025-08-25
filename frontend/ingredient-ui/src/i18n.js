@@ -175,6 +175,7 @@ const resources = {
         adding: 'Adding...',
         addButton: 'Add Recipe',
         confirmDelete: 'Are you sure you want to delete {recipe_name}?',
+        "downloadPDF": "Download PDF",
         dietaryOptions: {
           select: 'Choose a Dietary Preference',
           all: 'All',
@@ -225,7 +226,8 @@ const resources = {
           updateRecipeFields: 'Please fill in all fields to update the recipe.',
           updateRecipe: 'Error updating the recipe.',
           fetchRecipesAfterUpdate: 'Error loading recipes after update.',
-          invalidIngredientList: 'The ingredient list seems invalid.'
+          invalidIngredientList: 'The ingredient list seems invalid.',
+          "exportPDF": "Failed to export recipe PDF. Please try again."
         },
         editModal: {
           title: 'Edit Your Recipe',
@@ -409,6 +411,7 @@ const resources = {
         adding: 'در حال افزودن...',
         addButton: 'افزودن دستور پخت',
         confirmDelete: 'مطمئن هستید که می‌خواهید {recipe_name} را حذف کنید؟',
+        "downloadPDF": "دانلود فایل",
         dietaryOptions: {
           select: 'یک رژیم غذایی انتخاب کنید',
           all: 'همه',
@@ -459,7 +462,8 @@ const resources = {
           updateRecipeFields: 'لطفاً همه فیلدها رو برای به‌روزرسانی دستور پخت پر کنید.',
           updateRecipe: 'خطا در به‌روزرسانی دستور پخت.',
           fetchRecipesAfterUpdate: 'خطا در بارگیری دستورهای پخت پس از به‌روزرسانی.',
-          invalidIngredientList: 'لیست مواد اولیه نامعتبر به نظر می‌رسه.'
+          invalidIngredientList: 'لیست مواد اولیه نامعتبر به نظر می‌رسه.',
+          "exportPDF": "صدور فایل دستور غذا ناموفق بود. لطفاً دوباره امتحان کنید."
         },
         editModal: {
           title: 'ویرایش دستور پخت شما',

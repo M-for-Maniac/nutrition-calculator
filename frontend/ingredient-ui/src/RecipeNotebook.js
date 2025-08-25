@@ -27,7 +27,6 @@ function RecipeNotebook({ setErrorMessage }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [currency, setCurrency] = useState('Toman');
   const [isLoading, setIsLoading] = useState(false);
-  // Add state for accordion
   const [openNotes, setOpenNotes] = useState({
     purpose: false,
     nutrition: false,
@@ -68,7 +67,6 @@ function RecipeNotebook({ setErrorMessage }) {
     }
   };
 
-  // Function to toggle accordion items
   const toggleNote = (note) => {
     setOpenNotes((prev) => ({
       ...prev,
@@ -76,7 +74,6 @@ function RecipeNotebook({ setErrorMessage }) {
     }));
   };
 
-  // Fetch ingredients on mount
   useEffect(() => {
     setIsLoading(true);
     axios.get(`${BASE_URL}/ingredients`)
@@ -91,7 +88,6 @@ function RecipeNotebook({ setErrorMessage }) {
       .finally(() => setIsLoading(false));
   }, [setErrorMessage, t]);
 
-  // Fetch recipes when filters or currency change
   useEffect(() => {
     if (ingredients.length === 0) return;
     setIsLoading(true);
@@ -289,33 +285,63 @@ function RecipeNotebook({ setErrorMessage }) {
   };
 
   const handleExportRecipeNutrition = async (recipeName) => {
-  if (!recipeNutrition[recipeName]) return;
+    if (!recipeNutrition[recipeName]) return;
 
-  const ingredientList = allRecipes.find(r => r.recipe_name === recipeName)?.ingredient_list || [];
+    const ingredientList = allRecipes.find(r => r.recipe_name === recipeName)?.ingredient_list || [];
 
-  try {
-    setIsLoading(true);
-    const response = await axios.post(`${BASE_URL}/export_nutrition_image`, {
-      ingredient_list: ingredientList,
-      scale_factor: parseFloat(scaleFactor) || 1.0,
-      currency,
-      title: `Nutrition Facts: ${recipeName}`
-    });
-    const { image } = response.data;
-    const link = document.createElement('a');
-    link.href = image; // Base64 data URL
-    link.download = `${recipeName}_nutrition_label.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    setErrorMessage('');
-  } catch (err) {
-    console.error('Error exporting nutrition image:', err);
-    setErrorMessage(err.response?.data?.error || t('cookbook.error.exportImage'));
-  } finally {
-    setIsLoading(false);
-  }
-};
+    try {
+      setIsLoading(true);
+      const response = await axios.post(`${BASE_URL}/export_nutrition_image`, {
+        ingredient_list: ingredientList,
+        scale_factor: parseFloat(scaleFactor) || 1.0,
+        currency,
+        title: `Nutrition Facts: ${recipeName}`
+      });
+      const { image } = response.data;
+      const link = document.createElement('a');
+      link.href = image;
+      link.download = `${recipeName}_nutrition_label.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setErrorMessage('');
+    } catch (err) {
+      console.error('Error exporting nutrition image:', err);
+      setErrorMessage(err.response?.data?.error || t('cookbook.error.exportImage'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleExportRecipePDF = async (recipe) => {
+    try {
+      setIsLoading(true);
+      const response = await axios.post(`${BASE_URL}/export_recipe_pdf`, {
+        recipe_name: recipe.recipe_name,
+        ingredient_list: recipe.ingredient_list,
+        instructions: recipe.instructions,
+        prep_time: recipe.prep_time,
+        dietary: recipe.dietary,
+        complexity: recipe.complexity,
+        total_calories: recipe.total_calories,
+        total_cost: recipe.total_cost,
+        currency
+      });
+      const { pdf } = response.data;
+      const link = document.createElement('a');
+      link.href = pdf;
+      link.download = `${recipe.recipe_name}_recipe.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setErrorMessage('');
+    } catch (err) {
+      console.error('Error exporting recipe PDF:', err);
+      setErrorMessage(err.response?.data?.error || t('cookbook.error.exportPDF'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const ingredientOptions = ingredients.map(ing => ({
     value: ing.ingredient_name,
@@ -707,6 +733,15 @@ function RecipeNotebook({ setErrorMessage }) {
                     >
                       <i className="bi bi-download" style={styles.icon}></i>
                       {t('cookbook.export')}
+                    </button>
+                    <button
+                      className="btn"
+                      onClick={() => handleExportRecipePDF(recipe)}
+                      style={styles.button}
+                      disabled={isLoading}
+                    >
+                      <i className="bi bi-file-earmark-pdf" style={styles.icon}></i>
+                      {t('cookbook.downloadPDF')}
                     </button>
                   </div>
                 </td>
