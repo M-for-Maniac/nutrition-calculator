@@ -74,7 +74,9 @@ function Kitchen({ setErrorMessage }) {
   const [addIngredientMessage, setAddIngredientMessage] = useState('');
   const [showOptionalFields, setShowOptionalFields] = useState(false);
 
-  const BASE_URL = process.env.NODE_ENV === 'production' ? 'https://maniac.pythonanywhere.com' : 'http://localhost:5000';
+  // const BASE_URL = process.env.NODE_ENV === 'production' ? 'https://maniac.pythonanywhere.com' : 'http://localhost:3000';
+  const BASE_URL = 'https://maniac.pythonanywhere.com';
+
 
   const styles = {
     container: { backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '8px', minHeight: '100vh' },
@@ -592,6 +594,7 @@ function Kitchen({ setErrorMessage }) {
             <option value="omnivore">{t('kitchen.dietaryOptions.omnivore')}</option>
             <option value="vegetarian">{t('kitchen.dietaryOptions.vegetarian')}</option>
             <option value="vegan">{t('kitchen.dietaryOptions.vegan')}</option>
+            <option value="gluten-free">{t('cookbook.dietaryOptions.gluten_free')}</option>
           </select>
         </div>
       </div>
@@ -713,6 +716,7 @@ function Kitchen({ setErrorMessage }) {
                 <option value="omnivore">{t('kitchen.dietaryOptions.omnivore')}</option>
                 <option value="vegetarian">{t('kitchen.dietaryOptions.vegetarian')}</option>
                 <option value="vegan">{t('kitchen.dietaryOptions.vegan')}</option>
+                <option value="gluten-free">{t('cookbook.dietaryOptions.gluten_free')}</option>
               </select>
             </div>
             <div className="col-12 col-md-4">
