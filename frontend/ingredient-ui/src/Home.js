@@ -9,8 +9,8 @@ function Home({ setErrorMessage }) {
 
   const styles = {
     hero: {
-      background: 'linear-gradient(120deg, #295241, #1f3e31)', // Updated to new green palette
-      color: '#f1f1f1', // Text on green
+      background: 'linear-gradient(120deg, #295241, #1f3e31)',
+      color: '#f1f1f1',
       padding: '60px 20px',
       borderRadius: '12px',
       textAlign: 'center',
@@ -23,8 +23,8 @@ function Home({ setErrorMessage }) {
       flexDirection: 'column',
       borderRadius: '12px',
       boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)',
-      backgroundColor: '#e9e2d6', // Text on red (beige) for cards
-      border: '1px solid #295241' // Main green border
+      backgroundColor: '#e9e2d6',
+      border: '1px solid #295241'
     },
     cardHover: {
       transform: 'scale(1.03)',
@@ -36,26 +36,26 @@ function Home({ setErrorMessage }) {
       marginBottom: '40px'
     },
     tour: {
-      background: 'linear-gradient(135deg, #f8f9fa, #e9e2d6)', // Updated to beige
+      background: 'linear-gradient(135deg, #f8f9fa, #e9e2d6)',
       padding: '40px 20px',
       borderRadius: '12px',
       marginBottom: '40px',
-      border: '1px solid #295241' // Main green border
+      border: '1px solid #295241'
     },
     tourCard: {
       transition: 'transform 0.2s, box-shadow 0.2s',
       borderRadius: '12px',
       boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)',
       backgroundColor: '#fff',
-      border: '1px solid #1f3e31' // Darker green border
+      border: '1px solid #1f3e31'
     },
     tourCardHover: {
       transform: 'translateY(-5px)',
       boxShadow: '0 10px 20px rgba(0, 0, 0, 0.25)'
     },
     footer: {
-      backgroundColor: '#295241', // Main green
-      color: '#f1f1f1', // Text on green
+      backgroundColor: '#295241',
+      color: '#f1f1f1',
       padding: '20px 0',
       textAlign: 'center'
     }
@@ -68,19 +68,11 @@ function Home({ setErrorMessage }) {
         <div style={styles.hero} className="hero">
           <h1 className="display-4 mb-3">{t('home.hero.title')}</h1>
           <p className="lead mb-4">{t('home.hero.subtitle')}</p>
-          {/* <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
-            <Link to="/kitchen" className="btn btn-primary-custom btn-lg w-100 w-sm-auto" onClick={() => setErrorMessage('')}>
-              {t('home.hero.kitchenCTA')}
-            </Link>
-            <Link to="/cookbook" className="btn btn-secondary-custom btn-lg w-100 w-sm-auto" onClick={() => setErrorMessage('')}>
-              {t('home.hero.cookbookCTA')}
-            </Link>
-          </div> */}
         </div>
 
         {/* Feature Cards */}
         <div className="row mb-5 features">
-          <div className="col-md-6 mb-4">
+          <div className="col-md-4 mb-4">
             <div
               className="card shadow-sm h-100"
               style={styles.card}
@@ -103,7 +95,7 @@ function Home({ setErrorMessage }) {
               </div>
             </div>
           </div>
-          <div className="col-md-6 mb-4">
+          <div className="col-md-4 mb-4">
             <div
               className="card shadow-sm h-100"
               style={styles.card}
@@ -122,6 +114,29 @@ function Home({ setErrorMessage }) {
                 <p className="card-text flex-grow-1">{t('home.features.cookbook.description')}</p>
                 <Link to="/cookbook" className="btn btn-secondary-custom mt-auto">
                   {t('home.features.cookbook.button')}
+                </Link>
+              </div>
+            </div>
+          </div>
+          <div className="col-md-4 mb-4">
+            <div
+              className="card shadow-sm h-100"
+              style={styles.card}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = styles.cardHover.transform;
+                e.currentTarget.style.boxShadow = styles.cardHover.boxShadow;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'none';
+                e.currentTarget.style.boxShadow = styles.card.boxShadow;
+              }}
+            >
+              <div className="card-body d-flex flex-column">
+                <i className="fas fa-th-large fa-3x mb-3 icon-primary"></i>
+                <h3 className="card-title">{t('home.features.gallery.title')}</h3>
+                <p className="card-text flex-grow-1">{t('home.features.gallery.description')}</p>
+                <Link to="/gallery" className="btn btn-primary-custom mt-auto">
+                  {t('home.features.gallery.button')}
                 </Link>
               </div>
             </div>
@@ -185,7 +200,7 @@ function Home({ setErrorMessage }) {
           <h2 className="text-center mb-4">{t('home.tour.title')}</h2>
           <p className="text-center lead mb-5">{t('home.tour.intro')}</p>
           <div className="row">
-            <div className="col-md-6 mb-4">
+            <div className="col-md-4 mb-4">
               <div
                 className="card h-100"
                 style={styles.tourCard}
@@ -208,7 +223,7 @@ function Home({ setErrorMessage }) {
                 </div>
               </div>
             </div>
-            <div className="col-md-6 mb-4">
+            <div className="col-md-4 mb-4">
               <div
                 className="card h-100"
                 style={styles.tourCard}
@@ -227,6 +242,29 @@ function Home({ setErrorMessage }) {
                   <p className="card-text">{t('home.tour.cookbook.description')}</p>
                   <Link to="/cookbook" className="btn btn-secondary-custom mt-3">
                     {t('home.tour.cookbook.button')}
+                  </Link>
+                </div>
+              </div>
+            </div>
+            <div className="col-md-4 mb-4">
+              <div
+                className="card h-100"
+                style={styles.tourCard}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = styles.tourCardHover.transform;
+                  e.currentTarget.style.boxShadow = styles.tourCardHover.boxShadow;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'none';
+                  e.currentTarget.style.boxShadow = styles.tourCard.boxShadow;
+                }}
+              >
+                <div className="card-body">
+                  <i className="fas fa-th-large fa-3x mb-3 icon-primary"></i>
+                  <h3 className="card-title">{t('home.tour.gallery.title')}</h3>
+                  <p className="card-text">{t('home.tour.gallery.description')}</p>
+                  <Link to="/gallery" className="btn btn-primary-custom mt-3">
+                    {t('home.tour.gallery.button')}
                   </Link>
                 </div>
               </div>

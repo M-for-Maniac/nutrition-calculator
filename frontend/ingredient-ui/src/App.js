@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import Home from './Home';
 import Kitchen from './Kitchen';
 import RecipeNotebook from './RecipeNotebook';
+import GalleryPage from './GalleryPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
@@ -43,6 +44,9 @@ function App() {
                 <li className="nav-item">
                   <Link className="nav-link" to="/cookbook">{t('app.cookbook')}</Link>
                 </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/gallery">{t('app.gallery')}</Link>
+                </li>
               </ul>
               <div className="dropdown">
                 <button
@@ -79,6 +83,8 @@ function App() {
           <Route path="/nutrition-calculator" element={<Home setErrorMessage={setErrorMessage} />} />
           <Route path="/kitchen" element={<Kitchen setErrorMessage={setErrorMessage} />} />
           <Route path="/cookbook" element={<RecipeNotebook setErrorMessage={setErrorMessage} />} />
+          <Route path="/gallery" element={<GalleryPage setErrorMessage={setErrorMessage} />} />
+          <Route path="/" element={<Home setErrorMessage={setErrorMessage} />} />
         </Routes>
       </div>
     </Router>

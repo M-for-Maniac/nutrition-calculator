@@ -9,6 +9,7 @@ const resources = {
         home: 'Home',
         kitchen: 'Kitchen',
         cookbook: 'Cookbook',
+        gallery: 'Gallery', // Added
         language: 'Language',
         english: 'English',
         persian: 'Persian'
@@ -31,6 +32,11 @@ const resources = {
             title: 'Recipe Management',
             description: 'Build, edit, and organize your recipes with dietary and complexity filters.',
             button: 'Try Cookbook Now'
+          },
+          gallery: { // Added
+            title: 'Meal Planning',
+            description: 'Browse recipes, create a daily meal plan, and order your favorite dishes.',
+            button: 'Try Gallery Now'
           }
         },
         tips: {
@@ -53,6 +59,11 @@ const resources = {
             title: 'Cookbook: Your Recipe Playground',
             description: 'The Cookbook lets you create, edit, and manage recipes. Add ingredients, write instructions, and set dietary or complexity filters. Calculate the nutrition for any recipe and scale it up or down to fit your needs. Save your favorites and share them!',
             button: 'Go to Cookbook'
+          },
+          gallery: { // Added
+            title: 'Gallery: Your Meal Planner',
+            description: 'Explore a variety of recipes in the Gallery, filter by dietary needs, and build a daily meal plan. Add up to 5 recipes, calculate total nutrition, and place an order for your selected meals!',
+            button: 'Go to Gallery'
           }
         },
         sampleRecipe: {
@@ -104,7 +115,7 @@ const resources = {
         showOptionalFields: "Show Optional Nutritional Fields",
         hideOptionalFields: "Hide Optional Nutritional Fields",
         selectCategory: "Category",
-        "category": "Category",
+        category: "Category",
         recipeDetails: {
           ingredients: 'Ingredients',
           instructions: 'Instructions',
@@ -125,7 +136,8 @@ const resources = {
           omnivore: 'Omnivore',
           vegetarian: 'Vegetarian',
           vegan: 'Vegan',
-          select: 'Dietary Preference',
+          gluten_free: 'Gluten-Free',
+          select: 'Choose a Dietary Preference',
         },
         notes: {
           title: 'How to Use the Kitchen',
@@ -175,13 +187,14 @@ const resources = {
         adding: 'Adding...',
         addButton: 'Add Recipe',
         confirmDelete: 'Are you sure you want to delete {recipe_name}?',
-        "downloadPDF": "Download PDF",
+        downloadPDF: 'Download PDF',
         dietaryOptions: {
           select: 'Choose a Dietary Preference',
           all: 'All',
           omnivore: 'Omnivore',
           vegetarian: 'Vegetarian',
-          vegan: 'Vegan'
+          vegan: 'Vegan',
+          gluten_free: 'Gluten-Free'
         },
         complexityOptions: {
           select: 'Choose Complexity',
@@ -227,7 +240,7 @@ const resources = {
           updateRecipe: 'Error updating the recipe.',
           fetchRecipesAfterUpdate: 'Error loading recipes after update.',
           invalidIngredientList: 'The ingredient list seems invalid.',
-          "exportPDF": "Failed to export recipe PDF. Please try again."
+          exportPDF: 'Failed to export recipe PDF. Please try again.'
         },
         editModal: {
           title: 'Edit Your Recipe',
@@ -235,6 +248,34 @@ const resources = {
           update: 'Update Recipe',
           updating: 'Updating...'
         }
+      },
+      gallery: {
+        title: 'Plan Your Perfect Meals',
+        subtitle: 'Explore our recipes and create a daily meal plan tailored to your diet!',
+        allDiets: 'All Diets',
+        minProtein: 'Min Protein (g)', // Added
+        dietaryOptions: {
+          select: 'Choose a Dietary Preference',
+          omnivore: 'Omnivore',
+          vegetarian: 'Vegetarian',
+          vegan: 'Vegan',
+          gluten_free: 'Gluten-Free'
+        },
+        maxCalories: 'Max Calories',
+        applyFilters: 'Apply Filters',
+        dietary: 'Dietary',
+        calories: 'Calories',
+        prepTime: 'Prep Time',
+        addToPlan: 'Add to Meal Plan',
+        remove: 'Remove', // Added
+        mealPlan: 'Your Daily Meal Plan',
+        noPlan: 'No meals selected. Add recipes to your plan!',
+        totalNutrition: 'Total Nutrition',
+        emailPlaceholder: 'Enter your email to order',
+        enterEmail: 'Please enter your email to place an order.',
+        orderPlan: 'Order Meal Plan',
+        orderSuccess: 'Order placed successfully! Your order ID is {orderId}.',
+        mealPlanFull: 'Meal plan is full (max 5 recipes).'
       }
     }
   },
@@ -245,6 +286,7 @@ const resources = {
         home: 'خانه',
         kitchen: 'آشپزخانه',
         cookbook: 'کتاب آشپزی',
+        gallery: 'گالری', // Added
         language: 'زبان',
         english: 'انگلیسی',
         persian: 'فارسی'
@@ -267,6 +309,11 @@ const resources = {
             title: 'مدیریت دستور پخت',
             description: 'دستورهای پخت خود را با فیلترهای رژیم غذایی و پیچیدگی بسازید، ویرایش کنید و سازمان‌دهی کنید.',
             button: 'کتاب آشپزی را مشاهده کنید'
+          },
+          gallery: { // Added
+            title: 'برنامه‌ریزی غذایی',
+            description: 'دستورهای پخت را مرور کنید، یک برنامه غذایی روزانه بسازید و غذاهای مورد علاقه خود را سفارش دهید.',
+            button: 'گالری را امتحان کنید'
           }
         },
         tips: {
@@ -289,6 +336,11 @@ const resources = {
             title: 'کتاب آشپزی: زمین بازی دستورهای پخت شما',
             description: 'کتاب آشپزی به شما امکان می‌دهد دستورهای پخت را ذخیره، ویرایش کنید و مدیریت کنید. مواد اولیه را اضافه کنید، دستورالعمل‌ها را بنویسید و فیلترهای رژیم غذایی یا پیچیدگی را تنظیم کنید. ارزش غذایی هر دستور پخت را محاسبه کنید و آن را به دلخواه افزایش یا کاهش دهید. دستورهای مورد علاقه‌تان را ذخیره کنید و به اشتراک بگذارید!',
             button: 'برو به کتاب آشپزی'
+          },
+          gallery: { // Added
+            title: 'گالری: برنامه‌ریز غذایی شما',
+            description: 'در گالری انواع دستورهای پخت را کاوش کنید، بر اساس نیازهای غذایی فیلتر کنید و یک برنامه غذایی روزانه بسازید. تا ۵ دستور پخت را اضافه کنید، تغذیه کل را محاسبه کنید و برای وعده‌های انتخاب‌شده سفارش دهید!',
+            button: 'برو به گالری'
           }
         },
         sampleRecipe: {
@@ -326,21 +378,21 @@ const resources = {
         totalCost: 'هزینه کل',
         nutritionChart: 'نمودار تغذیه',
         suggestedRecipes: 'دستورهای پخت پیشنهادی',
-        "addIngredient": "افزودن ماده غذایی جدید",
-        "addIngredientButton": "افزودن ماده غذایی",
-        "ingredientName": "نام ماده غذایی (انگلیسی)",
-        "persianName": "نام پارسی",
-        "calories": "کالری",
-        "totalFat": "چربی کل",
-        "cholesterol": "کلسترول",
-        "sodium": "سدیم",
-        "potassium": "پتاسیم",
-        "totalCarbohydrate": "کربوهیدرات کل",
-        "protein": "پروتئین",
-        "showOptionalFields": "نمایش فیلدهای تغذیه‌ای اختیاری",
-        "hideOptionalFields": "مخفی کردن فیلدهای تغذیه‌ای اختیاری",
-        selectCategory: "دسته بندی",
-        "category": "دسته‌بندی",
+        addIngredient: 'افزودن ماده غذایی جدید',
+        addIngredientButton: 'افزودن ماده غذایی',
+        ingredientName: 'نام ماده غذایی (انگلیسی)',
+        persianName: 'نام پارسی',
+        calories: 'کالری',
+        totalFat: 'چربی کل',
+        cholesterol: 'کلسترول',
+        sodium: 'سدیم',
+        potassium: 'پتاسیم',
+        totalCarbohydrate: 'کربوهیدرات کل',
+        protein: 'پروتئین',
+        showOptionalFields: 'نمایش فیلدهای تغذیه‌ای اختیاری',
+        hideOptionalFields: 'مخفی کردن فیلدهای تغذیه‌ای اختیاری',
+        selectCategory: 'دسته‌بندی',
+        category: 'دسته‌بندی',
         recipeDetails: {
           ingredients: 'مواد اولیه',
           instructions: 'دستورالعمل‌ها',
@@ -361,7 +413,8 @@ const resources = {
           omnivore: 'همه‌چیزخوار',
           vegetarian: 'گیاه‌خوار',
           vegan: 'وگان',
-          select: 'رژیم غذایی',
+          gluten_free: 'بدون گلوتن',
+          select: 'یک رژیم غذایی انتخاب کنید',
         },
         notes: {
           title: 'چگونه از آشپزخانه استفاده کنید',
@@ -379,8 +432,8 @@ const resources = {
           updatePrice: 'خطا در به‌روزرسانی قیمت. ورودی‌ها رو بررسی کنید.',
           updatePriceFields: 'لطفاً همه فیلدها رو برای به‌روزرسانی قیمت پر کنید.',
           refreshIngredients: 'خطا در تازه‌سازی مواد اولیه.',
-          addIngredientFields: "لطفاً تمام فیلدهای مورد نیاز برای ماده غذایی جدید را پر کنید.",
-          addIngredient: "افزودن ماده غذایی ناموفق بود. لطفاً دوباره امتحان کنید."
+          addIngredientFields: 'لطفاً تمام فیلدهای مورد نیاز برای ماده غذایی جدید را پر کنید.',
+          addIngredient: 'افزودن ماده غذایی ناموفق بود. لطفاً دوباره امتحان کنید.'
         },
         exportPrompt: 'برای دانلود لیبل روی تأیید کلیک کنید .',
         nutritionLabelTitle: 'حقایق تغذیه‌ای: مواد غذایی انتخاب‌شده'
@@ -411,13 +464,14 @@ const resources = {
         adding: 'در حال افزودن...',
         addButton: 'افزودن دستور پخت',
         confirmDelete: 'مطمئن هستید که می‌خواهید {recipe_name} را حذف کنید؟',
-        "downloadPDF": "دانلود فایل",
+        downloadPDF: 'دانلود فایل',
         dietaryOptions: {
           select: 'یک رژیم غذایی انتخاب کنید',
           all: 'همه',
           omnivore: 'همه‌چیزخوار',
           vegetarian: 'گیاه‌خوار',
-          vegan: 'وگان'
+          vegan: 'وگان',
+          gluten_free: 'بدون گلوتن'
         },
         complexityOptions: {
           select: 'یک پیچیدگی انتخاب کنید',
@@ -463,7 +517,7 @@ const resources = {
           updateRecipe: 'خطا در به‌روزرسانی دستور پخت.',
           fetchRecipesAfterUpdate: 'خطا در بارگیری دستورهای پخت پس از به‌روزرسانی.',
           invalidIngredientList: 'لیست مواد اولیه نامعتبر به نظر می‌رسه.',
-          "exportPDF": "صدور فایل دستور غذا ناموفق بود. لطفاً دوباره امتحان کنید."
+          exportPDF: 'صدور فایل دستور غذا ناموفق بود. لطفاً دوباره امتحان کنید.'
         },
         editModal: {
           title: 'ویرایش دستور پخت شما',
@@ -471,6 +525,34 @@ const resources = {
           update: 'به‌روزرسانی دستور پخت',
           updating: 'در حال به‌روزرسانی...'
         }
+      },
+      gallery: {
+        title: 'وعده‌های غذایی خود را برنامه‌ریزی کنید',
+        subtitle: 'دستورهای غذایی ما را کاوش کنید و برنامه غذایی روزانه متناسب با رژیم خود بسازید!',
+        allDiets: 'همه رژیم‌ها',
+        minProtein: 'حداقل پروتئین (گرم)', // Added
+        dietaryOptions: {
+          select: 'یک رژیم غذایی انتخاب کنید',
+          omnivore: 'همه‌چیزخوار',
+          vegetarian: 'گیاه‌خوار',
+          vegan: 'وگان',
+          gluten_free: 'بدون گلوتن'
+        },
+        maxCalories: 'حداکثر کالری',
+        applyFilters: 'اعمال فیلترها',
+        dietary: 'رژیم غذایی',
+        calories: 'کالری',
+        prepTime: 'زمان آماده‌سازی',
+        addToPlan: 'افزودن به برنامه غذایی',
+        remove: 'حذف', // Added
+        mealPlan: 'برنامه غذایی روزانه شما',
+        noPlan: 'هیچ وعده‌ای انتخاب نشده است. دستورهای غذایی را به برنامه خود اضافه کنید!',
+        totalNutrition: 'تغذیه کل',
+        emailPlaceholder: 'ایمیل خود را برای سفارش وارد کنید',
+        enterEmail: 'لطفاً ایمیل خود را برای ثبت سفارش وارد کنید.',
+        orderPlan: 'سفارش برنامه غذایی',
+        orderSuccess: 'سفارش با موفقیت ثبت شد! شناسه سفارش شما {orderId} است.',
+        mealPlanFull: 'برنامه غذایی پر است (حداکثر ۵ دستور غذایی).'
       }
     }
   }

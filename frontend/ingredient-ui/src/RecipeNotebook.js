@@ -33,7 +33,7 @@ function RecipeNotebook({ setErrorMessage }) {
     usage: false
   });
 
-  const BASE_URL = process.env.NODE_ENV === 'production' ? 'https://maniac.pythonanywhere.com' : 'http://localhost:5000';
+  const BASE_URL = 'https://maniac.pythonanywhere.com';
 
   const styles = {
     container: { backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '8px', minHeight: '100vh' },
@@ -511,6 +511,7 @@ function RecipeNotebook({ setErrorMessage }) {
             <option value="omnivore">{t('cookbook.dietaryOptions.omnivore')}</option>
             <option value="vegetarian">{t('cookbook.dietaryOptions.vegetarian')}</option>
             <option value="vegan">{t('cookbook.dietaryOptions.vegan')}</option>
+            <option value="gluten-free">{t('cookbook.dietaryOptions.gluten_free')}</option>
           </select>
         </div>
         <div className="col-12 col-md-3">
@@ -622,6 +623,7 @@ function RecipeNotebook({ setErrorMessage }) {
               <option value="omnivore">{t('cookbook.dietaryOptions.omnivore')}</option>
               <option value="vegetarian">{t('cookbook.dietaryOptions.vegetarian')}</option>
               <option value="vegan">{t('cookbook.dietaryOptions.vegan')}</option>
+              <option value="gluten-free">{t('cookbook.dietaryOptions.gluten_free')}</option>
             </select>
             <select
               className="form-select"
@@ -874,6 +876,7 @@ function RecipeNotebook({ setErrorMessage }) {
                   <option value="omnivore">{t('cookbook.dietaryOptions.omnivore')}</option>
                   <option value="vegetarian">{t('cookbook.dietaryOptions.vegetarian')}</option>
                   <option value="vegan">{t('cookbook.dietaryOptions.vegan')}</option>
+                  <option value="gluten-free">{t('cookbook.dietaryOptions.gluten_free')}</option>
                 </select>
               </div>
               <div className="mb-2">
