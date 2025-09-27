@@ -273,9 +273,19 @@ const resources = {
         totalNutrition: 'Total Nutrition',
         emailPlaceholder: 'Enter your email to order',
         enterEmail: 'Please enter your email to place an order.',
+        protein: 'Protein',
         orderPlan: 'Order Meal Plan',
         orderSuccess: 'Order placed successfully! Your order ID is {orderId}.',
-        mealPlanFull: 'Meal plan is full (max 5 recipes).'
+        orderError: 'Failed to place order. Please try again.', // Added
+        mealPlanFull: 'Meal plan is full (max 5 recipes).',
+        availableRecipes: 'Available Recipes', // Added
+        mealCategories: { // Added
+          breakfast: 'Breakfast',
+          morningSnack: 'Morning Snack',
+          lunch: 'Lunch',
+          afternoonSnack: 'Afternoon Snack',
+          dinner: 'Dinner'
+        }
       }
     }
   },
@@ -548,11 +558,21 @@ const resources = {
         mealPlan: 'برنامه غذایی روزانه شما',
         noPlan: 'هیچ وعده‌ای انتخاب نشده است. دستورهای غذایی را به برنامه خود اضافه کنید!',
         totalNutrition: 'تغذیه کل',
+        protein: 'پروتئین',
         emailPlaceholder: 'ایمیل خود را برای سفارش وارد کنید',
         enterEmail: 'لطفاً ایمیل خود را برای ثبت سفارش وارد کنید.',
         orderPlan: 'سفارش برنامه غذایی',
         orderSuccess: 'سفارش با موفقیت ثبت شد! شناسه سفارش شما {orderId} است.',
-        mealPlanFull: 'برنامه غذایی پر است (حداکثر ۵ دستور غذایی).'
+        orderError: 'ثبت سفارش ناموفق بود. لطفاً دوباره امتحان کنید.', // Added
+        mealPlanFull: 'برنامه غذایی پر است (حداکثر ۵ دستور غذایی).',
+        availableRecipes: 'دستورهای موجود', // Added
+        mealCategories: { // Added
+          breakfast: 'صبحانه',
+          morningSnack: 'میان‌وعده صبح',
+          lunch: 'ناهار',
+          afternoonSnack: 'میان‌وعده بعدازظهر',
+          dinner: 'شام'
+        }
       }
     }
   }
