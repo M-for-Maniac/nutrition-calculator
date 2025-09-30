@@ -5,19 +5,19 @@ const resources = {
   en: {
     translation: {
       app: {
-        title: 'Nutrino',
+        title: 'Central Perk',
         home: 'Home',
         kitchen: 'Kitchen',
         cookbook: 'Cookbook',
-        gallery: 'Gallery', // Added
+        gallery: 'Central Perk',
         language: 'Language',
         english: 'English',
         persian: 'Persian'
       },
       home: {
         hero: {
-          title: 'Welcome to Nutrino, Your Nutritious Journey!',
-          subtitle: 'Easily plan meals, track nutrition, and create delicious recipes with us.',
+          title: 'Welcome to Central Perk, Your Nutritious Journey!',
+          subtitle: 'Easily plan meals, track nutrition, and order delicious, healthy dishes with us.',
           kitchenCTA: 'Explore Kitchen',
           cookbookCTA: 'Discover Cookbook'
         },
@@ -33,10 +33,10 @@ const resources = {
             description: 'Build, edit, and organize your recipes with dietary and complexity filters.',
             button: 'Try Cookbook Now'
           },
-          gallery: { // Added
-            title: 'Meal Planning',
-            description: 'Browse recipes, create a daily meal plan, and order your favorite dishes.',
-            button: 'Try Gallery Now'
+          gallery: {
+            title: 'Meal Planning & Ordering',
+            description: 'Browse our curated menu, create a daily meal plan, and order high-quality, diet-specific meals.',
+            button: 'Order Now'
           }
         },
         tips: {
@@ -60,10 +60,10 @@ const resources = {
             description: 'The Cookbook lets you create, edit, and manage recipes. Add ingredients, write instructions, and set dietary or complexity filters. Calculate the nutrition for any recipe and scale it up or down to fit your needs. Save your favorites and share them!',
             button: 'Go to Cookbook'
           },
-          gallery: { // Added
-            title: 'Gallery: Your Meal Planner',
-            description: 'Explore a variety of recipes in the Gallery, filter by dietary needs, and build a daily meal plan. Add up to 5 recipes, calculate total nutrition, and place an order for your selected meals!',
-            button: 'Go to Gallery'
+          gallery: {
+            title: 'Central Perk: Your Meal Planner & Restaurant',
+            description: 'Explore a variety of high-quality recipes, filter by dietary needs, build a daily meal plan, and order your meals for delivery via WhatsApp!',
+            button: 'Go to Central Perk'
           }
         },
         sampleRecipe: {
@@ -101,21 +101,21 @@ const resources = {
         totalCost: 'Total Cost',
         nutritionChart: 'Nutrition Chart',
         suggestedRecipes: 'Recipes You Might Like',
-        addIngredient: "Add New Ingredient",
-        addIngredientButton: "Add Ingredient",
-        ingredientName: "Ingredient Name (English)",
-        persianName: "Persian Name",
-        calories: "Calories",
-        totalFat: "Total Fat",
-        cholesterol: "Cholesterol",
-        sodium: "Sodium",
-        potassium: "Potassium",
-        totalCarbohydrate: "Total Carbohydrate",
-        protein: "Protein",
-        showOptionalFields: "Show Optional Nutritional Fields",
-        hideOptionalFields: "Hide Optional Nutritional Fields",
-        selectCategory: "Category",
-        category: "Category",
+        addIngredient: 'Add New Ingredient',
+        addIngredientButton: 'Add Ingredient',
+        ingredientName: 'Ingredient Name (English)',
+        persianName: 'Persian Name',
+        calories: 'Calories',
+        totalFat: 'Total Fat',
+        cholesterol: 'Cholesterol',
+        sodium: 'Sodium',
+        potassium: 'Potassium',
+        totalCarbohydrate: 'Total Carbohydrate',
+        protein: 'Protein',
+        showOptionalFields: 'Show Optional Nutritional Fields',
+        hideOptionalFields: 'Hide Optional Nutritional Fields',
+        selectCategory: 'Category',
+        category: 'Category',
         recipeDetails: {
           ingredients: 'Ingredients',
           instructions: 'Instructions',
@@ -155,8 +155,8 @@ const resources = {
           updatePrice: 'Error updating price. Check your inputs.',
           updatePriceFields: 'Please fill in all fields to update the price.',
           refreshIngredients: 'Error refreshing ingredients.',
-          addIngredientFields: "Please fill all required fields for the new ingredient.",
-          addIngredient: "Failed to add ingredient. Please try again."
+          addIngredientFields: 'Please fill all required fields for the new ingredient.',
+          addIngredient: 'Failed to add ingredient. Please try again.'
         },
         exportPrompt: 'Export? Click OK for Image.',
         nutritionLabelTitle: 'Nutrition Facts: Selected Ingredients'
@@ -216,7 +216,10 @@ const resources = {
           complexity: 'Complexity',
           calories: 'Calories',
           cost: 'Cost',
-          actions: 'Actions'
+          actions: 'Actions',
+          viewInstructions: 'View Instructions',
+          noRecipes: 'No recipes found',
+          close: 'Close'
         },
         notes: {
           title: 'How to Use the Cookbook',
@@ -249,42 +252,96 @@ const resources = {
           updating: 'Updating...'
         }
       },
-      gallery: {
-        title: 'Plan Your Perfect Meals',
-        subtitle: 'Explore our recipes and create a daily meal plan tailored to your diet!',
-        allDiets: 'All Diets',
-        minProtein: 'Min Protein (g)', // Added
+      centralPerk: {
+        title: 'Central Perk: Your Healthy Meal Solution',
+        subtitle: 'Discover delicious, high-quality meals tailored to your diet, delivered to your door!',
+        intro: {
+          title: 'Welcome to Central Perk',
+          subtitle: 'Your one-stop online restaurant for nutritious, chef-crafted meals designed for your lifestyle. Choose from our curated recipes, build your daily meal plan, and order with ease!',
+          benefit1: {
+            title: 'Diet-Specific Meals',
+            description: 'Vegan, gluten-free, or high-protein? Our recipes are crafted to meet your dietary needs with precise nutrition tracking.'
+          },
+          benefit2: {
+            title: 'High-Quality Ingredients',
+            description: 'We use fresh, premium ingredients to ensure every meal is both healthy and delicious.'
+          },
+          benefit3: {
+            title: 'Hassle-Free Ordering',
+            description: 'Build your meal plan in minutes and order via WhatsApp for quick delivery.'
+          },
+          cta: 'Start Building Your Meal Plan'
+        },
         dietaryOptions: {
           select: 'Choose a Dietary Preference',
+          all: 'All',
           omnivore: 'Omnivore',
           vegetarian: 'Vegetarian',
           vegan: 'Vegan',
           gluten_free: 'Gluten-Free'
         },
+        days: {
+          monday: 'Monday',
+          tuesday: 'Tuesday',
+          wednesday: 'Wednesday',
+          thursday: 'Thursday',
+          friday: 'Friday',
+          saturday: 'Saturday',
+          sunday: 'Sunday'
+        },
+        allDiets: 'All Diets',
         maxCalories: 'Max Calories',
+        minProtein: 'Min Protein (g)',
         applyFilters: 'Apply Filters',
         dietary: 'Dietary',
         calories: 'Calories',
+        protein: 'Protein',
         prepTime: 'Prep Time',
         addToPlan: 'Add to Meal Plan',
-        remove: 'Remove', // Added
+        selectCategory: 'Select Meal Category',
+        selectDay: 'Select Day of the Week',
+        day: 'Day',
+        customPlan: 'Custom Plan',
+        remove: 'Remove',
+        dropHere: 'Drag and drop your meals here for {category} to plan your day',
         mealPlan: 'Your Daily Meal Plan',
-        noPlan: 'No meals selected. Add recipes to your plan!',
+        noPlan: 'No meals selected. Add dishes to your plan!',
         totalNutrition: 'Total Nutrition',
-        emailPlaceholder: 'Enter your email to order',
-        enterEmail: 'Please enter your email to place an order.',
-        protein: 'Protein',
-        orderPlan: 'Order Meal Plan',
+        savePlan: 'Save Meal Plan',
+        planSaved: 'Meal plan saved successfully!',
+        orderPlan: 'Order Your Meal Plan',
         orderSuccess: 'Order placed successfully! Your order ID is {orderId}.',
-        orderError: 'Failed to place order. Please try again.', // Added
-        mealPlanFull: 'Meal plan is full (max 5 recipes).',
-        availableRecipes: 'Available Recipes', // Added
-        mealCategories: { // Added
+        orderError: 'Failed to place order. Please try again.',
+        mealPlanFull: 'Meal plan is full (max 5 dishes).',
+        availableRecipes: 'Our Menu',
+        mealCategories: {
           breakfast: 'Breakfast',
           morningSnack: 'Morning Snack',
           lunch: 'Lunch',
           afternoonSnack: 'Afternoon Snack',
           dinner: 'Dinner'
+        },
+        predefinedPlans: {
+          title: 'Curated Meal Plans',
+          veganDelight: 'Vegan Delight',
+          highProtein: 'High-Protein Day',
+          "omnivoreBalanced": "Omnivore Balanced",
+          "glutenFreeBreakfast": "Gluten-Free Breakfast"
+        },
+        selectPlan: 'Choose This Plan',
+        totalCalories: 'Total Calories',
+        totalProtein: 'Total Protein',
+        tags: {
+          highProtein: 'High-Protein',
+          lowCalorie: 'Low-Calorie'
+        },
+        viewDetails: 'View Details',
+        ingredients: 'Ingredients',
+        instructions: 'Instructions',
+        noInstructions: 'No instructions provided',
+        close: 'Close',
+        error: {
+          fetchRecipes: 'Couldn’t load our menu. Please try again.'
         }
       }
     }
@@ -292,19 +349,19 @@ const resources = {
   fa: {
     translation: {
       app: {
-        title: 'نوترینو',
+        title: 'سنترال پرک',
         home: 'خانه',
         kitchen: 'آشپزخانه',
         cookbook: 'کتاب آشپزی',
-        gallery: 'گالری', // Added
+        gallery: 'سنترال پرک',
         language: 'زبان',
         english: 'انگلیسی',
         persian: 'فارسی'
       },
       home: {
         hero: {
-          title: 'به نوترینو خوش اومدی!',
-          subtitle: 'با ما به‌راحتی وعده‌های غذایی خود را برنامه‌ریزی کنید، تغذیه را ردیابی کنید و دستورهای پخت خوشمزه بسازید.',
+          title: 'به سنترال پرک خوش اومدی!',
+          subtitle: 'با ما به‌راحتی وعده‌های غذایی خود را برنامه‌ریزی کنید، تغذیه را ردیابی کنید و غذاهای سالم و خوشمزه سفارش دهید.',
           kitchenCTA: 'بریم تو آشپزخانه',
           cookbookCTA: 'مشاهده کتاب آشپزی'
         },
@@ -320,10 +377,10 @@ const resources = {
             description: 'دستورهای پخت خود را با فیلترهای رژیم غذایی و پیچیدگی بسازید، ویرایش کنید و سازمان‌دهی کنید.',
             button: 'کتاب آشپزی را مشاهده کنید'
           },
-          gallery: { // Added
-            title: 'برنامه‌ریزی غذایی',
-            description: 'دستورهای پخت را مرور کنید، یک برنامه غذایی روزانه بسازید و غذاهای مورد علاقه خود را سفارش دهید.',
-            button: 'گالری را امتحان کنید'
+          gallery: {
+            title: 'برنامه‌ریزی و سفارش غذا',
+            description: 'منوی منتخب ما را مرور کنید، برنامه غذایی روزانه بسازید و غذاهای باکیفیت متناسب با رژیم غذایی خود سفارش دهید.',
+            button: 'الان سفارش بدید'
           }
         },
         tips: {
@@ -347,10 +404,10 @@ const resources = {
             description: 'کتاب آشپزی به شما امکان می‌دهد دستورهای پخت را ذخیره، ویرایش کنید و مدیریت کنید. مواد اولیه را اضافه کنید، دستورالعمل‌ها را بنویسید و فیلترهای رژیم غذایی یا پیچیدگی را تنظیم کنید. ارزش غذایی هر دستور پخت را محاسبه کنید و آن را به دلخواه افزایش یا کاهش دهید. دستورهای مورد علاقه‌تان را ذخیره کنید و به اشتراک بگذارید!',
             button: 'برو به کتاب آشپزی'
           },
-          gallery: { // Added
-            title: 'گالری: برنامه‌ریز غذایی شما',
-            description: 'در گالری انواع دستورهای پخت را کاوش کنید، بر اساس نیازهای غذایی فیلتر کنید و یک برنامه غذایی روزانه بسازید. تا ۵ دستور پخت را اضافه کنید، تغذیه کل را محاسبه کنید و برای وعده‌های انتخاب‌شده سفارش دهید!',
-            button: 'برو به گالری'
+          gallery: {
+            title: 'سنترال پرک: برنامه‌ریز غذایی و رستوران شما',
+            description: 'انواع غذاهای باکیفیت را کاوش کنید، بر اساس نیازهای غذایی فیلتر کنید، برنامه غذایی روزانه بسازید و غذاهای خود را از طریق واتس‌اپ برای تحویل سفارش دهید!',
+            button: 'برو به سنترال پرک'
           }
         },
         sampleRecipe: {
@@ -445,7 +502,7 @@ const resources = {
           addIngredientFields: 'لطفاً تمام فیلدهای مورد نیاز برای ماده غذایی جدید را پر کنید.',
           addIngredient: 'افزودن ماده غذایی ناموفق بود. لطفاً دوباره امتحان کنید.'
         },
-        exportPrompt: 'برای دانلود لیبل روی تأیید کلیک کنید .',
+        exportPrompt: 'برای دانلود لیبل روی تأیید کلیک کنید.',
         nutritionLabelTitle: 'حقایق تغذیه‌ای: مواد غذایی انتخاب‌شده'
       },
       cookbook: {
@@ -503,31 +560,34 @@ const resources = {
           complexity: 'پیچیدگی',
           calories: 'کالری',
           cost: 'هزینه',
-          actions: 'عملیات'
+          actions: 'عملیات',
+          viewInstructions: 'مشاهده دستورالعمل‌ها',
+          noRecipes: 'هیچ دستور پختی یافت نشد',
+          close: 'بستن'
         },
         notes: {
           title: 'چگونه از کتاب آشپزی استفاده کنید',
           purposeTitle: 'چرا از کتاب آشپزی استفاده کنید؟',
           purpose: 'کتاب آشپزی به شما امکان می‌دهد دستورهای پخت متناسب با رژیم غذایی و بودجه خود را بسازید، مدیریت کنید و تحلیل کنید. این ابزار برای ذخیره دستورهای پخت مورد علاقه، برنامه‌ریزی وعده‌های غذایی و اطمینان از تعادل تغذیه‌ای ایده‌آل است.',
           nutritionTitle: 'درک تغذیه دستورهای پخت',
-          nutritionInfo: 'دستورهای پخت تصویری از محتوای تغذیه‌ای بر اساس مواد اولیه ارائه می‌دهند. کالری‌ها، درشت‌مغذی‌ها (کربوهیدرات‌ها، پروتئین‌ها، چربی‌ها) و ریزمغذی‌ها (ویتامین‌ها، مواد معدنی) را برای رسیدن به اهداف سلامتی خود بررسی کنید. از ضریب مقیاس برای تنظیم اندازه وعده‌ها و به‌روزرسانی تغذیه و هزینه استفاده کنید.',
+          nutritionInfo: 'دستورهای پخت تصویری از محتوای تغذیه‌ای بر اساس مواد اولیه ارائه می‌دهند. کالری‌ها، درشت‌مغذی‌ها (کربوهیدرات‌ها، پروتئین‌ها، چربی‌ها) و ریزمغذی‌ها (ویتامین‌ها، مواد معدنی) را برای رسیدن به اهداف سلامتی خود رصد کنید. از ضریب مقیاس برای تنظیم اندازه پرس‌ها و به‌روزرسانی تغذیه و هزینه استفاده کنید.',
           usageTitle: 'چگونه شروع کنید',
-          usage: 'یک دستور پخت جدید با وارد کردن نام، مواد اولیه، دستورالعمل‌ها و جزئیاتی مانند زمان آماده‌سازی و رژیم غذایی اضافه کنید. از جدول برای مشاهده، ویرایش یا حذف دستورهای پخت استفاده کنید. تغذیه هر دستور پخت را محاسبه کنید، ضریب مقیاس را برای کنترل اندازه وعده اعمال کنید و نتایج را برای ذخیره یا اشتراک صادر کنید.'
+          usage: 'یک دستور پخت جدید با وارد کردن نام، مواد اولیه، دستورالعمل‌ها و جزئیاتی مثل زمان آماده‌سازی و رژیم غذایی اضافه کنید. از جدول برای مشاهده، ویرایش یا حذف دستورهای پخت استفاده کنید. تغذیه هر دستور پخت را محاسبه کنید، ضریب مقیاس را برای کنترل اندازه پرس اعمال کنید و نتایج را صادر کنید تا ذخیره یا به اشتراک بگذارید.'
         },
         error: {
-          exportImage: 'خطا در صادر کردن تصویر برچسب تغذیه',
-          addRecipeFields: 'لطفاً نام دستور پخت، مواد اولیه و زمان آماده‌سازی رو پر کنید.',
+          exportImage: 'خطا در دانلود لیبل تغذیه.',
+          addRecipeFields: 'لطفاً نام دستور پخت، مواد اولیه و زمان آماده‌سازی را پر کنید.',
           fetchIngredients: 'نمی‌تونیم مواد اولیه رو بارگیری کنیم. دوباره امتحان کنید؟',
           fetchRecipes: 'خطا در بارگیری دستورهای پخت. لطفاً دوباره امتحان کنید.',
-          addRecipe: 'مشکلی در افزودن دستور پخت پیش اومد.',
+          addRecipe: 'مشکلی در افزودن دستور پخت شما پیش اومد.',
           calculateNutrition: 'خطا در محاسبه تغذیه.',
           deleteRecipe: 'نمی‌تونیم دستور پخت رو حذف کنیم.',
           fetchRecipesAfterDelete: 'خطا در بارگیری دستورهای پخت پس از حذف.',
           updateRecipeFields: 'لطفاً همه فیلدها رو برای به‌روزرسانی دستور پخت پر کنید.',
           updateRecipe: 'خطا در به‌روزرسانی دستور پخت.',
           fetchRecipesAfterUpdate: 'خطا در بارگیری دستورهای پخت پس از به‌روزرسانی.',
-          invalidIngredientList: 'لیست مواد اولیه نامعتبر به نظر می‌رسه.',
-          exportPDF: 'صدور فایل دستور غذا ناموفق بود. لطفاً دوباره امتحان کنید.'
+          invalidIngredientList: 'لیست مواد اولیه نامعتبر به نظر می‌رسد.',
+          exportPDF: 'خطا در دانلود PDF دستور پخت. لطفاً دوباره امتحان کنید.'
         },
         editModal: {
           title: 'ویرایش دستور پخت شما',
@@ -536,42 +596,96 @@ const resources = {
           updating: 'در حال به‌روزرسانی...'
         }
       },
-      gallery: {
-        title: 'وعده‌های غذایی خود را برنامه‌ریزی کنید',
-        subtitle: 'دستورهای غذایی ما را کاوش کنید و برنامه غذایی روزانه متناسب با رژیم خود بسازید!',
-        allDiets: 'همه رژیم‌ها',
-        minProtein: 'حداقل پروتئین (گرم)', // Added
+      centralPerk: {
+        title: 'سنترال پرک: راه‌حل غذایی سالم شما',
+        subtitle: 'غذاهای خوشمزه و باکیفیت متناسب با رژیم غذایی شما، تحویل درب منزل!',
+        intro: {
+          title: 'خوش اومدی به سنترال پرک',
+          subtitle: 'رستوران آنلاین شما برای غذاهای مغذی و حرفه‌ای که برای سبک زندگی شما طراحی شده‌اند. از میان دستورهای پخت منتخب ما انتخاب کنید، برنامه غذایی روزانه خود را بسازید و به‌راحتی سفارش دهید!',
+          benefit1: {
+            title: 'غذاهای متناسب با رژیم غذایی',
+            description: 'وگان، بدون گلوتن یا پرپروتئین؟ دستورهای پخت ما با ردیابی دقیق تغذیه برای نیازهای غذایی شما طراحی شده‌اند.'
+          },
+          benefit2: {
+            title: 'مواد اولیه باکیفیت',
+            description: 'ما از مواد اولیه تازه و درجه یک استفاده می‌کنیم تا هر غذا هم سالم و هم خوشمزه باشد.'
+          },
+          benefit3: {
+            title: 'سفارش بدون دردسر',
+            description: 'برنامه غذایی خود را در چند دقیقه بسازید و از طریق واتس‌اپ برای تحویل سریع سفارش دهید.'
+          },
+          cta: 'شروع به ساخت برنامه غذایی خود کنید'
+        },
         dietaryOptions: {
           select: 'یک رژیم غذایی انتخاب کنید',
+          all: 'همه',
           omnivore: 'همه‌چیزخوار',
           vegetarian: 'گیاه‌خوار',
           vegan: 'وگان',
           gluten_free: 'بدون گلوتن'
         },
+        days: {
+          monday: 'دوشنبه',
+          tuesday: 'سه‌شنبه',
+          wednesday: 'چهارشنبه',
+          thursday: 'پنج‌شنبه',
+          friday: 'جمعه',
+          saturday: 'شنبه',
+          sunday: 'یک‌شنبه'
+        },
+        allDiets: 'همه رژیم‌ها',
         maxCalories: 'حداکثر کالری',
+        minProtein: 'حداقل پروتئین (گرم)',
         applyFilters: 'اعمال فیلترها',
         dietary: 'رژیم غذایی',
         calories: 'کالری',
-        prepTime: 'زمان آماده‌سازی',
-        addToPlan: 'افزودن به برنامه غذایی',
-        remove: 'حذف', // Added
-        mealPlan: 'برنامه غذایی روزانه شما',
-        noPlan: 'هیچ وعده‌ای انتخاب نشده است. دستورهای غذایی را به برنامه خود اضافه کنید!',
-        totalNutrition: 'تغذیه کل',
         protein: 'پروتئین',
-        emailPlaceholder: 'ایمیل خود را برای سفارش وارد کنید',
-        enterEmail: 'لطفاً ایمیل خود را برای ثبت سفارش وارد کنید.',
-        orderPlan: 'سفارش برنامه غذایی',
-        orderSuccess: 'سفارش با موفقیت ثبت شد! شناسه سفارش شما {orderId} است.',
-        orderError: 'ثبت سفارش ناموفق بود. لطفاً دوباره امتحان کنید.', // Added
-        mealPlanFull: 'برنامه غذایی پر است (حداکثر ۵ دستور غذایی).',
-        availableRecipes: 'دستورهای موجود', // Added
-        mealCategories: { // Added
+        prepTime: 'زمان آماده‌سازی',
+        addToPlan: 'اضافه به برنامه غذایی',
+        selectCategory: 'انتخاب دسته‌بندی غذا',
+        selectDay: 'انتخاب روز هفته',
+        day: 'روز',
+        customPlan: 'برنامه سفارشی',
+        remove: 'حذف',
+        dropHere: 'غذاهای خود را برای {category} به اینجا بکشید و رها کنید تا برنامه روز خود را بسازید',
+        mealPlan: 'برنامه غذایی روزانه شما',
+        noPlan: 'هیچ غذایی انتخاب نشده است. غذاها را به برنامه خود اضافه کنید!',
+        totalNutrition: 'تغذیه کل',
+        savePlan: 'ذخیره برنامه غذایی',
+        planSaved: 'برنامه غذایی با موفقیت ذخیره شد!',
+        orderPlan: 'سفارش برنامه غذایی شما',
+        orderSuccess: 'سفارش با موفقیت ثبت شد! شماره سفارش شما {orderId} است.',
+        orderError: 'خطا در ثبت سفارش. لطفاً دوباره امتحان کنید.',
+        mealPlanFull: 'برنامه غذایی پر است (حداکثر ۵ غذا).',
+        availableRecipes: 'منوی ما',
+        mealCategories: {
           breakfast: 'صبحانه',
           morningSnack: 'میان‌وعده صبح',
           lunch: 'ناهار',
           afternoonSnack: 'میان‌وعده بعدازظهر',
           dinner: 'شام'
+        },
+        predefinedPlans: {
+          title: 'برنامه‌های غذایی منتخب',
+          veganDelight: 'لذت وگان',
+          highProtein: 'روز پرپروتئین',
+          "omnivoreBalanced": "بالانس پرطرفدار",
+          "glutenFreeBreakfast": "صبحانه بدون گلوتن"
+        },
+        selectPlan: 'انتخاب این برنامه',
+        totalCalories: 'کل کالری',
+        totalProtein: 'کل پروتئین',
+        tags: {
+          highProtein: 'پرپروتئین',
+          lowCalorie: 'کم‌کالری'
+        },
+        viewDetails: 'مشاهده جزئیات',
+        ingredients: 'مواد اولیه',
+        instructions: 'دستورالعمل‌ها',
+        noInstructions: 'دستورالعملی ارائه نشده است',
+        close: 'بستن',
+        error: {
+          fetchRecipes: 'نمی‌تونیم منو رو بارگیری کنیم. لطفاً دوباره امتحان کنید.'
         }
       }
     }
@@ -586,8 +700,7 @@ i18n
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false
-    },
-    debug: true
+    }
   });
 
 export default i18n;
