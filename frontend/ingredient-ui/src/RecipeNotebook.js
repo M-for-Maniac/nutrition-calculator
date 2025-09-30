@@ -3,9 +3,10 @@ import axios from 'axios';
 import Select from 'react-select';
 import { useTranslation } from 'react-i18next';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 function RecipeNotebook({ setErrorMessage }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [ingredients, setIngredients] = useState([]);
   const [allRecipes, setAllRecipes] = useState([]);
   const [recipeMaxCalories, setRecipeMaxCalories] = useState('');
@@ -32,6 +33,8 @@ function RecipeNotebook({ setErrorMessage }) {
     nutrition: false,
     usage: false
   });
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [showInstructionsModal, setShowInstructionsModal] = useState(false);
 
   const BASE_URL = 'https://maniac.pythonanywhere.com';
 
@@ -72,6 +75,24 @@ function RecipeNotebook({ setErrorMessage }) {
       ...prev,
       [note]: !prev[note]
     }));
+  };
+
+  // Truncate text for table display
+  const truncateText = (text, maxLength = 50) => {
+    if (!text || text.length <= maxLength) return text || '';
+    return text.substring(0, maxLength) + '...';
+  };
+
+  // Handle showing instructions in modal
+  const handleShowInstructions = (recipe) => {
+    setSelectedRecipe(recipe);
+    setShowInstructionsModal(true);
+  };
+
+  // Close instructions modal
+  const handleCloseInstructionsModal = () => {
+    setShowInstructionsModal(false);
+    setSelectedRecipe(null);
   };
 
   useEffect(() => {
@@ -357,7 +378,7 @@ function RecipeNotebook({ setErrorMessage }) {
   );
 
   return (
-    <div className="container mt-4" style={styles.container}>
+    <div className="container mt-4" style={styles.container} dir={i18n.language === 'fa' ? 'rtl' : 'ltr'}>
       <h1 className="mb-4 text-center" style={styles.heading}>
         <i className="bi bi-book" style={styles.icon}></i> {t('cookbook.title')}
       </h1>
@@ -657,101 +678,150 @@ function RecipeNotebook({ setErrorMessage }) {
         <i className="bi bi-journal-text" style={styles.icon}></i> {t('cookbook.allRecipes')}
       </h3>
       <div className="table-responsive">
-        <table className="table table-striped">
-          <thead>
+        <table className="table table-hover table-bordered align-middle">
+          <thead style={{ backgroundColor: '#295241', color: '#fff' }}>
             <tr>
-              <th>{t('cookbook.table.name')}</th>
-              <th>{t('cookbook.table.ingredients')}</th>
-              <th>{t('cookbook.table.instructions')}</th>
-              <th>{t('cookbook.table.prepTime')}</th>
-              <th>{t('cookbook.table.dietary')}</th>
-              <th>{t('cookbook.table.complexity')}</th>
-              <th>{t('cookbook.table.calories')}</th>
-              <th>{t('cookbook.table.cost')}</th>
-              <th>{t('cookbook.table.actions')}</th>
+              <th scope="col">{t('cookbook.table.name')}</th>
+              <th scope="col">{t('cookbook.table.ingredients')}</th>
+              <th scope="col">{t('cookbook.table.instructions')}</th>
+              <th scope="col">{t('cookbook.table.prepTime')}</th>
+              <th scope="col">{t('cookbook.table.dietary')}</th>
+              <th scope="col">{t('cookbook.table.complexity')}</th>
+              <th scope="col">{t('cookbook.table.calories')}</th>
+              <th scope="col">{t('cookbook.table.cost')}</th>
+              <th scope="col">{t('cookbook.table.actions')}</th>
             </tr>
           </thead>
           <tbody>
-            {filteredRecipes.map(recipe => (
-              <tr key={recipe.recipe_name}>
-                <td>{recipe.recipe_name}</td>
-                <td>
-                  {recipe.ingredient_list.map(ing => {
-                    const ingredientData = ingredients.find(i => i.ingredient_name === ing.ingredient);
-                    const persianName = ingredientData?.persian_name || 'N/A';
-                    return `${ing.ingredient} (${persianName}) (${ing.quantity}g)`;
-                  }).join(', ')}
-                </td>
-                <td>{recipe.instructions}</td>
-                <td>{recipe.prep_time}</td>
-                <td>{recipe.dietary}</td>
-                <td>{recipe.complexity}</td>
-                <td>{recipe.total_calories}</td>
-                <td>{recipe.total_cost}</td>
-                <td>
-                  <div className="d-flex flex-column flex-sm-row gap-2 align-items-sm-center">
-                    <input
-                      type="number"
-                      min="0.1"
-                      step="0.1"
-                      className="form-control"
-                      placeholder={t('cookbook.scale')}
-                      value={scaleFactor}
-                      onChange={e => setScaleFactor(e.target.value)}
-                      style={{ ...styles.input, width: '100px' }}
-                    />
-                    <button
-                      className="btn"
-                      onClick={() => handleCalculateRecipeNutrition(recipe.ingredient_list, recipe.recipe_name)}
-                      style={styles.button}
-                      disabled={isLoading}
-                    >
-                      <i className="bi bi-calculator" style={styles.icon}></i>
-                      {isLoading ? t('cookbook.calculating') : t('cookbook.calculate')}
-                    </button>
-                    <button
-                      className="btn"
-                      onClick={() => handleEditRecipe(recipe)}
-                      style={styles.button}
-                      disabled={isLoading}
-                    >
-                      <i className="bi bi-pencil" style={styles.icon}></i>
-                      {t('cookbook.edit')}
-                    </button>
-                    <button
-                      className="btn"
-                      onClick={() => handleDeleteRecipe(recipe.recipe_name)}
-                      style={styles.buttonRemove}
-                      disabled={isLoading}
-                    >
-                      <i className="bi bi-trash" style={styles.iconRemove}></i>
-                      {t('cookbook.delete')}
-                    </button>
-                    <button
-                      className="btn"
-                      onClick={() => handleExportRecipeNutrition(recipe.recipe_name)}
-                      style={styles.button}
-                      disabled={!recipeNutrition[recipe.recipe_name] || isLoading}
-                    >
-                      <i className="bi bi-download" style={styles.icon}></i>
-                      {t('cookbook.export')}
-                    </button>
-                    <button
-                      className="btn"
-                      onClick={() => handleExportRecipePDF(recipe)}
-                      style={styles.button}
-                      disabled={isLoading}
-                    >
-                      <i className="bi bi-file-earmark-pdf" style={styles.icon}></i>
-                      {t('cookbook.downloadPDF')}
-                    </button>
-                  </div>
-                </td>
+            {filteredRecipes.length === 0 ? (
+              <tr>
+                <td colSpan="9" className="text-center">{t('cookbook.table.noRecipes')}</td>
               </tr>
-            ))}
+            ) : (
+              filteredRecipes.map(recipe => (
+                <tr key={recipe.recipe_name}>
+                  <td>{recipe.recipe_name}</td>
+                  <td>
+                    {recipe.ingredient_list.map(ing => {
+                      const ingredientData = ingredients.find(i => i.ingredient_name === ing.ingredient);
+                      const persianName = ingredientData?.persian_name || 'N/A';
+                      return `${ing.ingredient} (${persianName}) (${ing.quantity}g)`;
+                    }).join(', ')}
+                  </td>
+                  <td>
+                    {truncateText(recipe.instructions)}
+                    <button
+                      className="btn btn-link p-0 ms-2"
+                      onClick={() => handleShowInstructions(recipe)}
+                      title={t('cookbook.table.viewInstructions')}
+                      disabled={isLoading}
+                    >
+                      <i className="fas fa-eye" style={styles.icon}></i>
+                    </button>
+                  </td>
+                  <td>{recipe.prep_time}</td>
+                  <td>{recipe.dietary}</td>
+                  <td>{recipe.complexity}</td>
+                  <td>{recipe.total_calories}</td>
+                  <td>{recipe.total_cost}</td>
+                  <td>
+                    <div className="d-flex flex-column flex-sm-row gap-2 align-items-sm-center">
+                      <input
+                        type="number"
+                        min="0.1"
+                        step="0.1"
+                        className="form-control"
+                        placeholder={t('cookbook.scale')}
+                        value={scaleFactor}
+                        onChange={e => setScaleFactor(e.target.value)}
+                        style={{ ...styles.input, width: '100px' }}
+                      />
+                      <button
+                        className="btn"
+                        onClick={() => handleCalculateRecipeNutrition(recipe.ingredient_list, recipe.recipe_name)}
+                        style={styles.button}
+                        disabled={isLoading}
+                      >
+                        <i className="bi bi-calculator" style={styles.icon}></i>
+                        {isLoading ? t('cookbook.calculating') : t('cookbook.calculate')}
+                      </button>
+                      <button
+                        className="btn"
+                        onClick={() => handleEditRecipe(recipe)}
+                        style={styles.button}
+                        disabled={isLoading}
+                      >
+                        <i className="bi bi-pencil" style={styles.icon}></i>
+                        {t('cookbook.edit')}
+                      </button>
+                      <button
+                        className="btn"
+                        onClick={() => handleDeleteRecipe(recipe.recipe_name)}
+                        style={styles.buttonRemove}
+                        disabled={isLoading}
+                      >
+                        <i className="bi bi-trash" style={styles.iconRemove}></i>
+                        {t('cookbook.delete')}
+                      </button>
+                      <button
+                        className="btn"
+                        onClick={() => handleExportRecipeNutrition(recipe.recipe_name)}
+                        style={styles.button}
+                        disabled={!recipeNutrition[recipe.recipe_name] || isLoading}
+                      >
+                        <i className="bi bi-download" style={styles.icon}></i>
+                        {t('cookbook.export')}
+                      </button>
+                      <button
+                        className="btn"
+                        onClick={() => handleExportRecipePDF(recipe)}
+                        style={styles.button}
+                        disabled={isLoading}
+                      >
+                        <i className="bi bi-file-earmark-pdf" style={styles.icon}></i>
+                        {t('cookbook.downloadPDF')}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
+      {/* Instructions Modal */}
+      {selectedRecipe && (
+        <div className={`modal fade ${showInstructionsModal ? 'show d-block' : ''}`} tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)', display: showInstructionsModal ? 'block' : 'none' }}>
+          <div className="modal-dialog modal-dialog-centered modal-lg" style={styles.modal}>
+            <div className="modal-content">
+              <div className="modal-header" style={{ backgroundColor: '#295241', color: '#fff' }}>
+                <h5 className="modal-title">
+                  <i className="bi bi-list-check" style={styles.icon}></i> {t('cookbook.table.instructions')} - {selectedRecipe.recipe_name}
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close btn-close-white"
+                  onClick={handleCloseInstructionsModal}
+                  aria-label={t('cookbook.table.close')}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <p style={{ whiteSpace: 'pre-wrap' }}>{selectedRecipe.instructions}</p>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={handleCloseInstructionsModal}
+                  style={styles.buttonRemove}
+                >
+                  <i className="bi bi-x-circle" style={styles.iconRemove}></i> {t('cookbook.table.close')}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {Object.keys(recipeNutrition).map(recipeName => (
         recipeNutrition[recipeName] && (
           <div key={recipeName} className="mt-3">
