@@ -691,6 +691,10 @@
 }
 
 @media (max-width: 576px) {
+  .central-perk-page {
+    padding-bottom: 200px; /* Add padding to prevent overlap with fixed meal planner */
+  }
+
   .recipe-grid,
   .plan-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -742,7 +746,7 @@
     border-top: 1px solid #295241;
     padding: 10px;
     z-index: 1000;
-    max-height: 50vh;
+    max-height: 150px; /* Reduced height for compactness */
     overflow-y: auto;
     box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
   }
