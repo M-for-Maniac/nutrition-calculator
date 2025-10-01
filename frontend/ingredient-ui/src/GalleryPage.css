@@ -573,6 +573,14 @@
   border: 2px solid #295241;
 }
 
+.recipe-details {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 .modal-body h6 {
   font-size: 1rem;
   color: #295241;
@@ -683,14 +691,25 @@
 }
 
 @media (max-width: 576px) {
+  .recipe-grid,
+  .plan-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .recipe-card,
+  .plan-card {
+    padding: 8px;
+  }
+
   .recipe-card h3,
   .plan-card h3 {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
 
   .recipe-card p,
   .plan-card p {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 
   .recipe-image,
@@ -701,8 +720,8 @@
 
   .btn-primary-custom,
   .btn-info-custom {
-    font-size: 0.8rem;
-    padding: 5px;
+    font-size: 0.75rem;
+    padding: 4px;
   }
 
   .select-meal-plan {
@@ -714,10 +733,51 @@
     width: 100%;
   }
 
+  .meal-planner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #e9e2d6;
+    border-top: 1px solid #295241;
+    padding: 10px;
+    z-index: 1000;
+    max-height: 50vh;
+    overflow-y: auto;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .meal-categories {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 10px;
+  }
+
+  .meal-category {
+    flex: 0 0 150px;
+    padding: 8px;
+  }
+
+  .meal-drop-area {
+    min-height: 50px;
+    padding: 6px;
+  }
+
+  .meal-item {
+    font-size: 0.75rem;
+    padding: 6px;
+  }
+
+  .meal-item button {
+    font-size: 0.7rem;
+    padding: 3px 6px;
+  }
+
   .meal-planner h2,
   .recipe-gallery h2,
   .predefined-plans h2 {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
   }
 
   .modal-body {
