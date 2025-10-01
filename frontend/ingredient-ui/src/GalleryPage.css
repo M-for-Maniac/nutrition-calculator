@@ -380,6 +380,10 @@
   text-align: center;
 }
 
+.meal-planner p{
+  margin-top: 1rem;
+}
+
 .meal-categories {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
