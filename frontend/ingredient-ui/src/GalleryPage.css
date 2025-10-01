@@ -768,7 +768,7 @@
   }
 
   .meal-drop-area {
-    min-height: 40px; /* Smaller drop area */
+    min-height: 50px; /* Smaller drop area */
     padding: 4px;
   }
 
@@ -864,7 +864,7 @@
   }
 
   .meal-drop-area {
-    min-height: 35px;
+    min-height: 50px;
     padding: 3px;
   }
 
