@@ -36,7 +36,7 @@ const GalleryPage = ({ setErrorMessage }) => {
       id: 'vegan-delight',
       name: t('centralPerk.predefinedPlans.veganDelight'),
       dietary: 'vegan',
-      image: 'https://m-for-maniac.github.io/ingredient-ui/images/vegan-delight-plan.jpg',
+      image: '/nutrition-calculator/images/vegan-delight-plan.jpg',
       meal_plan: {
         breakfast: [
           {
@@ -47,11 +47,11 @@ const GalleryPage = ({ setErrorMessage }) => {
             prep_time: 60,
             ingredient_list: [{ ingredient: 'Adzuki Beans', quantity: 150 }],
             instructions: 'Boil Adzuki Beans with spices and vegetables. Simmer for 1 hour.',
-            image: 'https://m-for-maniac.github.io/ingredient-ui/images/bean-soup.jpg',
+            image: '/nutrition-calculator/images/bean-soup.jpg',
             thumbnails: [
-              'https://m-for-maniac.github.io/ingredient-ui/images/thumbnails/bean-soup-1.jpg',
-              'https://m-for-maniac.github.io/ingredient-ui/images/thumbnails/bean-soup-2.jpg',
-              'https://m-for-maniac.github.io/ingredient-ui/images/thumbnails/bean-soup-3.jpg',
+              '/nutrition-calculator/images/thumbnails/bean-soup-1.jpg',
+              '/nutrition-calculator/images/thumbnails/bean-soup-2.jpg',
+              '/nutrition-calculator/images/thumbnails/bean-soup-3.jpg',
             ],
           },
         ],
@@ -67,11 +67,11 @@ const GalleryPage = ({ setErrorMessage }) => {
               { ingredient: 'Alcoholic.Beer.Strong', quantity: 500 },
             ],
             instructions: 'Serve whiskey in a double shot, pour the cold beer on ice, drop the shot in your glass, and drink all at once.',
-            image: 'https://m-for-maniac.github.io/ingredient-ui/images/bomb.jpg',
+            image: '/nutrition-calculator/images/bomb.jpg',
             thumbnails: [
-              'https://m-for-maniac.github.io/ingredient-ui/images/thumbnails/bomb-1.jpg',
-              'https://m-for-maniac.github.io/ingredient-ui/images/thumbnails/bomb-2.jpg',
-              'https://m-for-maniac.github.io/ingredient-ui/images/thumbnails/bomb-3.jpg',
+              '/nutrition-calculator/images/thumbnails/bomb-1.jpg',
+              '/nutrition-calculator/images/thumbnails/bomb-2.jpg',
+              '/nutrition-calculator/images/thumbnails/bomb-3.jpg',
             ],
           },
         ],
@@ -84,7 +84,7 @@ const GalleryPage = ({ setErrorMessage }) => {
       id: 'omnivore-balanced',
       name: t('centralPerk.predefinedPlans.omnivoreBalanced'),
       dietary: 'omnivore',
-      image: 'https://m-for-maniac.github.io/ingredient-ui/images/omnivore-balanced-plan.jpg',
+      image: '/nutrition-calculator/images/omnivore-balanced-plan.jpg',
       meal_plan: {
         breakfast: [
           {
@@ -99,11 +99,11 @@ const GalleryPage = ({ setErrorMessage }) => {
               { ingredient: 'Milk Chocolate', quantity: 50 },
             ],
             instructions: 'Enjoy along with bread and coffee',
-            image: 'https://m-for-maniac.github.io/ingredient-ui/images/morning-trio.jpg',
+            image: '/nutrition-calculator/images/morning-trio.jpg',
             thumbnails: [
-              'https://m-for-maniac.github.io/ingredient-ui/images/thumbnails/morning-trio-1.jpg',
-              'https://m-for-maniac.github.io/ingredient-ui/images/thumbnails/morning-trio-2.jpg',
-              'https://m-for-maniac.github.io/ingredient-ui/images/thumbnails/morning-trio-3.jpg',
+              '/nutrition-calculator/images/thumbnails/morning-trio-1.jpg',
+              '/nutrition-calculator/images/thumbnails/morning-trio-2.jpg',
+              '/nutrition-calculator/images/thumbnails/morning-trio-3.jpg',
             ],
           },
         ],
@@ -119,11 +119,11 @@ const GalleryPage = ({ setErrorMessage }) => {
               { ingredient: 'Chicken Breast(Grilled)', quantity: 200 },
             ],
             instructions: 'Cook Adzuki Beans until tender. Grill Chicken Breast. Mix with greens and dressing.',
-            image: 'https://m-for-maniac.github.io/ingredient-ui/images/adzuki-bean-salad.jpg',
+            image: '/nutrition-calculator/images/adzuki-bean-salad.jpg',
             thumbnails: [
-              'https://m-for-maniac.github.io/ingredient-ui/images/thumbnails/adzuki-bean-salad-1.jpg',
-              'https://m-for-maniac.github.io/ingredient-ui/images/thumbnails/adzuki-bean-salad-2.jpg',
-              'https://m-for-maniac.github.io/ingredient-ui/images/thumbnails/adzuki-bean-salad-3.jpg',
+              '/nutrition-calculator/images/thumbnails/adzuki-bean-salad-1.jpg',
+              '/nutrition-calculator/images/thumbnails/adzuki-bean-salad-2.jpg',
+              '/nutrition-calculator/images/thumbnails/adzuki-bean-salad-3.jpg',
             ],
           },
         ],
@@ -136,11 +136,11 @@ const GalleryPage = ({ setErrorMessage }) => {
             prep_time: 40,
             ingredient_list: [{ ingredient: 'Beef.Flank(Raw)', quantity: 250 }],
             instructions: 'سرخ کنید در کنار سبزیجات میل کنید',
-            image: 'https://m-for-maniac.github.io/ingredient-ui/images/meat-maniac.jpg',
+            image: '/nutrition-calculator/images/meat-maniac.jpg',
             thumbnails: [
-              'https://m-for-maniac.github.io/ingredient-ui/images/thumbnails/meat-maniac-1.jpg',
-              'https://m-for-maniac.github.io/ingredient-ui/images/thumbnails/meat-maniac-2.jpg',
-              'https://m-for-maniac.github.io/ingredient-ui/images/thumbnails/meat-maniac-3.jpg',
+              '/nutrition-calculator/images/thumbnails/meat-maniac-1.jpg',
+              '/nutrition-calculator/images/thumbnails/meat-maniac-2.jpg',
+              '/nutrition-calculator/images/thumbnails/meat-maniac-3.jpg',
             ],
           },
         ],
@@ -152,7 +152,7 @@ const GalleryPage = ({ setErrorMessage }) => {
       id: 'gluten-free-breakfast',
       name: t('centralPerk.predefinedPlans.glutenFreeBreakfast'),
       dietary: 'vegetarian',
-      image: 'https://m-for-maniac.github.io/ingredient-ui/images/gluten-free-breakfast.jpg',
+      image: '/nutrition-calculator/images/gluten-free-breakfast.jpg',
       meal_plan: {
         breakfast: [
           {
@@ -175,11 +175,11 @@ const GalleryPage = ({ setErrorMessage }) => {
               { ingredient: 'Honey', quantity: 30 },
             ],
             instructions: 'Mix Dry Ingredients: In a large bowl, whisk potato flour, sugar, baking powder, baking soda, and salt until well combined.\r\nMix Wet Ingredients: In a separate bowl, whisk eggs, vegetable oil, warm water, apple cider vinegar, honey, and vanilla extract until smooth.\r\nCombine: Gradually add the wet ingredients to the dry, whisking gently until just combined.\r\nRest Batter: Let the batter sit for 5-10 minutes.\r\nHeat Pan: Preheat a non-stick skillet over medium heat. Lightly grease.\r\nCook Pancakes: Pour about 60-70 g (1/4 cup) of batter per pancake. Cook for 2-3 minutes until bubbles form, then flip and cook for 1-2 minutes more.\r\nServe: Serve warm with gluten marmalade, maple syrup, or fresh fruit.',
-            image: 'https://m-for-maniac.github.io/ingredient-ui/images/gluten-free-pancakes.jpg',
+            image: '/nutrition-calculator/images/gluten-free-pancakes.jpg',
             thumbnails: [
-              'https://m-for-maniac.github.io/ingredient-ui/images/thumbnails/gluten-free-pancakes-1.jpg',
-              'https://m-for-maniac.github.io/ingredient-ui/images/thumbnails/gluten-free-pancakes-2.jpg',
-              'https://m-for-maniac.github.io/ingredient-ui/images/thumbnails/gluten-free-pancakes-3.jpg',
+              '/nutrition-calculator/images/thumbnails/gluten-free-pancakes-1.jpg',
+              '/nutrition-calculator/images/thumbnails/gluten-free-pancakes-2.jpg',
+              '/nutrition-calculator/images/thumbnails/gluten-free-pancakes-3.jpg',
             ],
           },
         ],
@@ -204,11 +204,11 @@ const GalleryPage = ({ setErrorMessage }) => {
         });
         const enrichedRecipes = recipeResponse.data.map((recipe) => ({
           ...recipe,
-          image: recipe.image || 'https://m-for-maniac.github.io/ingredient-ui/images/placeholder.jpg',
+          image: recipe.image || '/nutrition-calculator/images/placeholder.jpg',
           thumbnails: recipe.thumbnails || [
-            'https://m-for-maniac.github.io/ingredient-ui/images/thumbnails/placeholder-1.jpg',
-            'https://m-for-maniac.github.io/ingredient-ui/images/thumbnails/placeholder-2.jpg',
-            'https://m-for-maniac.github.io/ingredient-ui/images/thumbnails/placeholder-3.jpg',
+            '/nutrition-calculator/images/thumbnails/placeholder-1.jpg',
+            '/nutrition-calculator/images/thumbnails/placeholder-2.jpg',
+            '/nutrition-calculator/images/thumbnails/placeholder-3.jpg',
           ],
         }));
         setRecipes(enrichedRecipes);
@@ -446,7 +446,7 @@ const GalleryPage = ({ setErrorMessage }) => {
 
   const openModal = (recipe) => {
     setSelectedRecipe(recipe);
-    setMainImage(recipe.image || 'https://m-for-maniac.github.io/ingredient-ui/images/placeholder.jpg');
+    setMainImage(recipe.image || '/nutrition-calculator/images/placeholder.jpg');
   };
 
   const closeModal = () => {
