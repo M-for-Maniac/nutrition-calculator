@@ -5,7 +5,7 @@ import axios from 'axios';
 import './GalleryPage.css';
 
 const BASE_URL = 'https://maniac.pythonanywhere.com';
-const WHATSAPP_NUMBER = '989233479443'; // Removed '+' for WhatsApp API compatibility
+const WHATSAPP_NUMBER = '989233479443'; // WhatsApp API format without '+'
 
 const GalleryPage = ({ setErrorMessage }) => {
   const { t, i18n } = useTranslation();
@@ -22,9 +22,10 @@ const GalleryPage = ({ setErrorMessage }) => {
     dinner: [],
   });
   const [totalNutrition, setTotalNutrition] = useState(null);
+  const [userName, setUserName] = useState('');
   const [selectedDay, setSelectedDay] = useState('');
   const [selectedRecipe, setSelectedRecipe] = useState(null);
-  const [selectedPlan, setSelectedPlan] = useState(null); // New state for plan modal
+  const [selectedPlan, setSelectedPlan] = useState(null);
   const [mainImage, setMainImage] = useState('');
   const [selectCategory, setSelectCategory] = useState('');
   const [ingredientTranslations, setIngredientTranslations] = useState({});
@@ -351,6 +352,10 @@ const GalleryPage = ({ setErrorMessage }) => {
   };
 
   const handleOrder = () => {
+    if (!userName.trim()) {
+      setErrorMessage(t('centralPerk.enterName'));
+      return;
+    }
     if (!selectedDay) {
       setErrorMessage(t('centralPerk.selectDay'));
       return;
@@ -361,6 +366,7 @@ const GalleryPage = ({ setErrorMessage }) => {
       return;
     }
     const orderDetails = {
+      user_name: userName.trim(),
       selected_day: selectedDay,
       meal_plan: mealPlan,
     };
@@ -370,7 +376,7 @@ const GalleryPage = ({ setErrorMessage }) => {
       .then((response) => {
         console.log('Order response:', response.data); // Debug log
         setErrorMessage('');
-        let message = `New Order: ${response.data.order_id}\nDay: ${t(`centralPerk.days.${selectedDay}`)}\n\nMeal Plan:\n`;
+        let message = `New Order: ${response.data.order_id}\nName: ${userName.trim()}\nDay: ${t(`centralPerk.days.${selectedDay}`)}\n\nMeal Plan:\n`;
         Object.entries(mealPlan).forEach(([category, recipes]) => {
           if (recipes.length > 0) {
             message += `${t(`centralPerk.mealCategories.${category}`)}:\n`;
@@ -382,8 +388,8 @@ const GalleryPage = ({ setErrorMessage }) => {
         if (totalNutrition) {
           message += `\nTotal Nutrition: ${totalNutrition.calories} kcal, ${totalNutrition.protein}g protein`;
         }
-        // Normalize newlines for URL encoding
-        message = message.replace(/[\r\n]+/g, '\n');
+        // Normalize newlines and remove non-ASCII for WhatsApp compatibility
+        message = message.replace(/[\r\n]+/g, '\n').replace(/[^\x20-\x7E\n]/g, '');
         const encodedMessage = encodeURIComponent(message);
         const whatsappUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}`;
         console.log('WhatsApp URL:', whatsappUrl); // Debug log
@@ -391,10 +397,8 @@ const GalleryPage = ({ setErrorMessage }) => {
         if (!newWindow) {
           console.error('Failed to open WhatsApp window. Popup blocker may be enabled.');
           setErrorMessage(t('centralPerk.popupBlocked'));
-          // Fallback: Provide manual instructions
           alert(t('centralPerk.popupBlocked') + '\n' + t('centralPerk.openManually', { url: whatsappUrl }));
         } else {
-          // Reset state after successful redirect
           setMealPlan({
             breakfast: [],
             morningSnack: [],
@@ -403,6 +407,7 @@ const GalleryPage = ({ setErrorMessage }) => {
             dinner: [],
           });
           setTotalNutrition(null);
+          setUserName('');
           setSelectedDay('');
           alert(t('centralPerk.orderSuccess', { orderId: response.data.order_id }));
         }
@@ -549,7 +554,7 @@ const GalleryPage = ({ setErrorMessage }) => {
                   <button
                     className="btn btn-primary-custom"
                     onClick={(e) => {
-                      e.stopPropagation(); // Prevent modal from opening
+                      e.stopPropagation();
                       selectPredefinedPlan(plan);
                     }}
                   >
@@ -718,25 +723,31 @@ const GalleryPage = ({ setErrorMessage }) => {
               {totalNutrition.protein}g {t('centralPerk.protein')}
             </p>
           )}
-          <div className="order-section">
-            <select
-              value={selectedDay}
-              onChange={(e) => setSelectedDay(e.target.value)}
-              className="form-control"
-            >
-              <option value="">{t('centralPerk.selectDay')}</option>
-              {daysOfWeek.map((day) => (
-                <option key={day.id} value={day.id}>
-                  {day.label}
-                </option>
-              ))}
-            </select>
-            <div className="order-buttons">
-              <button className="btn btn-primary-custom order-button" onClick={handleOrder}>
-                {t('centralPerk.orderPlan')}
-              </button>
-            </div>
-          </div>
+        </div>
+        <div className="order-form">
+          <h2>{t('centralPerk.submitOrder')}</h2>
+          <input
+            type="text"
+            placeholder={t('centralPerk.namePlaceholder')}
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
+            className="form-control"
+          />
+          <select
+            value={selectedDay}
+            onChange={(e) => setSelectedDay(e.target.value)}
+            className="form-control"
+          >
+            <option value="">{t('centralPerk.selectDay')}</option>
+            {daysOfWeek.map((day) => (
+              <option key={day.id} value={day.id}>
+                {day.label}
+              </option>
+            ))}
+          </select>
+          <button className="btn btn-primary-custom order-button" onClick={handleOrder}>
+            {t('centralPerk.orderPlan')}
+          </button>
         </div>
       </DragDropContext>
       {selectedRecipe && (
