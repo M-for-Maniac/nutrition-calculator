@@ -5,7 +5,7 @@ import axios from 'axios';
 import './GalleryPage.css';
 
 const BASE_URL = 'https://maniac.pythonanywhere.com';
-const WHATSAPP_NUMBER = '989233479443'; // WhatsApp API format without '+'
+const WHATSAPP_NUMBER = '989233479443'; // Removed '+' for WhatsApp API compatibility
 
 const GalleryPage = ({ setErrorMessage }) => {
   const { t, i18n } = useTranslation();
@@ -22,13 +22,14 @@ const GalleryPage = ({ setErrorMessage }) => {
     dinner: [],
   });
   const [totalNutrition, setTotalNutrition] = useState(null);
-  const [userName, setUserName] = useState('');
   const [selectedDay, setSelectedDay] = useState('');
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [mainImage, setMainImage] = useState('');
   const [selectCategory, setSelectCategory] = useState('');
   const [ingredientTranslations, setIngredientTranslations] = useState({});
+  const [userName, setUserName] = useState(''); // Added for order form
+  const [orderSuccess, setOrderSuccess] = useState(''); // Added for success message
 
   const [predefinedPlans] = useState([
     {
@@ -351,8 +352,8 @@ const GalleryPage = ({ setErrorMessage }) => {
     }
   };
 
-  const handleOrder = () => {
-    if (!userName.trim()) {
+  const handleOrder = async () => {
+    if (!userName) {
       setErrorMessage(t('centralPerk.enterName'));
       return;
     }
@@ -365,57 +366,62 @@ const GalleryPage = ({ setErrorMessage }) => {
       setErrorMessage(t('centralPerk.noPlan'));
       return;
     }
+
     const orderDetails = {
-      user_name: userName.trim(),
+      user_name: userName,
       selected_day: selectedDay,
       meal_plan: mealPlan,
     };
-    console.log('Sending order to backend:', orderDetails); // Debug log
-    axios
-      .post(`${BASE_URL}/order_meal`, orderDetails)
-      .then((response) => {
-        console.log('Order response:', response.data); // Debug log
-        setErrorMessage('');
-        let message = `New Order: ${response.data.order_id}\nName: ${userName.trim()}\nDay: ${t(`centralPerk.days.${selectedDay}`)}\n\nMeal Plan:\n`;
-        Object.entries(mealPlan).forEach(([category, recipes]) => {
-          if (recipes.length > 0) {
-            message += `${t(`centralPerk.mealCategories.${category}`)}:\n`;
-            recipes.forEach((recipe) => {
-              message += `- ${recipe.recipe_name} (${recipe.total_calories} kcal, ${recipe.total_protein}g protein)\n`;
-            });
-          }
+
+    console.log('Sending order to backend:', JSON.stringify(orderDetails, null, 2)); // Debug log
+
+    let message = `${t('centralPerk.orderSuccess').replace('{orderId}', '[order_id]')}\n${t('centralPerk.day')}: ${t(`centralPerk.days.${selectedDay}`)}\n\n${t('centralPerk.mealPlan')}:\n`;
+    Object.entries(mealPlan).forEach(([category, recipes]) => {
+      if (recipes.length > 0) {
+        message += `${t(`centralPerk.mealCategories.${category}`)}:\n`;
+        recipes.forEach((recipe) => {
+          message += `- ${recipe.recipe_name} (${recipe.total_calories} ${t('centralPerk.calories')}, ${recipe.total_protein}${t('kitchen.grams')} ${t('centralPerk.protein')})\n`;
         });
-        if (totalNutrition) {
-          message += `\nTotal Nutrition: ${totalNutrition.calories} kcal, ${totalNutrition.protein}g protein`;
-        }
-        // Normalize newlines and remove non-ASCII for WhatsApp compatibility
-        message = message.replace(/[\r\n]+/g, '\n').replace(/[^\x20-\x7E\n]/g, '');
-        const encodedMessage = encodeURIComponent(message);
-        const whatsappUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}`;
-        console.log('WhatsApp URL:', whatsappUrl); // Debug log
-        const newWindow = window.open(whatsappUrl, '_blank');
-        if (!newWindow) {
-          console.error('Failed to open WhatsApp window. Popup blocker may be enabled.');
-          setErrorMessage(t('centralPerk.popupBlocked'));
-          alert(t('centralPerk.popupBlocked') + '\n' + t('centralPerk.openManually', { url: whatsappUrl }));
-        } else {
-          setMealPlan({
-            breakfast: [],
-            morningSnack: [],
-            lunch: [],
-            afternoonSnack: [],
-            dinner: [],
-          });
-          setTotalNutrition(null);
-          setUserName('');
-          setSelectedDay('');
-          alert(t('centralPerk.orderSuccess', { orderId: response.data.order_id }));
-        }
-      })
-      .catch((error) => {
-        console.error('Error placing order:', error.response || error);
-        setErrorMessage(t('centralPerk.orderError'));
-      });
+      }
+    });
+    if (totalNutrition) {
+      message += `\n${t('centralPerk.totalNutrition')}: ${totalNutrition.calories} ${t('centralPerk.calories')}, ${totalNutrition.protein}${t('kitchen.grams')} ${t('centralPerk.protein')}`;
+    }
+
+    try {
+      const response = await axios.post(`${BASE_URL}/order_meal`, orderDetails);
+      console.log('Order response:', response.data); // Debug log
+      setErrorMessage('');
+      const orderId = response.data.order_id;
+      const encodedMessage = encodeURIComponent(message.replace(/[\r\n]+/g, '\n')); // Support Persian text
+      const whatsappUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage.replace('[order_id]', orderId)}`;
+      console.log('WhatsApp URL:', whatsappUrl); // Debug log
+      const newWindow = window.open(whatsappUrl, '_blank');
+      if (!newWindow) {
+        console.error('Failed to open WhatsApp window. Popup blocker may be enabled.');
+        setErrorMessage(t('centralPerk.error.popupBlocked').replace('{url}', whatsappUrl));
+        alert(t('centralPerk.error.popupBlocked') + '\n' + t('centralPerk.openManually', { url: whatsappUrl }));
+      } else {
+        setOrderSuccess(t('centralPerk.orderSuccess').replace('{orderId}', orderId));
+        setMealPlan({
+          breakfast: [],
+          morningSnack: [],
+          lunch: [],
+          afternoonSnack: [],
+          dinner: [],
+        });
+        setTotalNutrition(null);
+        setSelectedDay('');
+        setUserName('');
+      }
+    } catch (error) {
+      console.error('Error placing order:', error.response?.data || error.message);
+      setErrorMessage(
+        error.response?.data?.error
+          ? t('centralPerk.orderError') + `: ${error.response.data.error}`
+          : t('centralPerk.orderError')
+      );
+    }
   };
 
   const selectPredefinedPlan = (plan) => {
@@ -723,31 +729,33 @@ const GalleryPage = ({ setErrorMessage }) => {
               {totalNutrition.protein}g {t('centralPerk.protein')}
             </p>
           )}
-        </div>
-        <div className="order-form">
-          <h2>{t('centralPerk.submitOrder')}</h2>
-          <input
-            type="text"
-            placeholder={t('centralPerk.namePlaceholder')}
-            value={userName}
-            onChange={(e) => setUserName(e.target.value)}
-            className="form-control"
-          />
-          <select
-            value={selectedDay}
-            onChange={(e) => setSelectedDay(e.target.value)}
-            className="form-control"
-          >
-            <option value="">{t('centralPerk.selectDay')}</option>
-            {daysOfWeek.map((day) => (
-              <option key={day.id} value={day.id}>
-                {day.label}
-              </option>
-            ))}
-          </select>
-          <button className="btn btn-primary-custom order-button" onClick={handleOrder}>
-            {t('centralPerk.orderPlan')}
-          </button>
+          <div className="order-form">
+            <h2>{t('centralPerk.submitOrder')}</h2>
+            <input
+              type="text"
+              className="form-control"
+              placeholder={t('centralPerk.namePlaceholder')}
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+            />
+            <select
+              value={selectedDay}
+              onChange={(e) => setSelectedDay(e.target.value)}
+              className="form-control"
+            >
+              <option value="">{t('centralPerk.selectDay')}</option>
+              {daysOfWeek.map((day) => (
+                <option key={day.id} value={day.id}>
+                  {day.label}
+                </option>
+              ))}
+            </select>
+            <button className="order-button" onClick={handleOrder}>
+              {t('centralPerk.submitOrder')}
+            </button>
+            {orderSuccess && <p className="success-message">{orderSuccess}</p>}
+            {/* {setErrorMessage && errorMessage && <p className="error-message">{errorMessage}</p>} */}
+          </div>
         </div>
       </DragDropContext>
       {selectedRecipe && (
