@@ -741,7 +741,7 @@
   }
 
   .meal-planner {
-    position: fixed;
+    position: sticky; /* Changed to sticky for better dnd compatibility */
     bottom: 0;
     left: 0;
     right: 0;
@@ -749,10 +749,11 @@
     border-top: 1px solid #295241;
     padding: 10px;
     z-index: 1000;
-    max-height: 160px; /* Increased for better usability */
+    max-height: 160px; /* Maintained for usability */
     min-height: 80px;
     overflow-y: auto;
     box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    touch-action: none; /* Prevents scrolling during drag */
   }
 
   .meal-categories {
@@ -763,12 +764,12 @@
   }
 
   .meal-category {
-    flex: 0 0 150px; /* Slightly larger for taller planner */
+    flex: 0 0 150px;
     padding: 8px;
   }
 
   .meal-drop-area {
-    min-height: 50px; /* Increased for better drop zone visibility */
+    min-height: 50px;
     padding: 6px;
   }
 
@@ -849,9 +850,14 @@
   }
 
   .meal-planner {
-    max-height: 140px; /* Increased for better usability */
+    position: sticky; /* Changed to sticky for better dnd compatibility */
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-height: 140px; /* Maintained for usability */
     min-height: 70px;
     padding: 8px;
+    touch-action: none; /* Prevents scrolling during drag */
   }
 
   .meal-categories {
@@ -859,12 +865,12 @@
   }
 
   .meal-category {
-    flex: 0 0 130px; /* Adjusted for taller planner */
+    flex: 0 0 130px;
     padding: 6px;
   }
 
   .meal-drop-area {
-    min-height: 45px; /* Slightly larger drop area */
+    min-height: 45px;
     padding: 5px;
   }
 
