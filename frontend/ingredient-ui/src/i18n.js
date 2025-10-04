@@ -252,98 +252,102 @@ const resources = {
           updating: 'Updating...'
         }
       },
-      centralPerk: {
-        title: 'Central Perk: Your Healthy Meal Solution',
-        subtitle: 'Discover delicious, high-quality meals tailored to your diet, delivered to your door!',
-        intro: {
-          title: 'Welcome to Central Perk',
-          subtitle: 'Your one-stop online restaurant for nutritious, chef-crafted meals designed for your lifestyle. Choose from our curated recipes, build your daily meal plan, and order with ease!',
-          benefit1: {
-            title: 'Diet-Specific Meals',
-            description: 'Vegan, gluten-free, or high-protein? Our recipes are crafted to meet your dietary needs with precise nutrition tracking.'
+      "centralPerk": {
+        "title": "Central Perk: Your Healthy Meal Solution",
+        "subtitle": "Discover delicious, high-quality meals tailored to your diet, delivered to your door!",
+        "intro": {
+          "title": "Welcome to Central Perk",
+          "subtitle": "Your one-stop online restaurant for nutritious, chef-crafted meals designed for your lifestyle. Choose from our curated recipes, build your daily meal plan, and order with ease!",
+          "benefit1": {
+            "title": "Diet-Specific Meals",
+            "description": "Vegan, gluten-free, or high-protein? Our recipes are crafted to meet your dietary needs with precise nutrition tracking."
           },
-          benefit2: {
-            title: 'High-Quality Ingredients',
-            description: 'We use fresh, premium ingredients to ensure every meal is both healthy and delicious.'
+          "benefit2": {
+            "title": "High-Quality Ingredients",
+            "description": "We use fresh, premium ingredients to ensure every meal is both healthy and delicious."
           },
-          benefit3: {
-            title: 'Hassle-Free Ordering',
-            description: 'Build your meal plan in minutes and order via WhatsApp for quick delivery.'
+          "benefit3": {
+            "title": "Hassle-Free Ordering",
+            "description": "Build your meal plan in minutes and order via WhatsApp for quick delivery."
           },
-          cta: 'Start Building Your Meal Plan'
+          "cta": "Start Building Your Meal Plan"
         },
-        dietaryOptions: {
-          select: 'Choose a Dietary Preference',
-          all: 'All',
-          omnivore: 'Omnivore',
-          vegetarian: 'Vegetarian',
-          vegan: 'Vegan',
-          gluten_free: 'Gluten-Free'
+        "dietaryOptions": {
+          "select": "Choose a Dietary Preference",
+          "all": "All",
+          "omnivore": "Omnivore",
+          "vegetarian": "Vegetarian",
+          "vegan": "Vegan",
+          "gluten_free": "Gluten-Free"
         },
-        days: {
-          monday: 'Monday',
-          tuesday: 'Tuesday',
-          wednesday: 'Wednesday',
-          thursday: 'Thursday',
-          friday: 'Friday',
-          saturday: 'Saturday',
-          sunday: 'Sunday'
+        "days": {
+          "monday": "Monday",
+          "tuesday": "Tuesday",
+          "wednesday": "Wednesday",
+          "thursday": "Thursday",
+          "friday": "Friday",
+          "saturday": "Saturday",
+          "sunday": "Sunday"
         },
-        allDiets: 'All Diets',
-        maxCalories: 'Max Calories',
-        minProtein: 'Min Protein (g)',
-        applyFilters: 'Apply Filters',
-        dietary: 'Dietary',
-        calories: 'Calories',
-        protein: 'Protein',
-        prepTime: 'Prep Time',
-        addToPlan: 'Add to Meal Plan',
-        selectCategory: 'Select Meal Category',
-        selectDay: 'Select Day of the Week',
-        day: 'Day',
-        customPlan: 'Custom Plan',
-        remove: 'Remove',
-        dropHere: 'Drag and drop your chosen meals here to plan your day',
-        mealPlan: 'Your Daily Meal Plan',
-        noPlan: 'No meals selected. Add dishes to your plan!',
-        totalNutrition: 'Total Nutrition',
-        savePlan: 'Save Meal Plan',
-        planSaved: 'Meal plan saved successfully!',
-        orderPlan: 'Order Your Meal Plan',
-        orderSuccess: 'Order placed successfully! Your order ID is {orderId}.',
-        orderError: 'Failed to place order. Please try again.',
-        mealPlanFull: 'Meal plan is full (max 5 dishes).',
-        availableRecipes: 'Our Menu',
-        mealCategories: {
-          breakfast: 'Breakfast',
-          morningSnack: 'Morning Snack',
-          lunch: 'Lunch',
-          afternoonSnack: 'Afternoon Snack',
-          dinner: 'Dinner'
+        "allDiets": "All Diets",
+        "maxCalories": "Max Calories",
+        "minProtein": "Min Protein (g)",
+        "applyFilters": "Apply Filters",
+        "dietary": "Dietary",
+        "calories": "Calories",
+        "protein": "Protein",
+        "prepTime": "Prep Time",
+        "addToPlan": "Add to Meal Plan",
+        "selectCategory": "Select Meal Category",
+        "selectDay": "Select Day of the Week",
+        "day": "Day",
+        "customPlan": "Custom Plan",
+        "remove": "Remove",
+        "dropHere": "Drag and drop your chosen meals here to plan your day",
+        "mealPlan": "Your Daily Meal Plan",
+        "noPlan": "No meals selected. Add dishes to your plan!",
+        "totalNutrition": "Total Nutrition",
+        "savePlan": "Save Meal Plan",
+        "planSaved": "Meal plan saved successfully!",
+        "orderPlan": "Order Your Meal Plan",
+        "orderSuccess": "Order placed successfully! Your order ID is {orderId}.",
+        "orderError": "Failed to place order. Please try again.",
+        "mealPlanFull": "Meal plan is full (max 5 dishes).",
+        "availableRecipes": "Our Menu",
+        "mealCategories": {
+          "breakfast": "Breakfast",
+          "morningSnack": "Morning Snack",
+          "lunch": "Lunch",
+          "afternoonSnack": "Afternoon Snack",
+          "dinner": "Dinner"
         },
-        predefinedPlans: {
-          title: 'Curated Meal Plans',
-          veganDelight: 'Vegan Delight',
-          highProtein: 'High-Protein Day',
+        "predefinedPlans": {
+          "title": "Curated Meal Plans",
+          "veganDelight": "Vegan Delight",
+          "highProtein": "High-Protein Day",
           "omnivoreBalanced": "Omnivore Balanced",
           "glutenFreeBreakfast": "Gluten-Free Breakfast"
         },
-        selectPlan: 'Choose This Plan',
-        totalCalories: 'Total Calories',
-        totalProtein: 'Total Protein',
-        tags: {
-          highProtein: 'High-Protein',
-          lowCalorie: 'Low-Calorie'
+        "selectPlan": "Choose This Plan",
+        "totalCalories": "Total Calories",
+        "totalProtein": "Total Protein",
+        "tags": {
+          "highProtein": "High-Protein",
+          "lowCalorie": "Low-Calorie"
         },
-        viewDetails: 'View Details',
-        ingredients: 'Ingredients',
-        instructions: 'Instructions',
-        noInstructions: 'No instructions provided',
-        close: 'Close',
-        error: {
-          fetchRecipes: 'Couldn’t load our menu. Please try again.'
+        "viewDetails": "View Details",
+        "ingredients": "Ingredients",
+        "instructions": "Instructions",
+        "noInstructions": "No instructions provided",
+        "close": "Close",
+        "submitOrder": "Submit Your Order",
+        "namePlaceholder": "Enter Your Name",
+        "enterName": "Please enter your name.",
+        "error": {
+          "fetchRecipes": "Couldn’t load our menu. Please try again.",
+          "popupBlocked": "Unable to open WhatsApp. Please allow popups or open the link manually: {url}"
         }
-      }
+      },
     }
   },
   fa: {
@@ -596,98 +600,102 @@ const resources = {
           updating: 'در حال به‌روزرسانی...'
         }
       },
-      centralPerk: {
-        title: 'سنترال پرک: راه‌حل غذایی سالم شما',
-        subtitle: 'غذاهای خوشمزه و باکیفیت متناسب با رژیم غذایی شما، تحویل درب منزل!',
-        intro: {
-          title: 'خوش اومدی به سنترال پرک',
-          subtitle: 'رستوران آنلاین شما برای غذاهای مغذی و حرفه‌ای که برای سبک زندگی شما طراحی شده‌اند. از میان دستورهای پخت منتخب ما انتخاب کنید، برنامه غذایی روزانه خود را بسازید و به‌راحتی سفارش دهید!',
-          benefit1: {
-            title: 'غذاهای متناسب با رژیم غذایی',
-            description: 'وگان، بدون گلوتن یا پرپروتئین؟ دستورهای پخت ما با ردیابی دقیق تغذیه برای نیازهای غذایی شما طراحی شده‌اند.'
+      "centralPerk": {
+        "title": "سنترال پرک: راه‌حل غذای سالم شما",
+        "subtitle": "غذاهای خوشمزه و باکیفیت متناسب با رژیم غذایی شما، تحویل درب منزل!",
+        "intro": {
+          "title": "به سنترال پرک خوش آمدید",
+          "subtitle": "رستوران آنلاین شما برای غذاهای مغذی و حرفه‌ای که برای سبک زندگی شما طراحی شده‌اند. از بین دستور پخت‌های انتخاب‌شده ما انتخاب کنید، برنامه غذایی روزانه خود را بسازید و به راحتی سفارش دهید!",
+          "benefit1": {
+            "title": "غذاهای متناسب با رژیم غذایی",
+            "description": "وگان، بدون گلوتن یا پر پروتئین؟ دستور پخت‌های ما با ردیابی دقیق تغذیه برای نیازهای رژیم غذایی شما طراحی شده‌اند."
           },
-          benefit2: {
-            title: 'مواد اولیه باکیفیت',
-            description: 'ما از مواد اولیه تازه و درجه یک استفاده می‌کنیم تا هر غذا هم سالم و هم خوشمزه باشد.'
+          "benefit2": {
+            "title": "مواد اولیه باکیفیت",
+            "description": "ما از مواد اولیه تازه و درجه یک استفاده می‌کنیم تا هر وعده غذایی هم سالم و هم خوشمزه باشد."
           },
-          benefit3: {
-            title: 'سفارش بدون دردسر',
-            description: 'برنامه غذایی خود را در چند دقیقه بسازید و از طریق واتس‌اپ برای تحویل سریع سفارش دهید.'
+          "benefit3": {
+            "title": "سفارش بدون دردسر",
+            "description": "برنامه غذایی خود را در چند دقیقه بسازید و از طریق واتساپ برای تحویل سریع سفارش دهید."
           },
-          cta: 'شروع به ساخت برنامه غذایی خود کنید'
+          "cta": "شروع به ساخت برنامه غذایی خود کنید"
         },
-        dietaryOptions: {
-          select: 'یک رژیم غذایی انتخاب کنید',
-          all: 'همه',
-          omnivore: 'همه‌چیزخوار',
-          vegetarian: 'گیاه‌خوار',
-          vegan: 'وگان',
-          gluten_free: 'بدون گلوتن'
+        "dietaryOptions": {
+          "select": "انتخاب رژیم غذایی",
+          "all": "همه",
+          "omnivore": "همه‌چیزخوار",
+          "vegetarian": "گیاهخوار",
+          "vegan": "وگان",
+          "gluten_free": "بدون گلوتن"
         },
-        days: {
-          monday: 'دوشنبه',
-          tuesday: 'سه‌شنبه',
-          wednesday: 'چهارشنبه',
-          thursday: 'پنج‌شنبه',
-          friday: 'جمعه',
-          saturday: 'شنبه',
-          sunday: 'یک‌شنبه'
+        "days": {
+          "monday": "دوشنبه",
+          "tuesday": "سه‌شنبه",
+          "wednesday": "چهارشنبه",
+          "thursday": "پنج‌شنبه",
+          "friday": "جمعه",
+          "saturday": "شنبه",
+          "sunday": "یکشنبه"
         },
-        allDiets: 'همه رژیم‌ها',
-        maxCalories: 'حداکثر کالری',
-        minProtein: 'حداقل پروتئین (گرم)',
-        applyFilters: 'اعمال فیلترها',
-        dietary: 'رژیم غذایی',
-        calories: 'کالری',
-        protein: 'پروتئین',
-        prepTime: 'زمان آماده‌سازی',
-        addToPlan: 'اضافه به برنامه غذایی',
-        selectCategory: 'انتخاب دسته‌بندی غذا',
-        selectDay: 'انتخاب روز هفته',
-        day: 'روز',
-        customPlan: 'برنامه سفارشی',
-        remove: 'حذف',
-        dropHere: 'غذاهای مورد نظر خود را اینجا بندازید و رها کنید تا برنامه روز خود را بسازید',
-        mealPlan: 'برنامه غذایی روزانه شما',
-        noPlan: 'هیچ غذایی انتخاب نشده است. غذاها را به برنامه خود اضافه کنید!',
-        totalNutrition: 'تغذیه کل',
-        savePlan: 'ذخیره برنامه غذایی',
-        planSaved: 'برنامه غذایی با موفقیت ذخیره شد!',
-        orderPlan: 'سفارش برنامه غذایی شما',
-        orderSuccess: 'سفارش با موفقیت ثبت شد! شماره سفارش شما {orderId} است.',
-        orderError: 'خطا در ثبت سفارش. لطفاً دوباره امتحان کنید.',
-        mealPlanFull: 'برنامه غذایی پر است (حداکثر ۵ غذا).',
-        availableRecipes: 'منوی ما',
-        mealCategories: {
-          breakfast: 'صبحانه',
-          morningSnack: 'میان‌وعده صبح',
-          lunch: 'ناهار',
-          afternoonSnack: 'میان‌وعده بعدازظهر',
-          dinner: 'شام'
+        "allDiets": "همه رژیم‌ها",
+        "maxCalories": "حداکثر کالری",
+        "minProtein": "حداقل پروتئین (گرم)",
+        "applyFilters": "اعمال فیلترها",
+        "dietary": "رژیم غذایی",
+        "calories": "کالری",
+        "protein": "پروتئین",
+        "prepTime": "زمان آماده‌سازی",
+        "addToPlan": "افزودن به برنامه غذایی",
+        "selectCategory": "انتخاب دسته‌بندی وعده",
+        "selectDay": "انتخاب روز هفته",
+        "day": "روز",
+        "customPlan": "برنامه سفارشی",
+        "remove": "حذف",
+        "dropHere": "غذاهای انتخابی خود را اینجا بکشید و رها کنید تا برنامه روزانه خود را بسازید",
+        "mealPlan": "برنامه غذایی روزانه شما",
+        "noPlan": "هیچ غذایی انتخاب نشده است. غذاها را به برنامه خود اضافه کنید!",
+        "totalNutrition": "مجموع تغذیه",
+        "savePlan": "ذخیره برنامه غذایی",
+        "planSaved": "برنامه غذایی با موفقیت ذخیره شد!",
+        "orderPlan": "سفارش برنامه غذایی",
+        "orderSuccess": "سفارش با موفقیت ثبت شد! شماره سفارش شما {orderId} است.",
+        "orderError": "ثبت سفارش ناموفق بود. لطفاً دوباره تلاش کنید.",
+        "mealPlanFull": "برنامه غذایی پر است (حداکثر ۵ غذا).",
+        "availableRecipes": "منوی ما",
+        "mealCategories": {
+          "breakfast": "صبحانه",
+          "morningSnack": "میان‌وعده صبح",
+          "lunch": "ناهار",
+          "afternoonSnack": "میان‌وعده بعدازظهر",
+          "dinner": "شام"
         },
-        predefinedPlans: {
-          title: 'برنامه‌های غذایی منتخب',
-          veganDelight: 'لذت وگان',
-          highProtein: 'روز پرپروتئین',
-          "omnivoreBalanced": "بالانس پرطرفدار",
+        "predefinedPlans": {
+          "title": "برنامه‌های غذایی منتخب",
+          "veganDelight": "لذت وگان",
+          "highProtein": "روز پر پروتئین",
+          "omnivoreBalanced": "همه‌چیزخوار متعادل",
           "glutenFreeBreakfast": "صبحانه بدون گلوتن"
         },
-        selectPlan: 'انتخاب این برنامه',
-        totalCalories: 'کل کالری',
-        totalProtein: 'کل پروتئین',
-        tags: {
-          highProtein: 'پرپروتئین',
-          lowCalorie: 'کم‌کالری'
+        "selectPlan": "انتخاب این برنامه",
+        "totalCalories": "مجموع کالری",
+        "totalProtein": "مجموع پروتئین",
+        "tags": {
+          "highProtein": "پر پروتئین",
+          "lowCalorie": "کم کالری"
         },
-        viewDetails: 'مشاهده جزئیات',
-        ingredients: 'مواد اولیه',
-        instructions: 'دستورالعمل‌ها',
-        noInstructions: 'دستورالعملی ارائه نشده است',
-        close: 'بستن',
-        error: {
-          fetchRecipes: 'نمی‌تونیم منو رو بارگیری کنیم. لطفاً دوباره امتحان کنید.'
+        "viewDetails": "مشاهده جزئیات",
+        "ingredients": "مواد اولیه",
+        "instructions": "دستورالعمل‌ها",
+        "noInstructions": "دستورالعملی ارائه نشده است",
+        "close": "بستن",
+        "submitOrder": "ثبت سفارش",
+        "namePlaceholder": "نام خود را وارد کنید",
+        "enterName": "لطفاً نام خود را وارد کنید.",
+        "error": {
+          "fetchRecipes": "نمی‌توان منو را بارگیری کرد. لطفاً دوباره تلاش کنید.",
+          "popupBlocked": "نمی‌توان واتساپ را باز کرد. لطفاً پاپ‌آپ‌ها را مجاز کنید یا لینک را به صورت دستی باز کنید: {url}"
         }
-      }
+      },
     }
   }
 };

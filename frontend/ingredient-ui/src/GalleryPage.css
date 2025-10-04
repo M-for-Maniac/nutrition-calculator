@@ -371,6 +371,9 @@
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 30px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .meal-planner h2 {
@@ -382,8 +385,10 @@
 
 .meal-categories {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 15px;
+  max-width: 800px;
+  overflow-x: hidden;
 }
 
 .meal-category {
@@ -409,6 +414,8 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .meal-drop-area.dragging-over {
@@ -462,40 +469,39 @@
   background-color: #d32f2f;
 }
 
-.order-section {
-  margin-top: 30px;
+/* Order Form */
+.order-form {
+  margin: 30px auto;
+  padding: 20px;
+  background-color: #fff;
+  border: 1px solid #295241;
+  border-radius: 8px;
+  max-width: 800px;
   display: flex;
   flex-direction: column;
   gap: 15px;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.order-section select {
-  width: 100%;
-  max-width: 300px;
-  padding: 10px;
+.order-form h2 {
+  font-size: 1.5rem;
+  color: #295241;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.order-form .form-control {
+  padding: 8px;
   font-size: 0.9rem;
   border: 1px solid #295241;
   border-radius: 6px;
   background-color: #e9e2d6;
   color: #1f3e31;
+  max-width: 300px;
+  width: 100%;
 }
 
-.order-buttons {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.save-button,
-.order-button {
-  flex: 1;
-  max-width: 200px;
-  padding: 10px;
+.order-form .order-button {
+  padding: 8px 16px;
   font-size: 0.9rem;
   background-color: #295241;
   color: #f1f1f1;
@@ -503,10 +509,11 @@
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.2s;
+  max-width: 200px;
+  align-self: center;
 }
 
-.save-button:hover,
-.order-button:hover {
+.order-form .order-button:hover {
   background-color: #1f3e31;
 }
 
@@ -645,6 +652,10 @@
   padding-left: 0;
 }
 
+.central-perk-page[dir='rtl'] .order-form {
+  text-align: right;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
   .intro-section h1 {
@@ -666,22 +677,20 @@
     max-width: none;
   }
 
+  .meal-planner {
+    max-width: 100%;
+  }
+
   .meal-categories {
-    grid-template-columns: 1fr;
+    max-width: 100%;
   }
 
-  .order-section {
-    padding: 15px;
+  .order-form {
+    max-width: 100%;
   }
 
-  .order-buttons {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .save-button,
-  .order-button {
-    width: 100%;
+  .order-form .form-control,
+  .order-form .order-button {
     max-width: none;
   }
 
@@ -692,7 +701,7 @@
 
 @media (max-width: 576px) {
   .central-perk-page {
-    padding-bottom: 250px; /* Maintained to prevent overlap */
+    padding-bottom: 250px; /* Restored to prevent overlap */
   }
 
   .recipe-grid,
@@ -741,7 +750,7 @@
   }
 
   .meal-planner {
-    position: sticky; /* Changed to sticky for better dnd compatibility */
+    position: sticky; /* Restored for mobile usability */
     bottom: 0;
     left: 0;
     right: 0;
@@ -749,11 +758,11 @@
     border-top: 1px solid #295241;
     padding: 10px;
     z-index: 1000;
-    max-height: 160px; /* Maintained for usability */
+    max-height: 160px; /* Restored for usability */
     min-height: 80px;
     overflow-y: auto;
     box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
-    touch-action: none; /* Prevents scrolling during drag */
+    touch-action: none; /* Restored to prevent scrolling during drag */
   }
 
   .meal-categories {
@@ -761,6 +770,7 @@
     flex-wrap: nowrap;
     overflow-x: auto;
     gap: 8px;
+    max-width: 100%;
   }
 
   .meal-category {
@@ -808,7 +818,7 @@
 
 @media (max-width: 360px) {
   .central-perk-page {
-    padding-bottom: 300px; /* Maintained to prevent overlap */
+    padding-bottom: 300px; /* Restored to prevent overlap */
   }
 
   .recipe-grid,
@@ -850,14 +860,14 @@
   }
 
   .meal-planner {
-    position: sticky; /* Changed to sticky for better dnd compatibility */
+    position: sticky; /* Restored for mobile usability */
     bottom: 0;
     left: 0;
     right: 0;
-    max-height: 140px; /* Maintained for usability */
+    max-height: 140px; /* Restored for usability */
     min-height: 70px;
     padding: 8px;
-    touch-action: none; /* Prevents scrolling during drag */
+    touch-action: none; /* Restored to prevent scrolling during drag */
   }
 
   .meal-categories {
