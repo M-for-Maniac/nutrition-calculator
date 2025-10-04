@@ -101,6 +101,7 @@
   border-radius: 6px;
   background-color: #e9e2d6;
   color: #1f3e31;
+  height: 38px; /* Reduced height for consistency */
 }
 
 .filters button {
@@ -113,6 +114,7 @@
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.2s;
+  height: 38px; /* Match input height */
 }
 
 .filters button:hover {
@@ -848,6 +850,19 @@
   .order-section .error-message {
     font-size: 0.8rem;
   }
+
+  .filters select,
+  .filters input {
+    padding: 6px;
+    font-size: 0.8rem;
+    height: 32px; /* Reduced height for mobile */
+  }
+
+  .filters button {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    height: 32px; /* Match input height */
+  }
 }
 
 @media (max-width: 360px) {
@@ -949,5 +964,18 @@
   .order-section .success-message,
   .order-section .error-message {
     font-size: 0.75rem;
+  }
+
+  .filters select,
+  .filters input {
+    padding: 5px;
+    font-size: 0.75rem;
+    height: 28px; /* Further reduced height for smaller screens */
+  }
+
+  .filters button {
+    padding: 5px 10px;
+    font-size: 0.75rem;
+    height: 28px; /* Match input height */
   }
 }
