@@ -5,7 +5,7 @@ import axios from 'axios';
 import './GalleryPage.css';
 
 const BASE_URL = 'https://maniac.pythonanywhere.com';
-const WHATSAPP_NUMBER = '989233479443'; // Removed '+' for WhatsApp API compatibility
+const WHATSAPP_NUMBER = '989233479443';
 
 const GalleryPage = ({ setErrorMessage }) => {
   const { t, i18n } = useTranslation();
@@ -151,7 +151,7 @@ const GalleryPage = ({ setErrorMessage }) => {
     {
       id: 'gluten-free-breakfast',
       name: t('centralPerk.predefinedPlans.glutenFreeBreakfast'),
-      dietary: 'vegetarian',
+      dietary: 'gluten-free',
       image: '/nutrition-calculator/images/gluten-free-breakfast.jpg',
       meal_plan: {
         breakfast: [
@@ -159,7 +159,7 @@ const GalleryPage = ({ setErrorMessage }) => {
             recipe_name: 'Gluten-Free Pancakes',
             total_calories: 400,
             total_protein: 12,
-            dietary: 'vegetarian',
+            dietary: 'gluten-free',
             prep_time: 45,
             ingredient_list: [
               { ingredient: 'Potato flour', quantity: 120 },
@@ -508,6 +508,7 @@ const GalleryPage = ({ setErrorMessage }) => {
           <option value="vegan">{t('centralPerk.dietaryOptions.vegan')}</option>
           <option value="vegetarian">{t('centralPerk.dietaryOptions.vegetarian')}</option>
           <option value="omnivore">{t('centralPerk.dietaryOptions.omnivore')}</option>
+          <option value="gluten-free">{t('centralPerk.dietaryOptions.glutenFree')}</option>
         </select>
         <input
           type="number"
