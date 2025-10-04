@@ -579,6 +579,11 @@ const GalleryPage = ({ setErrorMessage }) => {
                           className={`recipe-card dietary-${recipe.dietary.toLowerCase()} ${
                             snapshot.isDragging ? 'dragging' : ''
                           }`}
+                          style={{
+                            ...provided.draggableProps.style,
+                            left: 'auto !important',
+                            top: 'auto !important',
+                          }}
                         >
                           <div className="recipe-tags">
                             {tags.map((tag) => (
@@ -675,12 +680,17 @@ const GalleryPage = ({ setErrorMessage }) => {
                             draggableId={`${category.id}-${recipe.recipe_name}`}
                             index={index}
                           >
-                            {(provided) => (
+                            {(provided, snapshot) => (
                               <div
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
                                 className="meal-item"
+                                style={{
+                                  ...provided.draggableProps.style,
+                                  left: 'auto !important',
+                                  top: 'auto !important',
+                                }}
                               >
                                 {recipe.recipe_name} ({recipe.total_calories} kcal,{' '}
                                 {recipe.total_protein}g {t('centralPerk.protein')})
