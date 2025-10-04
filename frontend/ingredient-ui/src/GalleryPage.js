@@ -5,7 +5,7 @@ import axios from 'axios';
 import './GalleryPage.css';
 
 const BASE_URL = 'https://maniac.pythonanywhere.com';
-const WHATSAPP_NUMBER = '+989233479443';
+const WHATSAPP_NUMBER = '989233479443'; // Removed '+' for WhatsApp API compatibility
 
 const GalleryPage = ({ setErrorMessage }) => {
   const { t, i18n } = useTranslation();
@@ -27,6 +27,10 @@ const GalleryPage = ({ setErrorMessage }) => {
   const [mainImage, setMainImage] = useState('');
   const [selectCategory, setSelectCategory] = useState('');
   const [ingredientTranslations, setIngredientTranslations] = useState({});
+  const [userName, setUserName] = useState('');
+  const [orderSuccess, setOrderSuccess] = useState('');
+  const [errorMessage, setLocalErrorMessage] = useState('');
+
   const [predefinedPlans] = useState([
     {
       id: 'vegan-delight',
@@ -41,9 +45,7 @@ const GalleryPage = ({ setErrorMessage }) => {
             total_protein: 10,
             dietary: 'vegan',
             prep_time: 60,
-            ingredient_list: [
-              { ingredient: 'Adzuki Beans', quantity: 150 },
-            ],
+            ingredient_list: [{ ingredient: 'Adzuki Beans', quantity: 150 }],
             instructions: 'Boil Adzuki Beans with spices and vegetables. Simmer for 1 hour.',
             image: 'https://m-for-maniac.github.io/ingredient-ui/images/bean-soup.jpg',
             thumbnails: [
@@ -132,9 +134,7 @@ const GalleryPage = ({ setErrorMessage }) => {
             total_protein: 40,
             dietary: 'omnivore',
             prep_time: 40,
-            ingredient_list: [
-              { ingredient: 'Beef.Flank(Raw)', quantity: 250 },
-            ],
+            ingredient_list: [{ ingredient: 'Beef.Flank(Raw)', quantity: 250 }],
             instructions: 'سرخ کنید در کنار سبزیجات میل کنید',
             image: 'https://m-for-maniac.github.io/ingredient-ui/images/meat-maniac.jpg',
             thumbnails: [
@@ -191,11 +191,9 @@ const GalleryPage = ({ setErrorMessage }) => {
     },
   ]);
 
-  // Fetch recipes and ingredient translations
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch recipes
         const recipeResponse = await axios.get(`${BASE_URL}/get_recipes`, {
           params: {
             dietary: dietaryFilter,
@@ -216,11 +214,11 @@ const GalleryPage = ({ setErrorMessage }) => {
         setRecipes(enrichedRecipes);
         setFilteredRecipes(enrichedRecipes);
 
-        // Fetch ingredient translations
         const translationResponse = await axios.get(`${BASE_URL}/get_ingredient_translations`);
         setIngredientTranslations(translationResponse.data);
       } catch (error) {
         console.error('Error loading data:', error);
+        setLocalErrorMessage(t('centralPerk.error.fetchRecipes'));
         setErrorMessage(t('centralPerk.error.fetchRecipes'));
       }
     };
@@ -229,19 +227,15 @@ const GalleryPage = ({ setErrorMessage }) => {
 
   const handleFilter = () => {
     let filtered = [...recipes];
-
     if (dietaryFilter) {
       filtered = filtered.filter((recipe) => recipe.dietary.toLowerCase() === dietaryFilter.toLowerCase());
     }
-
     if (maxCalories) {
       filtered = filtered.filter((recipe) => recipe.total_calories <= parseInt(maxCalories));
     }
-
     if (minProtein) {
       filtered = filtered.filter((recipe) => recipe.total_protein >= parseInt(minProtein));
     }
-
     setFilteredRecipes(filtered);
     setMealPlan({
       breakfast: [],
@@ -255,19 +249,15 @@ const GalleryPage = ({ setErrorMessage }) => {
 
   const handleDragEnd = (result) => {
     const { source, destination } = result;
-
     if (!destination) return;
-
     const sourceId = source.droppableId;
     const destId = destination.droppableId;
-
     if (sourceId === destId && source.index === destination.index) return;
-
     let updatedMealPlan = { ...mealPlan };
-
     if (sourceId === 'recipes') {
       const recipe = filteredRecipes[source.index];
       if (Object.values(updatedMealPlan).flat().length >= 5) {
+        setLocalErrorMessage(t('centralPerk.mealPlanFull'));
         setErrorMessage(t('centralPerk.mealPlanFull'));
         return;
       }
@@ -276,14 +266,11 @@ const GalleryPage = ({ setErrorMessage }) => {
       const sourceRecipes = [...updatedMealPlan[sourceId]];
       const [movedRecipe] = sourceRecipes.splice(source.index, 1);
       updatedMealPlan[sourceId] = sourceRecipes;
-
       if (destId !== 'recipes') {
         updatedMealPlan[destId] = [...updatedMealPlan[destId], movedRecipe];
       }
     }
-
     setMealPlan(updatedMealPlan);
-
     const allRecipes = Object.values(updatedMealPlan).flat();
     if (allRecipes.length > 0) {
       const newTotal = allRecipes.reduce(
@@ -301,17 +288,18 @@ const GalleryPage = ({ setErrorMessage }) => {
 
   const handleSelectForMealPlan = (recipe) => {
     if (!selectCategory) {
+      setLocalErrorMessage(t('centralPerk.selectCategory'));
       setErrorMessage(t('centralPerk.selectCategory'));
       return;
     }
     if (Object.values(mealPlan).flat().length >= 5) {
+      setLocalErrorMessage(t('centralPerk.mealPlanFull'));
       setErrorMessage(t('centralPerk.mealPlanFull'));
       return;
     }
     const updatedMealPlan = { ...mealPlan };
     updatedMealPlan[selectCategory] = [...updatedMealPlan[selectCategory], recipe];
     setMealPlan(updatedMealPlan);
-
     const allRecipes = Object.values(updatedMealPlan).flat();
     if (allRecipes.length > 0) {
       const newTotal = allRecipes.reduce(
@@ -332,7 +320,6 @@ const GalleryPage = ({ setErrorMessage }) => {
     const updatedMealPlan = { ...mealPlan };
     updatedMealPlan[category].splice(index, 1);
     setMealPlan(updatedMealPlan);
-
     const allRecipes = Object.values(updatedMealPlan).flat();
     if (allRecipes.length === 0) {
       setTotalNutrition(null);
@@ -348,47 +335,71 @@ const GalleryPage = ({ setErrorMessage }) => {
     }
   };
 
-  const handleOrder = () => {
+  const handleOrder = async () => {
+    if (!userName.trim()) {
+      setLocalErrorMessage(t('centralPerk.enterName'));
+      setErrorMessage(t('centralPerk.enterName'));
+      return;
+    }
     if (!selectedDay) {
+      setLocalErrorMessage(t('centralPerk.selectDay'));
       setErrorMessage(t('centralPerk.selectDay'));
       return;
     }
     const allRecipes = Object.values(mealPlan).flat();
     if (allRecipes.length === 0) {
+      setLocalErrorMessage(t('centralPerk.noPlan'));
       setErrorMessage(t('centralPerk.noPlan'));
       return;
     }
     const orderDetails = {
+      user_name: userName.trim(),
       selected_day: selectedDay,
-      meal_plan: mealPlan,
+      meal_plan: Object.keys(mealPlan).reduce((acc, key) => {
+        acc[key] = mealPlan[key].map((recipe) => ({
+          recipe_name: recipe.recipe_name,
+          total_calories: recipe.total_calories,
+          total_protein: recipe.total_protein,
+          dietary: recipe.dietary,
+          prep_time: recipe.prep_time,
+          ingredient_list: recipe.ingredient_list,
+          instructions: recipe.instructions,
+          image: recipe.image,
+          thumbnails: recipe.thumbnails,
+        }));
+        return acc;
+      }, {}),
     };
-    axios
-      .post(`${BASE_URL}/order_meal`, orderDetails)
-      .then((response) => {
-        setErrorMessage('');
-        let message = `New Order: ${response.data.order_id}\nDay: ${t(`centralPerk.days.${selectedDay}`)}\n\nMeal Plan:\n`;
-        Object.entries(mealPlan).forEach(([category, recipes]) => {
-          if (recipes.length > 0) {
-            message += `${t(`centralPerk.mealCategories.${category}`)}:\n`;
-            recipes.forEach((recipe) => {
-              message += `- ${recipe.recipe_name} (${recipe.total_calories} kcal, ${recipe.total_protein}g protein)\n`;
-            });
-          }
-        });
-        if (totalNutrition) {
-          message += `\nTotal Nutrition: ${totalNutrition.calories} kcal, ${totalNutrition.protein}g protein`;
+    console.log('Sending order:', JSON.stringify(orderDetails, null, 2));
+    try {
+      const response = await axios.post(`${BASE_URL}/order_meal`, orderDetails, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      setLocalErrorMessage('');
+      setErrorMessage('');
+      const orderId = response.data.order_id;
+      let message = `${t('centralPerk.orderSuccess').replace('{orderId}', orderId)}\n${t('centralPerk.userName')}: ${userName.trim()}\n${t('centralPerk.day')}: ${t(`centralPerk.days.${selectedDay}`)}\n\n${t('centralPerk.mealPlan')}:\n`;
+      Object.entries(mealPlan).forEach(([category, recipes]) => {
+        if (recipes.length > 0) {
+          message += `${t(`centralPerk.mealCategories.${category}`)}:\n`;
+          recipes.forEach((recipe) => {
+            message += `- ${recipe.recipe_name} (${recipe.total_calories} ${t('centralPerk.calories')}, ${recipe.total_protein}${t('kitchen.grams')} ${t('centralPerk.protein')})\n`;
+          });
         }
-        // Clean the message to remove problematic characters
-        message = message.replace(/[\r\n]+/g, '\n').replace(/[^\x20-\x7E\n]/g, '');
-        const encodedMessage = encodeURIComponent(message);
-        const whatsappUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}`;
-        console.log('WhatsApp URL:', whatsappUrl); // Debug log
-        const newWindow = window.open(whatsappUrl, '_blank');
-        if (!newWindow) {
-          console.error('Failed to open WhatsApp window. Popup blocker may be enabled.');
-          setErrorMessage(t('centralPerk.popupBlocked'));
-        }
-
+      });
+      if (totalNutrition) {
+        message += `\n${t('centralPerk.totalNutrition')}: ${totalNutrition.calories} ${t('centralPerk.calories')}, ${totalNutrition.protein}${t('kitchen.grams')} ${t('centralPerk.protein')}`;
+      }
+      const encodedMessage = encodeURIComponent(message);
+      const whatsappUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}`;
+      console.log('WhatsApp URL:', whatsappUrl);
+      const newWindow = window.open(whatsappUrl, '_blank');
+      if (!newWindow) {
+        setLocalErrorMessage(t('centralPerk.error.popupBlocked').replace('{url}', whatsappUrl));
+        setErrorMessage(t('centralPerk.error.popupBlocked').replace('{url}', whatsappUrl));
+        alert(t('centralPerk.error.popupBlocked') + '\n' + t('centralPerk.openManually', { url: whatsappUrl }));
+      } else {
+        setOrderSuccess(t('centralPerk.orderSuccess').replace('{orderId}', orderId));
         setMealPlan({
           breakfast: [],
           morningSnack: [],
@@ -398,12 +409,16 @@ const GalleryPage = ({ setErrorMessage }) => {
         });
         setTotalNutrition(null);
         setSelectedDay('');
-        alert(t('centralPerk.orderSuccess', { orderId: response.data.order_id }));
-      })
-      .catch((error) => {
-        console.error('Error placing order:', error);
-        setErrorMessage(t('centralPerk.orderError'));
-      });
+        setUserName('');
+      }
+    } catch (error) {
+      console.error('Error placing order:', error.response?.data || error.message);
+      const errorMsg = error.response?.data?.error
+        ? t('centralPerk.orderError') + `: ${error.response.data.error}`
+        : t('centralPerk.orderError') + `: ${error.message}`;
+      setLocalErrorMessage(errorMsg);
+      setErrorMessage(errorMsg);
+    }
   };
 
   const selectPredefinedPlan = (plan) => {
@@ -524,15 +539,9 @@ const GalleryPage = ({ setErrorMessage }) => {
                 <div key={plan.id} className="plan-card" onClick={() => selectPredefinedPlan(plan)}>
                   <img src={plan.image} alt={plan.name} className="plan-image" />
                   <h3>{plan.name}</h3>
-                  <p>
-                    {t('centralPerk.dietary')}: {t(`centralPerk.dietaryOptions.${plan.dietary}`)}
-                  </p>
-                  <p>
-                    {t('centralPerk.totalCalories')}: {totalCalories} kcal
-                  </p>
-                  <p>
-                    {t('centralPerk.totalProtein')}: {totalProtein}g
-                  </p>
+                  <p>{t('centralPerk.dietary')}: {t(`centralPerk.dietaryOptions.${plan.dietary}`)}</p>
+                  <p>{t('centralPerk.totalCalories')}: {totalCalories} kcal</p>
+                  <p>{t('centralPerk.totalProtein')}: {totalProtein}g</p>
                   <button className="btn btn-primary-custom">{t('centralPerk.selectPlan')}</button>
                 </div>
               );
@@ -555,22 +564,12 @@ const GalleryPage = ({ setErrorMessage }) => {
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
-                          className={`recipe-card dietary-${recipe.dietary.toLowerCase()} ${
-                            snapshot.isDragging ? 'dragging' : ''
-                          }`}
+                          className={`recipe-card dietary-${recipe.dietary.toLowerCase()} ${snapshot.isDragging ? 'dragging' : ''}`}
                         >
                           <div className="recipe-tags">
                             {tags.map((tag) => (
-                              <span
-                                key={tag}
-                                className={`tag tag-${tag}`}
-                                title={t(`centralPerk.tags.${tag}`)}
-                              >
-                                <i
-                                  className={`fas ${
-                                    tag === 'high-protein' ? 'fa-dumbbell' : 'fa-leaf'
-                                  }`}
-                                ></i>
+                              <span key={tag} className={`tag tag-${tag}`} title={t(`centralPerk.tags.${tag}`)}>
+                                <i className={`fas ${tag === 'high-protein' ? 'fa-dumbbell' : 'fa-leaf'}`}></i>
                               </span>
                             ))}
                           </div>
@@ -581,18 +580,10 @@ const GalleryPage = ({ setErrorMessage }) => {
                             onClick={() => openModal(recipe)}
                           />
                           <h3>{recipe.recipe_name}</h3>
-                          <p>
-                            {t('centralPerk.dietary')}: {t(`centralPerk.dietaryOptions.${recipe.dietary}`)}
-                          </p>
-                          <p>
-                            {t('centralPerk.calories')}: {recipe.total_calories} kcal
-                          </p>
-                          <p>
-                            {t('centralPerk.protein')}: {recipe.total_protein}g
-                          </p>
-                          <p>
-                            {t('centralPerk.prepTime')}: {recipe.prep_time} {t('kitchen.minutes')}
-                          </p>
+                          <p>{t('centralPerk.dietary')}: {t(`centralPerk.dietaryOptions.${recipe.dietary}`)}</p>
+                          <p>{t('centralPerk.calories')}: {recipe.total_calories} kcal</p>
+                          <p>{t('centralPerk.protein')}: {recipe.total_protein}g</p>
+                          <p>{t('centralPerk.prepTime')}: {recipe.prep_time} {t('kitchen.minutes')}</p>
                           <div className="recipe-actions">
                             <button className="btn btn-info-custom" onClick={() => openModal(recipe)}>
                               {t('centralPerk.viewDetails')}
@@ -661,8 +652,7 @@ const GalleryPage = ({ setErrorMessage }) => {
                                 {...provided.dragHandleProps}
                                 className="meal-item"
                               >
-                                {recipe.recipe_name} ({recipe.total_calories} kcal,{' '}
-                                {recipe.total_protein}g {t('centralPerk.protein')})
+                                {recipe.recipe_name} ({recipe.total_calories} kcal, {recipe.total_protein}g {t('centralPerk.protein')})
                                 <button
                                   className="btn btn-danger"
                                   onClick={() => removeFromMealPlan(category.id, index)}
@@ -683,29 +673,38 @@ const GalleryPage = ({ setErrorMessage }) => {
           </div>
           {totalNutrition && (
             <p>
-              {t('centralPerk.totalNutrition')}: {totalNutrition.calories} kcal,{' '}
-              {totalNutrition.protein}g {t('centralPerk.protein')}
+              {t('centralPerk.totalNutrition')}: {totalNutrition.calories} kcal, {totalNutrition.protein}g {t('centralPerk.protein')}
             </p>
           )}
-          <div className="order-section">
-            <select
-              value={selectedDay}
-              onChange={(e) => setSelectedDay(e.target.value)}
-              className="form-control"
-            >
-              <option value="">{t('centralPerk.selectDay')}</option>
-              {daysOfWeek.map((day) => (
-                <option key={day.id} value={day.id}>
-                  {day.label}
-                </option>
-              ))}
-            </select>
-            <div className="order-buttons">
-              <button className="btn btn-primary-custom order-button" onClick={handleOrder}>
-                {t('centralPerk.orderPlan')}
-              </button>
-            </div>
+        </div>
+        <div className="order-section">
+          <h2>{t('centralPerk.submitOrder')}</h2>
+          <input
+            type="text"
+            className="form-control"
+            placeholder={t('centralPerk.namePlaceholder')}
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
+          />
+          <select
+            value={selectedDay}
+            onChange={(e) => setSelectedDay(e.target.value)}
+            className="form-control"
+          >
+            <option value="">{t('centralPerk.selectDay')}</option>
+            {daysOfWeek.map((day) => (
+              <option key={day.id} value={day.id}>
+                {day.label}
+              </option>
+            ))}
+          </select>
+          <div className="order-buttons">
+            <button className="btn btn-primary-custom order-button" onClick={handleOrder}>
+              {t('centralPerk.orderPlan')}
+            </button>
           </div>
+          {orderSuccess && <p className="success-message">{orderSuccess}</p>}
+          {errorMessage && <p className="error-message">{errorMessage}</p>}
         </div>
       </DragDropContext>
       {selectedRecipe && (
@@ -718,11 +717,7 @@ const GalleryPage = ({ setErrorMessage }) => {
               </div>
               <div className="modal-body">
                 <div className="recipe-image-gallery">
-                  <img
-                    src={mainImage}
-                    alt={selectedRecipe.recipe_name}
-                    className="recipe-main-image"
-                  />
+                  <img src={mainImage} alt={selectedRecipe.recipe_name} className="recipe-main-image" />
                   <div className="thumbnail-gallery">
                     {(selectedRecipe.thumbnails || [mainImage]).map((img, idx) => (
                       <img
@@ -735,28 +730,15 @@ const GalleryPage = ({ setErrorMessage }) => {
                     ))}
                   </div>
                 </div>
-                <p>
-                  <strong>{t('centralPerk.dietary')}:</strong>{' '}
-                  {t(`centralPerk.dietaryOptions.${selectedRecipe.dietary}`)}
-                </p>
-                <p>
-                  <strong>{t('centralPerk.calories')}:</strong> {selectedRecipe.total_calories} kcal
-                </p>
-                <p>
-                  <strong>{t('centralPerk.protein')}:</strong> {selectedRecipe.total_protein}g
-                </p>
-                <p>
-                  <strong>{t('centralPerk.prepTime')}:</strong> {selectedRecipe.prep_time}{' '}
-                  {t('kitchen.minutes')}
-                </p>
+                <p><strong>{t('centralPerk.dietary')}:</strong> {t(`centralPerk.dietaryOptions.${selectedRecipe.dietary}`)}</p>
+                <p><strong>{t('centralPerk.calories')}:</strong> {selectedRecipe.total_calories} kcal</p>
+                <p><strong>{t('centralPerk.protein')}:</strong> {selectedRecipe.total_protein}g</p>
+                <p><strong>{t('centralPerk.prepTime')}:</strong> {selectedRecipe.prep_time} {t('kitchen.minutes')}</p>
                 <h6>{t('centralPerk.ingredients')}</h6>
                 <ul>
                   {selectedRecipe.ingredient_list?.map((ing, idx) => (
                     <li key={idx}>
-                      {ing.ingredient}{' '}
-                      {ingredientTranslations[ing.ingredient]
-                        ? `(${ingredientTranslations[ing.ingredient]})`
-                        : ''}: {ing.quantity}g
+                      {ing.ingredient} {ingredientTranslations[ing.ingredient] ? `(${ingredientTranslations[ing.ingredient]})` : ''}: {ing.quantity}g
                     </li>
                   ))}
                 </ul>
