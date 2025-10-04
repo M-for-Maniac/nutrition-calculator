@@ -278,7 +278,8 @@ const resources = {
         "dietaryOptions": {
           "vegan": "Vegan",
           "vegetarian": "Vegetarian",
-          "omnivore": "Omnivore"
+          "omnivore": "Omnivore",
+          "gluten-free": "Gluten-free"
         },
         "predefinedPlans": {
           "title": "Predefined Meal Plans",
@@ -309,7 +310,7 @@ const resources = {
           "afternoonSnack": "Afternoon Snack",
           "dinner": "Dinner"
         },
-        "dropHere": "Drop {category} recipes here",
+        "dropHere": "Drop your recipes of intrest here",
         "remove": "Remove",
         "totalNutrition": "Total Nutrition",
         "submitOrder": "Submit Order",
@@ -620,7 +621,8 @@ const resources = {
         "dietaryOptions": {
           "vegan": "گیاه‌خواری کامل",
           "vegetarian": "گیاه‌خواری",
-          "omnivore": "همه‌چیزخوار"
+          "omnivore": "همه‌چیزخوار",
+          "gluten-free": "بدون گلوتن"
         },
         "predefinedPlans": {
           "title": "برنامه‌های غذایی از پیش تعریف‌شده",
@@ -651,7 +653,7 @@ const resources = {
           "afternoonSnack": "میان‌وعده بعدازظهر",
           "dinner": "شام"
         },
-        "dropHere": "دستورهای {category} را اینجا رها کنید",
+        "dropHere": "دستورهای مورد علاقتون را اینجا رها کنید",
         "remove": "حذف",
         "totalNutrition": "تغذیه کل",
         "submitOrder": "ارسال سفارش",

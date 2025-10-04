@@ -24,6 +24,7 @@ const GalleryPage = ({ setErrorMessage }) => {
   const [totalNutrition, setTotalNutrition] = useState(null);
   const [selectedDay, setSelectedDay] = useState('');
   const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [selectedPlan, setSelectedPlan] = useState(null);
   const [mainImage, setMainImage] = useState('');
   const [selectCategory, setSelectCategory] = useState('');
   const [ingredientTranslations, setIngredientTranslations] = useState({});
@@ -449,8 +450,13 @@ const GalleryPage = ({ setErrorMessage }) => {
     setMainImage(recipe.image || '/nutrition-calculator/images/placeholder.jpg');
   };
 
+  const openPlanModal = (plan) => {
+    setSelectedPlan(plan);
+  };
+
   const closeModal = () => {
     setSelectedRecipe(null);
+    setSelectedPlan(null);
     setMainImage('');
     setSelectCategory('');
   };
@@ -537,13 +543,20 @@ const GalleryPage = ({ setErrorMessage }) => {
               const totalCalories = planRecipes.reduce((sum, r) => sum + (r.total_calories || 0), 0);
               const totalProtein = planRecipes.reduce((sum, r) => sum + (r.total_protein || 0), 0);
               return (
-                <div key={plan.id} className="plan-card" onClick={() => selectPredefinedPlan(plan)}>
+                <div key={plan.id} className="plan-card">
                   <img src={plan.image} alt={plan.name} className="plan-image" />
                   <h3>{plan.name}</h3>
                   <p>{t('centralPerk.dietary')}: {t(`centralPerk.dietaryOptions.${plan.dietary}`)}</p>
                   <p>{t('centralPerk.totalCalories')}: {totalCalories} kcal</p>
                   <p>{t('centralPerk.totalProtein')}: {totalProtein}g</p>
-                  <button className="btn btn-primary-custom">{t('centralPerk.selectPlan')}</button>
+                  <div className="recipe-actions">
+                    <button className="btn btn-info-custom" onClick={() => openPlanModal(plan)}>
+                      {t('centralPerk.viewDetails')}
+                    </button>
+                    <button className="btn btn-primary-custom" onClick={() => selectPredefinedPlan(plan)}>
+                      {t('centralPerk.selectPlan')}
+                    </button>
+                  </div>
                 </div>
               );
             })}
@@ -766,6 +779,67 @@ const GalleryPage = ({ setErrorMessage }) => {
                     {t('centralPerk.addToPlan')}
                   </button>
                 </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={closeModal}>
+                  {t('centralPerk.close')}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {selectedPlan && (
+        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content recipe-book-modal">
+              <div className="modal-header">
+                <h5 className="modal-title">{selectedPlan.name}</h5>
+                <button type="button" className="btn-close" onClick={closeModal}></button>
+              </div>
+              <div className="modal-body">
+                <div className="recipe-image-gallery">
+                  <img src={selectedPlan.image} alt={selectedPlan.name} className="recipe-main-image" />
+                </div>
+                <p><strong>{t('centralPerk.dietary')}:</strong> {t(`centralPerk.dietaryOptions.${selectedPlan.dietary}`)}</p>
+                <p><strong>{t('centralPerk.totalCalories')}:</strong> {Object.values(selectedPlan.meal_plan).flat().reduce((sum, r) => sum + (r.total_calories || 0), 0)} kcal</p>
+                <p><strong>{t('centralPerk.totalProtein')}:</strong> {Object.values(selectedPlan.meal_plan).flat().reduce((sum, r) => sum + (r.total_protein || 0), 0)}g</p>
+                {mealCategories.map((category) => (
+                  selectedPlan.meal_plan[category.id].length > 0 && (
+                    <div key={category.id}>
+                      <h6>{t(`centralPerk.mealCategories.${category.id}`)}</h6>
+                      {selectedPlan.meal_plan[category.id].map((recipe, idx) => (
+                        <div key={idx} style={{ marginBottom: '20px' }}>
+                          <h6>{recipe.recipe_name}</h6>
+                          <img src={recipe.image} alt={recipe.recipe_name} className="recipe-main-image" style={{ maxHeight: '150px' }} />
+                          <p><strong>{t('centralPerk.dietary')}:</strong> {t(`centralPerk.dietaryOptions.${recipe.dietary}`)}</p>
+                          <p><strong>{t('centralPerk.calories')}:</strong> {recipe.total_calories} kcal</p>
+                          <p><strong>{t('centralPerk.protein')}:</strong> {recipe.total_protein}g</p>
+                          <p><strong>{t('centralPerk.prepTime')}:</strong> {recipe.prep_time} {t('kitchen.minutes')}</p>
+                          <h6>{t('centralPerk.ingredients')}</h6>
+                          <ul>
+                            {recipe.ingredient_list?.map((ing, i) => (
+                              <li key={i}>
+                                {ing.ingredient} {ingredientTranslations[ing.ingredient] ? `(${ingredientTranslations[ing.ingredient]})` : ''}: {ing.quantity}g
+                              </li>
+                            ))}
+                          </ul>
+                          <h6>{t('centralPerk.instructions')}</h6>
+                          <p>{recipe.instructions || t('centralPerk.noInstructions')}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )
+                ))}
+                <button
+                  className="btn btn-primary-custom"
+                  onClick={() => {
+                    selectPredefinedPlan(selectedPlan);
+                    closeModal();
+                  }}
+                >
+                  {t('centralPerk.selectPlan')}
+                </button>
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={closeModal}>

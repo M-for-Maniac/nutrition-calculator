@@ -692,6 +692,7 @@
   .filters input {
     width: 100%;
     max-width: none;
+    height: 32px;
   }
 
   .meal-planner {
