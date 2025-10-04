@@ -469,8 +469,8 @@
   background-color: #d32f2f;
 }
 
-/* Order Form */
-.order-form {
+/* Order Section */
+.order-section {
   margin: 30px auto;
   padding: 20px;
   background-color: #fff;
@@ -480,28 +480,39 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
+  align-items: center;
 }
 
-.order-form h2 {
+.order-section h2 {
   font-size: 1.5rem;
   color: #295241;
   margin-bottom: 15px;
   text-align: center;
 }
 
-.order-form .form-control {
-  padding: 8px;
+.order-section .form-control {
+  width: 100%;
+  max-width: 400px;
+  padding: 10px;
   font-size: 0.9rem;
   border: 1px solid #295241;
   border-radius: 6px;
   background-color: #e9e2d6;
   color: #1f3e31;
-  max-width: 300px;
-  width: 100%;
+  box-sizing: border-box;
 }
 
-.order-form .order-button {
-  padding: 8px 16px;
+.order-section .order-buttons {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  justify-content: center;
+}
+
+.order-section .order-button {
+  width: 100%;
+  max-width: 200px;
+  padding: 10px 20px;
   font-size: 0.9rem;
   background-color: #295241;
   color: #f1f1f1;
@@ -509,12 +520,24 @@
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.2s;
-  max-width: 200px;
-  align-self: center;
 }
 
-.order-form .order-button:hover {
+.order-section .order-button:hover {
   background-color: #1f3e31;
+}
+
+.order-section .success-message {
+  color: #66bb6a;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.order-section .error-message {
+  color: #e57373;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: 10px;
 }
 
 /* Modal Styling */
@@ -578,14 +601,6 @@
 .thumbnail.active,
 .thumbnail:hover {
   border: 2px solid #295241;
-}
-
-.recipe-details {
-  margin-bottom: 20px;
-  padding: 15px;
-  background-color: #fff;
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .modal-body h6 {
@@ -652,7 +667,7 @@
   padding-left: 0;
 }
 
-.central-perk-page[dir='rtl'] .order-form {
+.central-perk-page[dir='rtl'] .order-section {
   text-align: right;
 }
 
@@ -685,12 +700,12 @@
     max-width: 100%;
   }
 
-  .order-form {
+  .order-section {
     max-width: 100%;
   }
 
-  .order-form .form-control,
-  .order-form .order-button {
+  .order-section .form-control,
+  .order-section .order-button {
     max-width: none;
   }
 
@@ -701,7 +716,7 @@
 
 @media (max-width: 576px) {
   .central-perk-page {
-    padding-bottom: 250px; /* Restored to prevent overlap */
+    padding-bottom: 250px;
   }
 
   .recipe-grid,
@@ -750,7 +765,7 @@
   }
 
   .meal-planner {
-    position: sticky; /* Restored for mobile usability */
+    position: sticky;
     bottom: 0;
     left: 0;
     right: 0;
@@ -758,11 +773,11 @@
     border-top: 1px solid #295241;
     padding: 10px;
     z-index: 1000;
-    max-height: 160px; /* Restored for usability */
+    max-height: 160px;
     min-height: 80px;
     overflow-y: auto;
     box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
-    touch-action: none; /* Restored to prevent scrolling during drag */
+    touch-action: none;
   }
 
   .meal-categories {
@@ -814,11 +829,30 @@
     max-width: 100%;
     object-fit: contain;
   }
+
+  .order-section {
+    padding: 15px;
+  }
+
+  .order-section .form-control {
+    padding: 8px;
+    font-size: 0.85rem;
+  }
+
+  .order-section .order-button {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+
+  .order-section .success-message,
+  .order-section .error-message {
+    font-size: 0.8rem;
+  }
 }
 
 @media (max-width: 360px) {
   .central-perk-page {
-    padding-bottom: 300px; /* Restored to prevent overlap */
+    padding-bottom: 300px;
   }
 
   .recipe-grid,
@@ -860,14 +894,14 @@
   }
 
   .meal-planner {
-    position: sticky; /* Restored for mobile usability */
+    position: sticky;
     bottom: 0;
     left: 0;
     right: 0;
-    max-height: 140px; /* Restored for usability */
+    max-height: 140px;
     min-height: 70px;
     padding: 8px;
-    touch-action: none; /* Restored to prevent scrolling during drag */
+    touch-action: none;
   }
 
   .meal-categories {
@@ -896,5 +930,24 @@
 
   .meal-planner h2 {
     font-size: 1rem;
+  }
+
+  .order-section {
+    padding: 10px;
+  }
+
+  .order-section .form-control {
+    padding: 6px;
+    font-size: 0.8rem;
+  }
+
+  .order-section .order-button {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+
+  .order-section .success-message,
+  .order-section .error-message {
+    font-size: 0.75rem;
   }
 }

@@ -112,6 +112,7 @@ const resources = {
         potassium: 'Potassium',
         totalCarbohydrate: 'Total Carbohydrate',
         protein: 'Protein',
+        "grams": "g",
         showOptionalFields: 'Show Optional Nutritional Fields',
         hideOptionalFields: 'Hide Optional Nutritional Fields',
         selectCategory: 'Category',
@@ -253,33 +254,69 @@ const resources = {
         }
       },
       "centralPerk": {
-        "title": "Central Perk: Your Healthy Meal Solution",
-        "subtitle": "Discover delicious, high-quality meals tailored to your diet, delivered to your door!",
         "intro": {
-          "title": "Welcome to Central Perk",
-          "subtitle": "Your one-stop online restaurant for nutritious, chef-crafted meals designed for your lifestyle. Choose from our curated recipes, build your daily meal plan, and order with ease!",
+          "title": "Healthy Bites Meal Planner",
+          "subtitle": "Plan your meals with ease and enjoy healthy, delicious recipes tailored to your dietary needs.",
           "benefit1": {
-            "title": "Diet-Specific Meals",
-            "description": "Vegan, gluten-free, or high-protein? Our recipes are crafted to meet your dietary needs with precise nutrition tracking."
+            "title": "Fresh Ingredients",
+            "description": "We use only the freshest ingredients to ensure quality and taste."
           },
           "benefit2": {
-            "title": "High-Quality Ingredients",
-            "description": "We use fresh, premium ingredients to ensure every meal is both healthy and delicious."
+            "title": "Customizable Plans",
+            "description": "Tailor your meal plan to fit your dietary preferences and goals."
           },
           "benefit3": {
-            "title": "Hassle-Free Ordering",
-            "description": "Build your meal plan in minutes and order via WhatsApp for quick delivery."
+            "title": "Time-Saving",
+            "description": "Quick and easy recipes to fit your busy lifestyle."
           },
-          "cta": "Start Building Your Meal Plan"
+          "cta": "Get Started"
         },
+        "allDiets": "All Diets",
+        "maxCalories": "Max Calories",
+        "minProtein": "Min Protein (g)",
+        "applyFilters": "Apply Filters",
         "dietaryOptions": {
-          "select": "Choose a Dietary Preference",
-          "all": "All",
-          "omnivore": "Omnivore",
-          "vegetarian": "Vegetarian",
           "vegan": "Vegan",
-          "gluten_free": "Gluten-Free"
+          "vegetarian": "Vegetarian",
+          "omnivore": "Omnivore"
         },
+        "predefinedPlans": {
+          "title": "Predefined Meal Plans",
+          "veganDelight": "Vegan Delight",
+          "omnivoreBalanced": "Omnivore Balanced",
+          "glutenFreeBreakfast": "Gluten-Free Breakfast"
+        },
+        "dietary": "Dietary",
+        "totalCalories": "Total Calories",
+        "totalProtein": "Total Protein",
+        "selectPlan": "Select Plan",
+        "availableRecipes": "Available Recipes",
+        "tags": {
+          "high-protein": "High Protein",
+          "low-calorie": "Low Calorie"
+        },
+        "calories": "kcal",
+        "protein": "Protein",
+        "prepTime": "Prep Time",
+        "viewDetails": "View Details",
+        "selectCategory": "Select Meal Category",
+        "addToPlan": "Add to Plan",
+        "mealPlan": "Meal Plan",
+        "mealCategories": {
+          "breakfast": "Breakfast",
+          "morningSnack": "Morning Snack",
+          "lunch": "Lunch",
+          "afternoonSnack": "Afternoon Snack",
+          "dinner": "Dinner"
+        },
+        "dropHere": "Drop {category} recipes here",
+        "remove": "Remove",
+        "totalNutrition": "Total Nutrition",
+        "submitOrder": "Submit Order",
+        "namePlaceholder": "Enter Your Name",
+        "enterName": "Please enter your name.",
+        "userName": "Name",
+        "selectDay": "Please select a delivery day.",
         "days": {
           "monday": "Monday",
           "tuesday": "Tuesday",
@@ -289,64 +326,21 @@ const resources = {
           "saturday": "Saturday",
           "sunday": "Sunday"
         },
-        "allDiets": "All Diets",
-        "maxCalories": "Max Calories",
-        "minProtein": "Min Protein (g)",
-        "applyFilters": "Apply Filters",
-        "dietary": "Dietary",
-        "calories": "Calories",
-        "protein": "Protein",
-        "prepTime": "Prep Time",
-        "addToPlan": "Add to Meal Plan",
-        "selectCategory": "Select Meal Category",
-        "selectDay": "Select Day of the Week",
-        "day": "Day",
-        "customPlan": "Custom Plan",
-        "remove": "Remove",
-        "dropHere": "Drag and drop your chosen meals here to plan your day",
-        "mealPlan": "Your Daily Meal Plan",
-        "noPlan": "No meals selected. Add dishes to your plan!",
-        "totalNutrition": "Total Nutrition",
-        "savePlan": "Save Meal Plan",
-        "planSaved": "Meal plan saved successfully!",
-        "orderPlan": "Order Your Meal Plan",
-        "orderSuccess": "Order placed successfully! Your order ID is {orderId}.",
-        "orderError": "Failed to place order. Please try again.",
-        "mealPlanFull": "Meal plan is full (max 5 dishes).",
-        "availableRecipes": "Our Menu",
-        "mealCategories": {
-          "breakfast": "Breakfast",
-          "morningSnack": "Morning Snack",
-          "lunch": "Lunch",
-          "afternoonSnack": "Afternoon Snack",
-          "dinner": "Dinner"
-        },
-        "predefinedPlans": {
-          "title": "Curated Meal Plans",
-          "veganDelight": "Vegan Delight",
-          "highProtein": "High-Protein Day",
-          "omnivoreBalanced": "Omnivore Balanced",
-          "glutenFreeBreakfast": "Gluten-Free Breakfast"
-        },
-        "selectPlan": "Choose This Plan",
-        "totalCalories": "Total Calories",
-        "totalProtein": "Total Protein",
-        "tags": {
-          "highProtein": "High-Protein",
-          "lowCalorie": "Low-Calorie"
-        },
-        "viewDetails": "View Details",
+        "orderPlan": "Order Plan",
+        "orderSuccess": "Order placed successfully! Order ID: {orderId}",
+        "noPlan": "Please add at least one recipe to your meal plan.",
+        "mealPlanFull": "Meal plan is full (max 5 recipes).",
         "ingredients": "Ingredients",
         "instructions": "Instructions",
-        "noInstructions": "No instructions provided",
+        "noInstructions": "No instructions provided.",
         "close": "Close",
-        "submitOrder": "Submit Your Order",
-        "namePlaceholder": "Enter Your Name",
-        "enterName": "Please enter your name.",
+        "day": "Day",
         "error": {
-          "fetchRecipes": "Couldn’t load our menu. Please try again.",
-          "popupBlocked": "Unable to open WhatsApp. Please allow popups or open the link manually: {url}"
-        }
+          "fetchRecipes": "Failed to load recipes. Please try again.",
+          "popupBlocked": "Unable to open WhatsApp. Please allow popups or open manually: {url}",
+          "openManually": "Open this link manually: {url}",
+          "orderError": "Failed to place order"
+        },
       },
     }
   },
@@ -437,6 +431,7 @@ const resources = {
         minProtein: 'حداقل پروتئین (گرم)',
         maxFat: 'حداکثر چربی (گرم)',
         dietary: 'رژیم غذایی',
+        "grams": "گرم",
         search: 'جستجوی مواد اولیه',
         updatePrice: 'به‌روزرسانی قیمت ماده اولیه',
         selectIngredient: 'یک ماده اولیه انتخاب کنید',
@@ -601,67 +596,54 @@ const resources = {
         }
       },
       "centralPerk": {
-        "title": "سنترال پرک: راه‌حل غذای سالم شما",
-        "subtitle": "غذاهای خوشمزه و باکیفیت متناسب با رژیم غذایی شما، تحویل درب منزل!",
         "intro": {
-          "title": "به سنترال پرک خوش آمدید",
-          "subtitle": "رستوران آنلاین شما برای غذاهای مغذی و حرفه‌ای که برای سبک زندگی شما طراحی شده‌اند. از بین دستور پخت‌های انتخاب‌شده ما انتخاب کنید، برنامه غذایی روزانه خود را بسازید و به راحتی سفارش دهید!",
+          "title": "برنامه‌ریز غذای سالم",
+          "subtitle": "برنامه غذایی خود را به راحتی تنظیم کنید و از دستورهای غذایی سالم و خوشمزه متناسب با نیازهای غذایی خود لذت ببرید.",
           "benefit1": {
-            "title": "غذاهای متناسب با رژیم غذایی",
-            "description": "وگان، بدون گلوتن یا پر پروتئین؟ دستور پخت‌های ما با ردیابی دقیق تغذیه برای نیازهای رژیم غذایی شما طراحی شده‌اند."
+            "title": "مواد اولیه تازه",
+            "description": "ما فقط از تازه‌ترین مواد اولیه برای تضمین کیفیت و طعم استفاده می‌کنیم."
           },
           "benefit2": {
-            "title": "مواد اولیه باکیفیت",
-            "description": "ما از مواد اولیه تازه و درجه یک استفاده می‌کنیم تا هر وعده غذایی هم سالم و هم خوشمزه باشد."
+            "title": "برنامه‌های قابل تنظیم",
+            "description": "برنامه غذایی خود را متناسب با ترجیحات و اهداف غذایی خود تنظیم کنید."
           },
           "benefit3": {
-            "title": "سفارش بدون دردسر",
-            "description": "برنامه غذایی خود را در چند دقیقه بسازید و از طریق واتساپ برای تحویل سریع سفارش دهید."
+            "title": "صرفه‌جویی در زمان",
+            "description": "دستورهای غذایی سریع و آسان برای سبک زندگی پرمشغله شما."
           },
-          "cta": "شروع به ساخت برنامه غذایی خود کنید"
-        },
-        "dietaryOptions": {
-          "select": "انتخاب رژیم غذایی",
-          "all": "همه",
-          "omnivore": "همه‌چیزخوار",
-          "vegetarian": "گیاهخوار",
-          "vegan": "وگان",
-          "gluten_free": "بدون گلوتن"
-        },
-        "days": {
-          "monday": "دوشنبه",
-          "tuesday": "سه‌شنبه",
-          "wednesday": "چهارشنبه",
-          "thursday": "پنج‌شنبه",
-          "friday": "جمعه",
-          "saturday": "شنبه",
-          "sunday": "یکشنبه"
+          "cta": "شروع کنید"
         },
         "allDiets": "همه رژیم‌ها",
         "maxCalories": "حداکثر کالری",
         "minProtein": "حداقل پروتئین (گرم)",
         "applyFilters": "اعمال فیلترها",
+        "dietaryOptions": {
+          "vegan": "گیاه‌خواری کامل",
+          "vegetarian": "گیاه‌خواری",
+          "omnivore": "همه‌چیزخوار"
+        },
+        "predefinedPlans": {
+          "title": "برنامه‌های غذایی از پیش تعریف‌شده",
+          "veganDelight": "لذت گیاه‌خواری",
+          "omnivoreBalanced": "متعادل همه‌چیزخوار",
+          "glutenFreeBreakfast": "صبحانه بدون گلوتن"
+        },
         "dietary": "رژیم غذایی",
-        "calories": "کالری",
+        "totalCalories": "کل کالری",
+        "totalProtein": "کل پروتئین",
+        "selectPlan": "انتخاب برنامه",
+        "availableRecipes": "دستورهای غذایی موجود",
+        "tags": {
+          "high-protein": "پروتئین بالا",
+          "low-calorie": "کالری پایین"
+        },
+        "calories": "کیلوکالری",
         "protein": "پروتئین",
         "prepTime": "زمان آماده‌سازی",
-        "addToPlan": "افزودن به برنامه غذایی",
-        "selectCategory": "انتخاب دسته‌بندی وعده",
-        "selectDay": "انتخاب روز هفته",
-        "day": "روز",
-        "customPlan": "برنامه سفارشی",
-        "remove": "حذف",
-        "dropHere": "غذاهای انتخابی خود را اینجا بکشید و رها کنید تا برنامه روزانه خود را بسازید",
-        "mealPlan": "برنامه غذایی روزانه شما",
-        "noPlan": "هیچ غذایی انتخاب نشده است. غذاها را به برنامه خود اضافه کنید!",
-        "totalNutrition": "مجموع تغذیه",
-        "savePlan": "ذخیره برنامه غذایی",
-        "planSaved": "برنامه غذایی با موفقیت ذخیره شد!",
-        "orderPlan": "سفارش برنامه غذایی",
-        "orderSuccess": "سفارش با موفقیت ثبت شد! شماره سفارش شما {orderId} است.",
-        "orderError": "ثبت سفارش ناموفق بود. لطفاً دوباره تلاش کنید.",
-        "mealPlanFull": "برنامه غذایی پر است (حداکثر ۵ غذا).",
-        "availableRecipes": "منوی ما",
+        "viewDetails": "مشاهده جزئیات",
+        "selectCategory": "انتخاب دسته‌بندی غذا",
+        "addToPlan": "افزودن به برنامه",
+        "mealPlan": "برنامه غذایی",
         "mealCategories": {
           "breakfast": "صبحانه",
           "morningSnack": "میان‌وعده صبح",
@@ -669,32 +651,38 @@ const resources = {
           "afternoonSnack": "میان‌وعده بعدازظهر",
           "dinner": "شام"
         },
-        "predefinedPlans": {
-          "title": "برنامه‌های غذایی منتخب",
-          "veganDelight": "لذت وگان",
-          "highProtein": "روز پر پروتئین",
-          "omnivoreBalanced": "همه‌چیزخوار متعادل",
-          "glutenFreeBreakfast": "صبحانه بدون گلوتن"
-        },
-        "selectPlan": "انتخاب این برنامه",
-        "totalCalories": "مجموع کالری",
-        "totalProtein": "مجموع پروتئین",
-        "tags": {
-          "highProtein": "پر پروتئین",
-          "lowCalorie": "کم کالری"
-        },
-        "viewDetails": "مشاهده جزئیات",
-        "ingredients": "مواد اولیه",
-        "instructions": "دستورالعمل‌ها",
-        "noInstructions": "دستورالعملی ارائه نشده است",
-        "close": "بستن",
-        "submitOrder": "ثبت سفارش",
+        "dropHere": "دستورهای {category} را اینجا رها کنید",
+        "remove": "حذف",
+        "totalNutrition": "تغذیه کل",
+        "submitOrder": "ارسال سفارش",
         "namePlaceholder": "نام خود را وارد کنید",
         "enterName": "لطفاً نام خود را وارد کنید.",
+        "userName": "نام",
+        "selectDay": "لطفاً روز تحویل را انتخاب کنید.",
+        "days": {
+          "monday": "دوشنبه",
+          "tuesday": "سه‌شنبه",
+          "wednesday": "چهارشنبه",
+          "thursday": "پنج‌شنبه",
+          "friday": "جمعه",
+          "saturday": "شنبه",
+          "sunday": "یک‌شنبه"
+        },
+        "orderPlan": "سفارش برنامه",
+        "orderSuccess": "سفارش با موفقیت ثبت شد! شناسه سفارش: {orderId}",
+        "noPlan": "لطفاً حداقل یک دستور غذا به برنامه غذایی خود اضافه کنید.",
+        "mealPlanFull": "برنامه غذایی پر است (حداکثر ۵ دستور غذا).",
+        "ingredients": "مواد اولیه",
+        "instructions": "دستورالعمل‌ها",
+        "noInstructions": "دستورالعملی ارائه نشده است.",
+        "close": "بستن",
+        "day": "روز",
         "error": {
-          "fetchRecipes": "نمی‌توان منو را بارگیری کرد. لطفاً دوباره تلاش کنید.",
-          "popupBlocked": "نمی‌توان واتساپ را باز کرد. لطفاً پاپ‌آپ‌ها را مجاز کنید یا لینک را به صورت دستی باز کنید: {url}"
-        }
+          "fetchRecipes": "بارگیری دستورهای غذایی ناموفق بود. لطفاً دوباره تلاش کنید.",
+          "popupBlocked": "نمی‌توان واتساپ را باز کرد. لطفاً اجازه بازشدن پاپ‌آپ‌ها را بدهید یا به صورت دستی باز کنید: {url}",
+          "openManually": "این لینک را به صورت دستی باز کنید: {url}",
+          "orderError": "خطا در ثبت سفارش"
+        },
       },
     }
   }
