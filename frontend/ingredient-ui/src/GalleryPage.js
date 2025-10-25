@@ -127,9 +127,9 @@ const GalleryPage = ({ setErrorMessage }) => {
     if (allRecipes.length > 0) {
       const newTotal = allRecipes.reduce(
         (acc, r) => ({
-          calories: acc.calories + (r.total_calories || 0),
-          protein: acc.protein + (r.total_protein || 0),
-          cost: acc.cost + (r.total_cost || 0),
+          calories: acc.calories + (r.per_serving_calories || 0),
+          protein: acc.protein + (r.per_serving_protein || 0),
+          cost: acc.cost + (r.per_serving_cost || 0),
         }),
         { calories: 0, protein: 0, cost: 0 }
       );
@@ -157,9 +157,9 @@ const GalleryPage = ({ setErrorMessage }) => {
     if (allRecipes.length > 0) {
       const newTotal = allRecipes.reduce(
         (acc, r) => ({
-          calories: acc.calories + (r.total_calories || 0),
-          protein: acc.protein + (r.total_protein || 0),
-          cost: acc.cost + (r.total_cost || 0),
+          calories: acc.calories + (r.per_serving_calories || 0),
+          protein: acc.protein + (r.per_serving_protein || 0),
+          cost: acc.cost + (r.per_serving_cost || 0),
         }),
         { calories: 0, protein: 0, cost: 0 }
       );
@@ -180,15 +180,17 @@ const GalleryPage = ({ setErrorMessage }) => {
     } else {
       const newTotal = allRecipes.reduce(
         (acc, r) => ({
-          calories: acc.calories + (r.total_calories || 0),
-          protein: acc.protein + (r.total_protein || 0),
-          cost: acc.cost + (r.total_cost || 0),
+          calories: acc.calories + (r.per_serving_calories || 0),
+          protein: acc.protein + (r.per_serving_protein || 0),
+          cost: acc.cost + (r.per_serving_cost || 0),
         }),
         { calories: 0, protein: 0, cost: 0 }
       );
       setTotalNutrition(newTotal);
     }
   };
+
+  const formatPrice = (cost) => Math.ceil((cost || 0) / 1000) * 1000;
 
   const handleOrder = async () => {
     if (!userName.trim()) {
@@ -242,12 +244,12 @@ const GalleryPage = ({ setErrorMessage }) => {
         if (recipes.length > 0) {
           message += `${t(`centralPerk.mealCategories.${category}`)}:\n`;
           recipes.forEach((recipe) => {
-            message += `- ${recipe.recipe_name} (${recipe.per_serving_calories.toFixed(2)} ${t('centralPerk.calories')} per serving, ${recipe.per_serving_protein.toFixed(2)}${t('kitchen.grams')} ${t('centralPerk.protein')}, ${recipe.per_serving_cost.toFixed(2)} Toman per serving)\n`;
+            message += `- ${recipe.recipe_name} (${t('centralPerk.units.kcalPerServing')} ${(recipe.per_serving_calories || 0).toFixed(2)}, ${t('centralPerk.units.proteinPerServing')} ${(recipe.per_serving_protein || 0).toFixed(2)}${t('kitchen.grams')}, ${t('centralPerk.units.tomanPerServing')} ${formatPrice(recipe.per_serving_cost)})\n`;
           });
         }
       });
       if (totalNutrition) {
-        message += `\n${t('centralPerk.totalNutrition')}: ${totalNutrition.calories.toFixed(2)} ${t('centralPerk.calories')}, ${totalNutrition.protein.toFixed(2)}${t('kitchen.grams')} ${t('centralPerk.protein')}, ${totalNutrition.cost.toFixed(2)} Toman`;
+        message += `\n${t('centralPerk.totalNutrition')}: ${t('centralPerk.units.kcalPerServing')} ${totalNutrition.calories.toFixed(2)}, ${t('centralPerk.units.proteinPerServing')} ${totalNutrition.protein.toFixed(2)}${t('kitchen.grams')}, ${t('centralPerk.units.tomanPerServing')} ${formatPrice(totalNutrition.cost)}`;
       }
       const encodedMessage = encodeURIComponent(message);
       const whatsappUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}`;
@@ -403,9 +405,15 @@ const GalleryPage = ({ setErrorMessage }) => {
                             />
                             <h3>{recipe.recipe_name}</h3>
                             <p>{t('centralPerk.dietary')}: {t(`centralPerk.dietaryOptions.${recipe.dietary}`)}</p>
-                            <p>{t('centralPerk.calories')}: {(recipe.per_serving_calories || 0).toFixed(2)} kcal per serving</p>
-                            <p>{t('centralPerk.protein')}: {(recipe.per_serving_protein || 0).toFixed(2)}g per serving</p>
-                            <p>{t('centralPerk.cost')}: {(recipe.per_serving_cost || 0).toFixed(2)} Toman per serving</p>
+                            <p>
+                              {t('centralPerk.units.kcalPerServing')} {(recipe.per_serving_calories || 0).toFixed(2)}
+                            </p>
+                            <p>
+                              {t('centralPerk.units.proteinPerServing')} {(recipe.per_serving_protein || 0).toFixed(2)}{t('kitchen.grams')}
+                            </p>
+                            <p>
+                              {t('centralPerk.units.tomanPerServing')} {formatPrice(recipe.per_serving_cost)}
+                            </p>
                             <p>{t('centralPerk.prepTime')}: {recipe.prep_time} {t('kitchen.minutes')}</p>
                             <p>{t('centralPerk.servings')}: {recipe.servings || 1}</p>
                             <div className="recipe-actions">
@@ -477,7 +485,7 @@ const GalleryPage = ({ setErrorMessage }) => {
                                 {...provided.dragHandleProps}
                                 className="meal-item"
                               >
-                                {recipe.recipe_name} ({(recipe.per_serving_calories || 0).toFixed(2)} kcal per serving, {(recipe.per_serving_protein || 0).toFixed(2)}g {t('centralPerk.protein')}, {(recipe.per_serving_cost || 0).toFixed(2)} Toman per serving)
+                                {recipe.recipe_name} ({t('centralPerk.units.kcalPerServing')} {(recipe.per_serving_calories || 0).toFixed(2)}, {t('centralPerk.units.proteinPerServing')} {(recipe.per_serving_protein || 0).toFixed(2)}{t('kitchen.grams')}, {t('centralPerk.units.tomanPerServing')} {formatPrice(recipe.per_serving_cost)})
                                 <button
                                   className="btn btn-danger"
                                   onClick={() => removeFromMealPlan(category.id, index)}
@@ -498,7 +506,7 @@ const GalleryPage = ({ setErrorMessage }) => {
           </div>
           {totalNutrition && (
             <p>
-              {t('centralPerk.totalNutrition')}: {totalNutrition.calories.toFixed(2)} kcal, {totalNutrition.protein.toFixed(2)}g {t('centralPerk.protein')}, {totalNutrition.cost.toFixed(2)} Toman
+              {t('centralPerk.totalNutrition')}: {t('centralPerk.units.kcalPerServing')} {totalNutrition.calories.toFixed(2)}, {t('centralPerk.units.proteinPerServing')} {totalNutrition.protein.toFixed(2)}{t('kitchen.grams')}, {t('centralPerk.units.tomanPerServing')} {formatPrice(totalNutrition.cost)}
             </p>
           )}
         </div>
@@ -556,9 +564,15 @@ const GalleryPage = ({ setErrorMessage }) => {
                   </div>
                 </div>
                 <p><strong>{t('centralPerk.dietary')}:</strong> {t(`centralPerk.dietaryOptions.${selectedRecipe.dietary}`)}</p>
-                <p><strong>{t('centralPerk.calories')}:</strong> {(selectedRecipe.per_serving_calories || 0).toFixed(2)} kcal per serving</p>
-                <p><strong>{t('centralPerk.protein')}:</strong> {(selectedRecipe.per_serving_protein || 0).toFixed(2)}g per serving</p>
-                <p><strong>{t('centralPerk.cost')}:</strong> {(selectedRecipe.per_serving_cost || 0).toFixed(2)} Toman per serving</p>
+                <p>
+                  <strong>{t('centralPerk.calories')}:</strong> {t('centralPerk.units.kcalPerServing')} {(selectedRecipe.per_serving_calories || 0).toFixed(2)}
+                </p>
+                <p>
+                  <strong>{t('centralPerk.protein')}:</strong> {t('centralPerk.units.proteinPerServing')} {(selectedRecipe.per_serving_protein || 0).toFixed(2)}{t('kitchen.grams')}
+                </p>
+                <p>
+                  <strong>{t('centralPerk.cost')}:</strong> {t('centralPerk.units.tomanPerServing')} {formatPrice(selectedRecipe.per_serving_cost)}
+                </p>
                 <p><strong>{t('centralPerk.prepTime')}:</strong> {selectedRecipe.prep_time} {t('kitchen.minutes')}</p>
                 <p><strong>{t('centralPerk.servings')}:</strong> {selectedRecipe.servings || 1}</p>
                 <h6>{t('centralPerk.ingredients')}</h6>
