@@ -271,6 +271,9 @@ const resources = {
           },
           "cta": "Get Started"
         },
+        "cost": "Cost",
+        "totalCost": "Total Cost",
+        "servings": "Servings",
         "allDiets": "All Diets",
         "maxCalories": "Max Calories",
         "minProtein": "Min Protein (g)",
@@ -614,6 +617,9 @@ const resources = {
           },
           "cta": "شروع کنید"
         },
+        "cost": "هزینه",
+        "totalCost": "هزینه کل",
+        "servings": "تعداد سروینگ",
         "allDiets": "همه رژیم‌ها",
         "maxCalories": "حداکثر کالری",
         "minProtein": "حداقل پروتئین (گرم)",

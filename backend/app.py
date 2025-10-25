@@ -65,6 +65,8 @@ DAILY_VALUES = {
     'Cost': {'value': None, 'unit': None}
 }
 
+BENEFIT_PERCENT = 1.2  # 20% benefit markup for price per serving
+
 def adjust_cost(cost, currency):
     """Adjust cost based on currency (Toman or IRR)."""
     return cost * 10 if currency == 'IRR' else cost
@@ -142,7 +144,7 @@ def create_nutrition_label_image(nutrition_data, title, currency):
         persian_pattern = re.compile(r'[\u0600-\u06FF]')
         is_rtl = bool(persian_pattern.search(title))
 
-        def draw_line(text, x=left_margin, bold=False, small=False, dv_text=None, rtl=False):
+        def draw_line(text, x=left_margin, bold=False, small=False, dv_text=None, rtl=is_rtl):
             nonlocal y_position
             font_to_use = bold_font if bold else (small_font if small else font)
             if rtl:
@@ -347,20 +349,29 @@ def get_matching_recipes():
                     continue
 
                 total_calories = 0
+                total_protein = 0
                 total_cost = 0
                 for ing in recipe['ingredient_list']:
-                    ing_name = ing['ingredient']
-                    qty = ing['quantity']
-                    ing_info = ingredient_data[ingredient_data['ingredient_name'] == ing_name]
-                    if not ing_info.empty:
-                        total_calories += ing_info['Calories'].iloc[0] * qty / 100
-                        total_cost += ing_info['Price/Unit'].iloc[0] * qty
+                    ingredient = ingredient_data[ingredient_data['ingredient_name'] == ing['ingredient'].strip()]
+                    if not ingredient.empty:
+                        total_calories += float(ingredient['Calories'].iloc[0]) * ing['quantity'] / 100
+                        total_protein += float(ingredient['Proteins'].iloc[0]) * ing['quantity'] / 100
+                        total_cost += float(ingredient['Price/Unit'].iloc[0] or 0) * ing['quantity']
                     else:
-                        logger.warning(f"Ingredient {ing_name} not found in database")
+                        logger.warning(f"Ingredient {ing['ingredient']} not found in database")
+
+                servings = recipe.get('servings', 1)
+                per_serving_calories = total_calories / servings
+                per_serving_protein = total_protein / servings
+                per_serving_cost = (total_cost / servings) * BENEFIT_PERCENT
 
                 recipe_copy = recipe.copy()
                 recipe_copy['total_calories'] = round(total_calories, 2)
+                recipe_copy['total_protein'] = round(total_protein, 2)
                 recipe_copy['total_cost'] = round(adjust_cost(total_cost, currency), 2)
+                recipe_copy['per_serving_calories'] = round(per_serving_calories, 2)
+                recipe_copy['per_serving_protein'] = round(per_serving_protein, 2)
+                recipe_copy['per_serving_cost'] = round(adjust_cost(per_serving_cost, currency), 2)
                 matching_recipes.append(recipe_copy)
 
         return jsonify(matching_recipes)
@@ -381,17 +392,20 @@ def get_recipes():
             logger.warning(f"Recipes file not found at {RECIPES_PATH}")
             return jsonify([]), 200
 
-        recipes = pd.read_json(RECIPES_PATH)
+        with open(RECIPES_PATH, 'r') as f:
+            recipes = json.load(f)
+
         conn = get_db_connection()
         df = pd.read_sql_query("SELECT * FROM ingredients", conn)
         conn.close()
 
         matches = []
-        for _, recipe in recipes.iterrows():
+        for recipe in recipes:
             if dietary and recipe['dietary'].lower() != dietary.lower():
                 continue
             if complexity and recipe['complexity'].lower() != complexity.lower():
                 continue
+
             ingredients = recipe['ingredient_list']
             total_calories = 0
             total_protein = 0
@@ -404,27 +418,39 @@ def get_recipes():
                     total_cost += float(ingredient['Price/Unit'].iloc[0] or 0) * ing['quantity']
                 else:
                     logger.warning(f"Ingredient {ing['ingredient']} not found")
+
+            servings = recipe.get('servings', 1)
+            per_serving_calories = total_calories / servings
+            per_serving_protein = total_protein / servings
+            per_serving_cost = (total_cost / servings) * BENEFIT_PERCENT
+
             if max_calories and total_calories > max_calories:
                 continue
             if max_cost and adjust_cost(total_cost, currency) > max_cost:
                 continue
+
             matches.append({
                 'recipe_name': recipe['recipe_name'],
                 'ingredient_list': recipe['ingredient_list'],
                 'instructions': recipe['instructions'],
-                'prep_time': int(recipe['prep_time']),
+                'prep_time': recipe['prep_time'],
                 'dietary': recipe['dietary'],
                 'complexity': recipe['complexity'],
+                'servings': servings,
                 'total_calories': round(total_calories, 2),
                 'total_protein': round(total_protein, 2),
                 'total_cost': round(adjust_cost(total_cost, currency), 2),
-                'image': recipe.get('image', '/nutrition-calculator/images/placeholder.jpg'),  # Include image
+                'per_serving_calories': round(per_serving_calories, 2),
+                'per_serving_protein': round(per_serving_protein, 2),
+                'per_serving_cost': round(adjust_cost(per_serving_cost, currency), 2),
+                'image': recipe.get('image', '/nutrition-calculator/images/placeholder.jpg'),
                 'thumbnails': recipe.get('thumbnails', [
                     '/nutrition-calculator/images/thumbnails/placeholder-1.jpg',
                     '/nutrition-calculator/images/thumbnails/placeholder-2.jpg',
                     '/nutrition-calculator/images/thumbnails/placeholder-3.jpg'
-                ])  # Include thumbnails
+                ])
             })
+
         return jsonify(matches)
     except Exception as e:
         logger.error(f"Error in get_recipes: {str(e)}")
@@ -438,36 +464,33 @@ def recipe_nutrition():
         ingredient_list = data.get('ingredient_list', [])
         scale_factor = data.get('scale_factor', 1.0)
         currency = data.get('currency', 'Toman')
+        servings = data.get('servings', 1)
 
         if not ingredient_list:
             return jsonify({'error': 'No ingredients provided'}), 400
 
-        conn = get_db_connection()
-        ingredients = pd.read_sql_query("SELECT * FROM ingredients", conn)
-        conn.close()
+        nutrition_data = calculate_nutrition(ingredient_list, scale_factor, currency)
 
-        ingredients.set_index('ingredient_name', inplace=True)
-        nutrient_columns = [col for col in ingredients.columns if col in DAILY_VALUES and col not in ['PurchaseCost', 'PurchaseAmt', 'persian_name', 'dietary', 'category']]
-        result = {}
-
-        for nutrient in nutrient_columns:
-            try:
-                value = sum(ingredients.loc[ing['ingredient'], nutrient] * ing['quantity'] * scale_factor / 100
-                           for ing in ingredient_list if ing['ingredient'] in ingredients.index)
-                result[nutrient] = {
-                    'value': round(value, 2),
-                    'unit': DAILY_VALUES[nutrient]['unit'],
-                    'percent_dv': round((value / DAILY_VALUES[nutrient]['value'] * 100), 2) if DAILY_VALUES[nutrient]['value'] else None
+        per_serving_nutrition = {}
+        for key, value in nutrition_data.items():
+            if key != 'Cost':
+                per_serving_nutrition[key] = {
+                    'value': round(value['value'] / servings, 2),
+                    'unit': value['unit'],
+                    'percent_dv': round(value['percent_dv'] / servings, 2) if value['percent_dv'] is not None else None
                 }
-            except KeyError as e:
-                logger.warning(f"Nutrient {nutrient} not found for some ingredients: {str(e)}")
-                result[nutrient] = {'value': 0, 'unit': DAILY_VALUES[nutrient]['unit'], 'percent_dv': None}
+            else:
+                per_serving_cost = (value['value'] / servings) * BENEFIT_PERCENT
+                per_serving_nutrition[key] = {
+                    'value': round(per_serving_cost, 2),
+                    'unit': value['unit'],
+                    'percent_dv': None
+                }
 
-        cost = sum(ingredients.loc[ing['ingredient'], 'Price/Unit'] * ing['quantity'] * scale_factor
-                   for ing in ingredient_list if ing['ingredient'] in ingredients.index)
-        result['Cost'] = {'value': round(adjust_cost(cost, currency), 2), 'unit': currency, 'percent_dv': None}
-
-        return jsonify(result)
+        return jsonify({
+            'total_nutrition': nutrition_data,
+            'per_serving_nutrition': per_serving_nutrition
+        })
     except Exception as e:
         logger.error(f"Error in recipe_nutrition: {str(e)}")
         return jsonify({'error': str(e)}), 500
@@ -517,20 +540,31 @@ def add_recipe():
         prep_time = data.get('prep_time')
         dietary = data.get('dietary', '')
         complexity = data.get('complexity', '')
+        servings = data.get('servings', 1)  # New field, default to 1
+        image = data.get('image', '')  # Optional image
+        thumbnails = data.get('thumbnails', [])  # Optional thumbnails
+
         if not recipe_name or not ingredient_list:
             return jsonify({"error": "Recipe name and ingredients are required"}), 400
         try:
             prep_time = int(prep_time)
+            servings = int(servings)
         except (ValueError, TypeError):
-            return jsonify({"error": "Prep time must be a number"}), 400
-        recipes = pd.read_json(RECIPES_PATH) if os.path.exists(RECIPES_PATH) and pd.io.json.read_json(RECIPES_PATH).shape[0] > 0 else pd.DataFrame(columns=['recipe_name', 'ingredient_list', 'instructions', 'prep_time', 'dietary', 'complexity'])
+            return jsonify({"error": "Prep time and servings must be numbers"}), 400
+        if prep_time <= 0 or servings <= 0:
+            return jsonify({"error": "Prep time and servings must be positive"}), 400
+
+        recipes = pd.read_json(RECIPES_PATH) if os.path.exists(RECIPES_PATH) and pd.io.json.read_json(RECIPES_PATH).shape[0] > 0 else pd.DataFrame(columns=['recipe_name', 'ingredient_list', 'instructions', 'prep_time', 'dietary', 'complexity', 'servings', 'image', 'thumbnails'])
         new_recipe = pd.DataFrame([{
             'recipe_name': recipe_name,
             'ingredient_list': ingredient_list,
             'instructions': instructions,
             'prep_time': prep_time,
             'dietary': dietary,
-            'complexity': complexity
+            'complexity': complexity,
+            'servings': servings,
+            'image': image,
+            'thumbnails': thumbnails
         }])
         recipes = pd.concat([recipes, new_recipe], ignore_index=True)
         recipes.to_json(RECIPES_PATH, orient='records', indent=2)
@@ -568,19 +602,28 @@ def update_recipe():
         prep_time = data.get('prep_time')
         dietary = data.get('dietary', '')
         complexity = data.get('complexity', '')
+        servings = data.get('servings', 1)  # New field, default to 1
+        image = data.get('image', '')  # Optional image
+        thumbnails = data.get('thumbnails', [])  # Optional thumbnails
+
         if not recipe_name or not ingredient_list:
             return jsonify({"error": "Recipe name and ingredients are required"}), 400
         try:
             prep_time = int(prep_time)
+            servings = int(servings)
         except (ValueError, TypeError):
-            return jsonify({"error": "Prep time must be a number"}), 400
+            return jsonify({"error": "Prep time and servings must be numbers"}), 400
+        if prep_time <= 0 or servings <= 0:
+            return jsonify({"error": "Prep time and servings must be positive"}), 400
+
         conn = get_db_connection()
         df = pd.read_sql_query("SELECT ingredient_name FROM ingredients", conn)
         conn.close()
         for ing in ingredient_list:
             if ing['ingredient'] not in df['ingredient_name'].values:
                 return jsonify({"error": f"Ingredient {ing['ingredient']} not found"}), 404
-        recipes = pd.read_json(RECIPES_PATH) if os.path.exists(RECIPES_PATH) and pd.io.json.read_json(RECIPES_PATH).shape[0] > 0 else pd.DataFrame(columns=['recipe_name', 'ingredient_list', 'instructions', 'prep_time', 'dietary', 'complexity'])
+
+        recipes = pd.read_json(RECIPES_PATH) if os.path.exists(RECIPES_PATH) and pd.io.json.read_json(RECIPES_PATH).shape[0] > 0 else pd.DataFrame(columns=['recipe_name', 'ingredient_list', 'instructions', 'prep_time', 'dietary', 'complexity', 'servings', 'image', 'thumbnails'])
         if recipe_name not in recipes['recipe_name'].values:
             return jsonify({"error": f"Recipe {recipe_name} not found"}), 404
         recipes = recipes[recipes['recipe_name'] != recipe_name]
@@ -590,331 +633,16 @@ def update_recipe():
             'instructions': instructions,
             'prep_time': prep_time,
             'dietary': dietary,
-            'complexity': complexity
+            'complexity': complexity,
+            'servings': servings,
+            'image': image,
+            'thumbnails': thumbnails
         }])
         recipes = pd.concat([recipes, updated_recipe], ignore_index=True)
         recipes.to_json(RECIPES_PATH, orient='records', indent=2)
         return jsonify({"message": f"Updated recipe {recipe_name}"})
     except Exception as e:
         logger.error(f"Error in update_recipe: {str(e)}")
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/add_ingredient', methods=['POST'])
-def add_ingredient():
-    try:
-        data = request.get_json()
-        logger.debug(f"Received in /add_ingredient: {data}")
-
-        # Required fields
-        required_fields = [
-            'ingredient_name', 'persian_name', 'Calories', 'Fats', 'Cholestrols', 'Na',
-            'Potassium(K)', 'Carb', 'Proteins', 'PurchaseCost', 'PurchaseAmt', 'dietary', 'category'
-        ]
-        for field in required_fields:
-            if field not in data or data[field] is None or data[field] == '':
-                return jsonify({"error": f"Missing required field: {field}"}), 400
-
-        # Numerical fields (required and optional)
-        numerical_fields = [
-            'Calories', 'Fats', 'Cholestrols', 'Na', 'Potassium(K)', 'Carb', 'Proteins',
-            'PurchaseCost', 'PurchaseAmt',
-            'Zn', 'Se', 'Phosphorus(P)', 'Manganese(Mn)', 'Magnesium(Mg)', 'Iron(Fe)',
-            'Fluoride(F)', 'Copper(Cu)', 'Calcium(Ca)', 'VitaminK', 'VitaminE', 'VitaminD',
-            'VitaminC', 'VitaminB6', 'VitaminB12', 'VitaminA', 'Thiamin(B1)', 'Ribofavin(B2)',
-            'PantothenicAcid(B5)', 'Niacin(B3)', 'Cholines', 'SaturatedFattyacid',
-            'TransFattyacid', 'Alcohol(ethyl)', 'Fiber(F)', 'Sugars', 'Caffeines', 'Water(H2O)', 'Ashes'
-        ]
-        # Validate numerical fields, allowing optional fields to be empty
-        for field in numerical_fields:
-            if field in data and data[field] is not None and data[field] != '':
-                try:
-                    data[field] = float(data[field])
-                    if data[field] < 0:
-                        return jsonify({"error": f"{field} must be non-negative"}), 400
-                except (ValueError, TypeError):
-                    return jsonify({"error": f"{field} must be a number"}), 400
-
-        # Validate PurchaseAmt
-        if data['PurchaseAmt'] <= 0:
-            return jsonify({"error": "Purchase amount must be positive"}), 400
-
-        # Calculate Price/Unit
-        price_per_unit = data['PurchaseCost'] / data['PurchaseAmt']
-
-        # Validate dietary and category
-        valid_dietary = ['omnivore', 'vegetarian', 'vegan']
-        valid_categories = [
-            'Vegetables', 'Fruits', 'Grains and Cereals', 'Legumes and Beans', 'Meat and Poultry',
-            'Dairy and Alternatives', 'Nuts and Seeds', 'Spices and Herbs', 'Beverages',
-            'Condiments and Sauces', 'Sweets and Snacks', 'Baking Ingredients', 'Eggs', 'Other'
-        ]
-        if data['dietary'] not in valid_dietary:
-            return jsonify({"error": f"Invalid dietary value. Must be one of: {', '.join(valid_dietary)}"}), 400
-        if data['category'] not in valid_categories:
-            return jsonify({"error": f"Invalid category value. Must be one of: {', '.join(valid_categories)}"}), 400
-
-        # Check for duplicate ingredient_name
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT ingredient_name FROM ingredients WHERE ingredient_name = ?", (data['ingredient_name'],))
-        if cursor.fetchone():
-            conn.close()
-            return jsonify({"error": f"Ingredient {data['ingredient_name']} already exists"}), 400
-
-        # Prepare data for insertion (set defaults for optional fields)
-        ingredient_data = {
-            'ingredient_name': data['ingredient_name'],
-            'persian_name': data['persian_name'],
-            'dietary': data['dietary'],
-            'category': data['category'],
-            'PurchaseCost': data['PurchaseCost'],
-            'PurchaseAmt': data['PurchaseAmt'],
-            'Price/Unit': price_per_unit,
-            'Calories': data['Calories'],
-            'Fats': data['Fats'],
-            'Cholestrols': data['Cholestrols'],
-            'Na': data['Na'],
-            'Potassium(K)': data['Potassium(K)'],
-            'Carb': data['Carb'],
-            'Proteins': data['Proteins'],
-            'Zn': float(data.get('Zn', 0)) if data.get('Zn', '') != '' else 0,
-            'Se': float(data.get('Se', 0)) if data.get('Se', '') != '' else 0,
-            'Phosphorus(P)': float(data.get('Phosphorus(P)', 0)) if data.get('Phosphorus(P)', '') != '' else 0,
-            'Manganese(Mn)': float(data.get('Manganese(Mn)', 0)) if data.get('Manganese(Mn)', '') != '' else 0,
-            'Magnesium(Mg)': float(data.get('Magnesium(Mg)', 0)) if data.get('Magnesium(Mg)', '') != '' else 0,
-            'Iron(Fe)': float(data.get('Iron(Fe)', 0)) if data.get('Iron(Fe)', '') != '' else 0,
-            'Fluoride(F)': float(data.get('Fluoride(F)', 0)) if data.get('Fluoride(F)', '') != '' else 0,
-            'Copper(Cu)': float(data.get('Copper(Cu)', 0)) if data.get('Copper(Cu)', '') != '' else 0,
-            'Calcium(Ca)': float(data.get('Calcium(Ca)', 0)) if data.get('Calcium(Ca)', '') != '' else 0,
-            'VitaminK': float(data.get('VitaminK', 0)) if data.get('VitaminK', '') != '' else 0,
-            'VitaminE': float(data.get('VitaminE', 0)) if data.get('VitaminE', '') != '' else 0,
-            'VitaminD': float(data.get('VitaminD', 0)) if data.get('VitaminD', '') != '' else 0,
-            'VitaminC': float(data.get('VitaminC', 0)) if data.get('VitaminC', '') != '' else 0,
-            'VitaminB6': float(data.get('VitaminB6', 0)) if data.get('VitaminB6', '') != '' else 0,
-            'VitaminB12': float(data.get('VitaminB12', 0)) if data.get('VitaminB12', '') != '' else 0,
-            'VitaminA': float(data.get('VitaminA', 0)) if data.get('VitaminA', '') != '' else 0,
-            'Thiamin(B1)': float(data.get('Thiamin(B1)', 0)) if data.get('Thiamin(B1)', '') != '' else 0,
-            'Ribofavin(B2)': float(data.get('Ribofavin(B2)', 0)) if data.get('Ribofavin(B2)', '') != '' else 0,
-            'PantothenicAcid(B5)': float(data.get('PantothenicAcid(B5)', 0)) if data.get('PantothenicAcid(B5)', '') != '' else 0,
-            'Niacin(B3)': float(data.get('Niacin(B3)', 0)) if data.get('Niacin(B3)', '') != '' else 0,
-            'Cholines': float(data.get('Cholines', 0)) if data.get('Cholines', '') != '' else 0,
-            'SaturatedFattyacid': float(data.get('SaturatedFattyacid', 0)) if data.get('SaturatedFattyacid', '') != '' else 0,
-            'TransFattyacid': float(data.get('TransFattyacid', 0)) if data.get('TransFattyacid', '') != '' else 0,
-            'Alcohol(ethyl)': float(data.get('Alcohol(ethyl)', 0)) if data.get('Alcohol(ethyl)', '') != '' else 0,
-            'Fiber(F)': float(data.get('Fiber(F)', 0)) if data.get('Fiber(F)', '') != '' else 0,
-            'Sugars': float(data.get('Sugars', 0)) if data.get('Sugars', '') != '' else 0,
-            'Caffeines': float(data.get('Caffeines', 0)) if data.get('Caffeines', '') != '' else 0,
-            'Water(H2O)': float(data.get('Water(H2O)', 0)) if data.get('Water(H2O)', '') != '' else 0,
-            'Ashes': float(data.get('Ashes', 0)) if data.get('Ashes', '') != '' else 0
-        }
-
-        # Insert into database
-        columns = ', '.join([f'"{key}"' for key in ingredient_data.keys()])  # Quote column names
-        placeholders = ', '.join(['?' for _ in ingredient_data])
-        query = f"INSERT INTO ingredients ({columns}) VALUES ({placeholders})"
-        cursor.execute(query, list(ingredient_data.values()))
-        conn.commit()
-        conn.close()
-
-        return jsonify({"message": f"Added ingredient {data['ingredient_name']} successfully"})
-    except Exception as e:
-        logger.error(f"Error in add_ingredient: {str(e)}")
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/export_recipe_pdf', methods=['POST'])
-def export_recipe_pdf():
-    try:
-        data = request.get_json()
-        logger.debug(f"Received in /export_recipe_pdf: {data}")
-
-        # Required fields
-        required_fields = ['recipe_name', 'ingredient_list', 'instructions', 'prep_time', 'dietary', 'complexity', 'total_calories', 'total_cost', 'currency']
-        for field in required_fields:
-            if field not in data or data[field] is None:
-                return jsonify({"error": f"Missing required field: {field}"}), 400
-
-        # Fetch ingredient Persian names
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        ingredient_names = {}
-        for ing in data['ingredient_list']:
-            cursor.execute("SELECT persian_name FROM ingredients WHERE ingredient_name = ?", (ing['ingredient'],))
-            result = cursor.fetchone()
-            ingredient_names[ing['ingredient']] = result[0] if result else 'N/A'
-        conn.close()
-
-        # Font setup (use DejaVu Sans for consistency with nutrition label)
-        try:
-            font_path = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
-            font = ImageFont.truetype(font_path, size=14)
-            font_bold = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', size=18)
-        except IOError:
-            try:
-                font_path = '/home/Maniac/ingredient-app/fonts/Vazir.ttf'
-                font = ImageFont.truetype(font_path, size=14)
-                font_bold = ImageFont.truetype(font_path, size=18)
-            except IOError:
-                font = ImageFont.load_default()
-                font_bold = ImageFont.load_default()
-                logger.warning("Failed to load fonts, using default font")
-
-        # Layout parameters
-        width = 595  # A4 width at 72 DPI
-        margin = 30
-        line_height = 20
-        title_height = 30
-        section_spacing = 15
-        table_header_height = 25
-        row_height = 20
-        col_widths = [178, 178, 178]  # Adjusted for wider quantity column
-
-        # Create image canvas
-        image = Image.new('RGB', (width, 842), 'white')  # Start with A4 height
-        draw = ImageDraw.Draw(image)
-
-        # Helper function to wrap text
-        def wrap_text(text, font, max_width, draw):
-            if not text:
-                return [""]
-            lines = []
-            words = text.split()
-            current_line = ''
-            for word in words:
-                test_line = current_line + (word + ' ')
-                bbox = draw.textbbox((0, 0), test_line, font=font)
-                if bbox[2] - bbox[0] <= max_width:
-                    current_line = test_line
-                else:
-                    lines.append(current_line.strip())
-                    current_line = word + ' '
-            if current_line:
-                lines.append(current_line.strip())
-            return lines if lines else [""]
-
-        # Detect Persian text for RTL support
-        persian_pattern = re.compile(r'[\u0600-\u06FF]')
-
-        # Estimate canvas height dynamically
-        table_data = [
-            ["Ingredient", "Persian Name", "Quantity (g)"]
-        ] + [
-            [ing['ingredient'].replace('.', ' '), ingredient_names[ing['ingredient']] or 'N/A', str(ing['quantity'])]
-            for ing in data['ingredient_list']
-        ]
-        table_height = 0
-        for row in table_data:
-            max_lines = 1
-            for i, cell in enumerate(row):
-                max_lines = max(max_lines, len(wrap_text(cell, font, col_widths[i], draw)))
-            table_height += max_lines * row_height
-        table_height += table_header_height + section_spacing
-
-        # Calculate height for instructions
-        instructions_lines = sum(
-            len(wrap_text(line, font, width - 2 * margin, draw)) for line in (data['instructions'] or "").split('\n')
-        )
-        instructions_height = instructions_lines * line_height + section_spacing
-
-        # Other details
-        details = [
-            ("Prep Time", f"{data['prep_time']} minutes"),
-            ("Dietary", data['dietary']),
-            ("Complexity", data['complexity']),
-            ("Total Calories", f"{data['total_calories']} kcal"),
-            ("Total Cost", f"{data['total_cost']} {data['currency']}")
-        ]
-        details_height = sum(
-            (1 + len(wrap_text(value, font, width - 2 * margin - 20, draw))) * line_height + 15  # Increased spacing
-            for _, value in details
-        )
-
-        # Total height
-        height = max(842, title_height + table_height + instructions_height + details_height + 2 * margin + 50)
-        if height > 842:
-            image = Image.new('RGB', (width, int(height)), 'white')
-            draw = ImageDraw.Draw(image)
-
-        y = margin
-
-        # Draw recipe name (title)
-        is_rtl = bool(persian_pattern.search(data['recipe_name'] or ""))
-        recipe_name = data['recipe_name'] or "Untitled Recipe"
-        if is_rtl:
-            text_width = draw.textlength(recipe_name, font=font_bold)
-            draw.text((width - margin - text_width, y), recipe_name, font=font_bold, fill='black')
-        else:
-            draw.text((margin, y), recipe_name, font=font_bold, fill='black')
-        draw.line([(margin, y + title_height - 5), (width - margin, y + title_height - 5)], fill='black', width=2)
-        y += title_height + 5
-
-        # Draw ingredients table
-        draw.text((margin, y), "Ingredients", font=font_bold, fill='black')
-        draw.line([(margin, y + table_header_height - 5), (margin + sum(col_widths), y + table_header_height - 5)], fill='black', width=2)
-        y += table_header_height
-        for row in table_data:
-            max_lines = 1
-            for i, cell in enumerate(row):
-                is_cell_rtl = bool(persian_pattern.search(cell or "")) and i == 1  # RTL for Persian Name
-                wrapped_lines = wrap_text(cell, font, col_widths[i], draw)
-                max_lines = max(max_lines, len(wrapped_lines))
-                cell_y = y
-                for line in wrapped_lines:
-                    if is_cell_rtl:
-                        text_width = draw.textlength(line, font=font)
-                        draw.text((margin + sum(col_widths[:i]) + col_widths[i] - text_width, cell_y), line, font=font, fill='black')
-                    else:
-                        draw.text((margin + sum(col_widths[:i]), cell_y), line, font=font, fill='black')
-                    cell_y += line_height
-                if i < len(row) - 1:
-                    draw.line([(margin + sum(col_widths[:i+1]), y - 5), (margin + sum(col_widths[:i+1]), y + max_lines * row_height - 5)], fill='black', width=1)
-            y += max_lines * row_height
-            draw.line([(margin, y - 5), (margin + sum(col_widths), y - 5)], fill='black', width=1)
-        y += section_spacing
-
-        # Draw instructions
-        draw.text((margin, y), "Instructions", font=font_bold, fill='black')
-        draw.line([(margin, y + table_header_height - 5), (width - margin, y + table_header_height - 5)], fill='black', width=2)
-        y += table_header_height
-        instructions = data['instructions'] or "No instructions provided."
-        for line in instructions.split('\n'):
-            wrapped_lines = wrap_text(line, font, width - 2 * margin, draw)
-            for wrapped_line in wrapped_lines:
-                is_line_rtl = bool(persian_pattern.search(wrapped_line or ""))
-                if is_line_rtl:
-                    text_width = draw.textlength(wrapped_line, font=font)
-                    draw.text((width - margin - text_width, y), wrapped_line, font=font, fill='black')
-                else:
-                    draw.text((margin, y), wrapped_line, font=font, fill='black')
-                y += line_height
-        y += section_spacing
-
-        # Draw other details
-        for label, value in details:
-            draw.text((margin, y), label, font=font_bold, fill='black')
-            draw.line([(margin, y + line_height), (margin + draw.textlength(label, font=font_bold) + 10, y + line_height)], fill='black', width=1)
-            y += line_height + 5  # Added spacing after title
-            wrapped_lines = wrap_text(value, font, width - 2 * margin - 20, draw)
-            for line in wrapped_lines:
-                is_line_rtl = bool(persian_pattern.search(line or ""))
-                if is_line_rtl:
-                    text_width = draw.textlength(line, font=font)
-                    draw.text((width - margin - text_width, y), line, font=font, fill='black')
-                else:
-                    draw.text((margin + 20, y), line, font=font, fill='black')
-                y += line_height
-            y += 10
-
-        # Save image as PDF
-        buffer = BytesIO()
-        image.save(buffer, format='PDF', resolution=72)
-        pdf_data = buffer.getvalue()
-        buffer.close()
-
-        # Encode PDF as base64
-        pdf_base64 = base64.b64encode(pdf_data).decode('utf-8')
-        return jsonify({"pdf": f"data:application/pdf;base64,{pdf_base64}"})
-    except Exception as e:
-        logger.error(f"Error in export_recipe_pdf: {str(e)}", exc_info=True)
         return jsonify({"error": str(e)}), 500
 
 @app.route('/generate_meal_plan', methods=['POST'])

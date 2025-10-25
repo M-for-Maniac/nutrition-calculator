@@ -13,12 +13,15 @@ function RecipeNotebook({ setErrorMessage }) {
   const [recipeMaxCost, setRecipeMaxCost] = useState('');
   const [dietaryFilter, setDietaryFilter] = useState('');
   const [complexityFilter, setComplexityFilter] = useState('');
-  const [newRecipeName, setNewRecipeName] = useState('');
-  const [newRecipeIngredients, setNewRecipeIngredients] = useState([]);
-  const [newRecipeInstructions, setNewRecipeInstructions] = useState('');
-  const [newRecipePrepTime, setNewRecipePrepTime] = useState('');
-  const [newRecipeDietary, setNewRecipeDietary] = useState('');
-  const [newRecipeComplexity, setNewRecipeComplexity] = useState('');
+  const [formData, setFormData] = useState({
+    recipeName: '',
+    ingredients: [],
+    instructions: '',
+    prepTime: '',
+    dietary: '',
+    complexity: '',
+    servings: 1,
+  });
   const [recipeMessage, setRecipeMessage] = useState('');
   const [recipeNutrition, setRecipeNutrition] = useState({});
   const [ingredientQuantities, setIngredientQuantities] = useState({});
@@ -31,7 +34,7 @@ function RecipeNotebook({ setErrorMessage }) {
   const [openNotes, setOpenNotes] = useState({
     purpose: false,
     nutrition: false,
-    usage: false
+    usage: false,
   });
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [showInstructionsModal, setShowInstructionsModal] = useState(false);
@@ -56,53 +59,59 @@ function RecipeNotebook({ setErrorMessage }) {
       color: '#295241',
       fontWeight: '500',
       fontSize: '1rem',
-      padding: '10px 15px'
+      padding: '10px 15px',
     },
     accordionButtonCollapsed: {
       backgroundColor: '#f8f9fa',
-      color: '#295241'
+      color: '#295241',
     },
     noteCard: {
       backgroundColor: '#fff',
       border: '1px solid #295241',
       borderRadius: '4px',
-      padding: '10px'
-    }
+      padding: '10px',
+    },
   };
 
   const toggleNote = (note) => {
     setOpenNotes((prev) => ({
       ...prev,
-      [note]: !prev[note]
+      [note]: !prev[note],
     }));
   };
 
-  // Truncate text for table display
   const truncateText = (text, maxLength = 50) => {
     if (!text || text.length <= maxLength) return text || '';
     return text.substring(0, maxLength) + '...';
   };
 
-  // Handle showing instructions in modal
   const handleShowInstructions = (recipe) => {
     setSelectedRecipe(recipe);
     setShowInstructionsModal(true);
   };
 
-  // Close instructions modal
   const handleCloseInstructionsModal = () => {
     setShowInstructionsModal(false);
     setSelectedRecipe(null);
   };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   useEffect(() => {
     setIsLoading(true);
-    axios.get(`${BASE_URL}/ingredients`)
-      .then(res => {
+    axios
+      .get(`${BASE_URL}/ingredients`)
+      .then((res) => {
         setIngredients(res.data);
         setErrorMessage('');
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('Error fetching ingredients:', err);
         setErrorMessage(err.response?.data?.error || t('cookbook.error.fetchIngredients'));
       })
@@ -120,12 +129,13 @@ function RecipeNotebook({ setErrorMessage }) {
     if (complexityFilter) params.push(`complexity=${complexityFilter}`);
     if (currency) params.push(`currency=${currency}`);
     if (params.length) url += `?${params.join('&')}`;
-    axios.get(url)
-      .then(res => {
+    axios
+      .get(url)
+      .then((res) => {
         setAllRecipes(res.data);
         setErrorMessage('');
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('Error fetching recipes:', err);
         setErrorMessage(err.response?.data?.error || t('cookbook.error.fetchRecipes'));
       })
@@ -133,38 +143,44 @@ function RecipeNotebook({ setErrorMessage }) {
   }, [recipeMaxCalories, recipeMaxCost, dietaryFilter, complexityFilter, currency, ingredients, setErrorMessage, t]);
 
   const handleAddRecipe = () => {
-    if (!newRecipeName || !newRecipeIngredients.length || !newRecipePrepTime) {
+    if (!formData.recipeName || !formData.ingredients.length || !formData.prepTime) {
       setRecipeMessage(t('cookbook.error.addRecipeFields'));
       return;
     }
     setIsLoading(true);
-    const ingredientList = newRecipeIngredients.map(opt => ({
+    const ingredientList = formData.ingredients.map((opt) => ({
       ingredient: opt.value,
-      quantity: parseFloat(ingredientQuantities[opt.value]) || 100
+      quantity: parseFloat(ingredientQuantities[opt.value]) || 100,
     }));
-    axios.post(`${BASE_URL}/add_recipe`, {
-      recipe_name: newRecipeName,
-      ingredient_list: ingredientList,
-      instructions: newRecipeInstructions,
-      prep_time: parseInt(newRecipePrepTime),
-      dietary: newRecipeDietary,
-      complexity: newRecipeComplexity,
-      currency
-    })
-      .then(res => {
+    axios
+      .post(`${BASE_URL}/add_recipe`, {
+        recipe_name: formData.recipeName,
+        ingredient_list: ingredientList,
+        instructions: formData.instructions,
+        prep_time: parseInt(formData.prepTime),
+        dietary: formData.dietary,
+        complexity: formData.complexity,
+        servings: parseInt(formData.servings) || 1,
+        currency,
+      })
+      .then((res) => {
         setRecipeMessage(res.data.message);
-        axios.get(`${BASE_URL}/get_recipes?currency=${currency}`)
-          .then(res => setAllRecipes(res.data))
-          .catch(err => setErrorMessage(err.response?.data?.error || t('cookbook.error.fetchRecipes')));
-        setNewRecipeName('');
-        setNewRecipeIngredients([]);
-        setNewRecipeInstructions('');
-        setNewRecipePrepTime('');
-        setNewRecipeDietary('');
-        setNewRecipeComplexity('');
+        axios
+          .get(`${BASE_URL}/get_recipes?currency=${currency}`)
+          .then((res) => setAllRecipes(res.data))
+          .catch((err) => setErrorMessage(err.response?.data?.error || t('cookbook.error.fetchRecipes')));
+        setFormData({
+          recipeName: '',
+          ingredients: [],
+          instructions: '',
+          prepTime: '',
+          dietary: '',
+          complexity: '',
+          servings: 1,
+        });
         setIngredientQuantities({});
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('Error adding recipe:', err);
         setRecipeMessage(err.response?.data?.error || t('cookbook.error.addRecipe'));
       })
@@ -177,15 +193,16 @@ function RecipeNotebook({ setErrorMessage }) {
       return;
     }
     setIsLoading(true);
-    axios.post(`${BASE_URL}/recipe_nutrition`, {
-      ingredient_list,
-      scale_factor: parseFloat(scaleFactor) || 1.0,
-      currency
-    })
-      .then(res => {
-        setRecipeNutrition(prev => ({ ...prev, [recipe_name]: res.data }));
+    axios
+      .post(`${BASE_URL}/recipe_nutrition`, {
+        ingredient_list,
+        scale_factor: parseFloat(scaleFactor) || 1.0,
+        currency,
       })
-      .catch(err => {
+      .then((res) => {
+        setRecipeNutrition((prev) => ({ ...prev, [recipe_name]: res.data }));
+      })
+      .catch((err) => {
         console.error('Error calculating recipe nutrition:', err);
         setErrorMessage(err.response?.data?.error || t('cookbook.error.calculateNutrition'));
       })
@@ -195,24 +212,26 @@ function RecipeNotebook({ setErrorMessage }) {
   const handleDeleteRecipe = (recipe_name) => {
     if (!window.confirm(t('cookbook.confirmDelete', { recipe_name }))) return;
     setIsLoading(true);
-    axios.post(`${BASE_URL}/delete_recipe`, { recipe_name })
-      .then(res => {
+    axios
+      .post(`${BASE_URL}/delete_recipe`, { recipe_name })
+      .then((res) => {
         setRecipeMessage(res.data.message);
-        axios.get(`${BASE_URL}/get_recipes?currency=${currency}`)
-          .then(res => {
+        axios
+          .get(`${BASE_URL}/get_recipes?currency=${currency}`)
+          .then((res) => {
             setAllRecipes(res.data);
-            setRecipeNutrition(prev => {
+            setRecipeNutrition((prev) => {
               const updated = { ...prev };
               delete updated[recipe_name];
               return updated;
             });
           })
-          .catch(err => {
+          .catch((err) => {
             console.error('Error fetching recipes:', err);
             setErrorMessage(err.response?.data?.error || t('cookbook.error.fetchRecipesAfterDelete'));
           });
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('Error deleting recipe:', err);
         setRecipeMessage(err.response?.data?.error || t('cookbook.error.deleteRecipe'));
       })
@@ -226,66 +245,76 @@ function RecipeNotebook({ setErrorMessage }) {
       instructions: recipe.instructions,
       prep_time: recipe.prep_time,
       dietary: recipe.dietary,
-      complexity: recipe.complexity
+      complexity: recipe.complexity,
+      servings: recipe.servings || 1,
     });
-    setNewRecipeName(recipe.recipe_name);
-    setNewRecipeIngredients(recipe.ingredient_list.map(ing => ({
-      value: ing.ingredient,
-      label: `${ing.ingredient.replace(/\./g, ' ')} (${ingredients.find(i => i.ingredient_name === ing.ingredient)?.persian_name || ''})`
-    })));
-    setNewRecipeInstructions(recipe.instructions);
-    setNewRecipePrepTime(recipe.prep_time);
-    setNewRecipeDietary(recipe.dietary);
-    setNewRecipeComplexity(recipe.complexity);
+    setFormData({
+      recipeName: recipe.recipe_name,
+      ingredients: recipe.ingredient_list.map((ing) => ({
+        value: ing.ingredient,
+        label: `${ing.ingredient.replace(/\./g, ' ')} (${ingredients.find((i) => i.ingredient_name === ing.ingredient)?.persian_name || ''})`,
+      })),
+      instructions: recipe.instructions,
+      prepTime: recipe.prep_time,
+      dietary: recipe.dietary,
+      complexity: recipe.complexity,
+      servings: recipe.servings || 1,
+    });
     setIngredientQuantities(
       recipe.ingredient_list.reduce((acc, ing) => ({
         ...acc,
-        [ing.ingredient]: ing.quantity
+        [ing.ingredient]: ing.quantity,
       }), {})
     );
     setEditModalOpen(true);
   };
 
   const handleUpdateRecipe = () => {
-    if (!newRecipeName || !newRecipeIngredients.length || !newRecipePrepTime) {
+    if (!formData.recipeName || !formData.ingredients.length || !formData.prepTime) {
       setRecipeMessage(t('cookbook.error.updateRecipeFields'));
       return;
     }
     setIsLoading(true);
-    const ingredientList = newRecipeIngredients.map(opt => ({
+    const ingredientList = formData.ingredients.map((opt) => ({
       ingredient: opt.value,
-      quantity: parseFloat(ingredientQuantities[opt.value]) || 100
+      quantity: parseFloat(ingredientQuantities[opt.value]) || 100,
     }));
-    axios.post(`${BASE_URL}/update_recipe`, {
-      recipe_name: newRecipeName,
-      ingredient_list: ingredientList,
-      instructions: newRecipeInstructions,
-      prep_time: parseInt(newRecipePrepTime),
-      dietary: newRecipeDietary,
-      complexity: newRecipeComplexity,
-      currency
-    })
-      .then(res => {
+    axios
+      .post(`${BASE_URL}/update_recipe`, {
+        recipe_name: formData.recipeName,
+        ingredient_list: ingredientList,
+        instructions: formData.instructions,
+        prep_time: parseInt(formData.prepTime),
+        dietary: formData.dietary,
+        complexity: formData.complexity,
+        servings: parseInt(formData.servings) || 1,
+        currency,
+      })
+      .then((res) => {
         setRecipeMessage(res.data.message);
-        axios.get(`${BASE_URL}/get_recipes?currency=${currency}`)
-          .then(res => {
+        axios
+          .get(`${BASE_URL}/get_recipes?currency=${currency}`)
+          .then((res) => {
             setAllRecipes(res.data);
             setEditModalOpen(false);
-            setNewRecipeName('');
-            setNewRecipeIngredients([]);
-            setNewRecipeInstructions('');
-            setNewRecipePrepTime('');
-            setNewRecipeDietary('');
-            setNewRecipeComplexity('');
+            setFormData({
+              recipeName: '',
+              ingredients: [],
+              instructions: '',
+              prepTime: '',
+              dietary: '',
+              complexity: '',
+              servings: 1,
+            });
             setIngredientQuantities({});
             setEditRecipe(null);
           })
-          .catch(err => {
+          .catch((err) => {
             console.error('Error fetching recipes:', err);
             setErrorMessage(err.response?.data?.error || t('cookbook.error.fetchRecipesAfterUpdate'));
           });
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('Error updating recipe:', err);
         setRecipeMessage(err.response?.data?.error || t('cookbook.error.updateRecipe'));
       })
@@ -294,12 +323,15 @@ function RecipeNotebook({ setErrorMessage }) {
 
   const handleCloseModal = () => {
     setEditModalOpen(false);
-    setNewRecipeName('');
-    setNewRecipeIngredients([]);
-    setNewRecipeInstructions('');
-    setNewRecipePrepTime('');
-    setNewRecipeDietary('');
-    setNewRecipeComplexity('');
+    setFormData({
+      recipeName: '',
+      ingredients: [],
+      instructions: '',
+      prepTime: '',
+      dietary: '',
+      complexity: '',
+      servings: 1,
+    });
     setIngredientQuantities({});
     setEditRecipe(null);
     setRecipeMessage('');
@@ -308,7 +340,7 @@ function RecipeNotebook({ setErrorMessage }) {
   const handleExportRecipeNutrition = async (recipeName) => {
     if (!recipeNutrition[recipeName]) return;
 
-    const ingredientList = allRecipes.find(r => r.recipe_name === recipeName)?.ingredient_list || [];
+    const ingredientList = allRecipes.find((r) => r.recipe_name === recipeName)?.ingredient_list || [];
 
     try {
       setIsLoading(true);
@@ -316,7 +348,7 @@ function RecipeNotebook({ setErrorMessage }) {
         ingredient_list: ingredientList,
         scale_factor: parseFloat(scaleFactor) || 1.0,
         currency,
-        title: `Nutrition Facts: ${recipeName}`
+        title: `Nutrition Facts: ${recipeName}`,
       });
       const { image } = response.data;
       const link = document.createElement('a');
@@ -346,7 +378,8 @@ function RecipeNotebook({ setErrorMessage }) {
         complexity: recipe.complexity,
         total_calories: recipe.total_calories,
         total_cost: recipe.total_cost,
-        currency
+        servings: recipe.servings || 1,
+        currency,
       });
       const { pdf } = response.data;
       const link = document.createElement('a');
@@ -364,17 +397,19 @@ function RecipeNotebook({ setErrorMessage }) {
     }
   };
 
-  const ingredientOptions = ingredients.map(ing => ({
+  const ingredientOptions = ingredients.map((ing) => ({
     value: ing.ingredient_name,
-    label: `${ing.ingredient_name.replace(/\./g, ' ')} (${ing.persian_name || ''})`
+    label: `${ing.ingredient_name.replace(/\./g, ' ')} (${ing.persian_name || ''})`,
   }));
 
-  const filteredRecipes = allRecipes.filter(recipe =>
-    recipe.recipe_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    recipe.ingredient_list.some(ing =>
-      ing.ingredient.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      ingredients.find(i => i.ingredient_name === ing.ingredient)?.persian_name?.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+  const filteredRecipes = allRecipes.filter(
+    (recipe) =>
+      recipe.recipe_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      recipe.ingredient_list.some(
+        (ing) =>
+          ing.ingredient.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          ingredients.find((i) => i.ingredient_name === ing.ingredient)?.persian_name?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
   );
 
   return (
@@ -395,7 +430,7 @@ function RecipeNotebook({ setErrorMessage }) {
                 aria-controls="collapseCookbookPurpose"
                 style={{
                   ...styles.accordionButton,
-                  ...(openNotes.purpose ? {} : styles.accordionButtonCollapsed)
+                  ...(openNotes.purpose ? {} : styles.accordionButtonCollapsed),
                 }}
               >
                 <i className="fas fa-info-circle" style={styles.icon}></i>
@@ -408,7 +443,12 @@ function RecipeNotebook({ setErrorMessage }) {
               aria-labelledby="cookbookNotePurpose"
             >
               <div className="accordion-body" style={styles.noteCard}>
-                <p>{t('cookbook.notes.purpose', { defaultValue: 'The Cookbook allows you to create, manage, and analyze recipes tailored to your dietary preferences and budget. It’s ideal for saving favorite recipes, planning meals, and ensuring nutritional balance.' })}</p>
+                <p>
+                  {t('cookbook.notes.purpose', {
+                    defaultValue:
+                      'The Cookbook allows you to create, manage, and analyze recipes tailored to your dietary preferences and budget. It’s ideal for saving favorite recipes, planning meals, and ensuring nutritional balance.',
+                  })}
+                </p>
               </div>
             </div>
           </div>
@@ -422,7 +462,7 @@ function RecipeNotebook({ setErrorMessage }) {
                 aria-controls="collapseCookbookNutrition"
                 style={{
                   ...styles.accordionButton,
-                  ...(openNotes.nutrition ? {} : styles.accordionButtonCollapsed)
+                  ...(openNotes.nutrition ? {} : styles.accordionButtonCollapsed),
                 }}
               >
                 <i className="fas fa-heart" style={styles.icon}></i>
@@ -435,7 +475,12 @@ function RecipeNotebook({ setErrorMessage }) {
               aria-labelledby="cookbookNoteNutrition"
             >
               <div className="accordion-body" style={styles.noteCard}>
-                <p>{t('cookbook.notes.nutritionInfo', { defaultValue: 'Recipes provide a snapshot of nutritional content based on their ingredients. Monitor calories, macronutrients (carbs, proteins, fats), and micronutrients (vitamins, minerals) to meet your health goals. Use the scale factor to adjust portion sizes and update nutrition and cost accordingly.' })}</p>
+                <p>
+                  {t('cookbook.notes.nutritionInfo', {
+                    defaultValue:
+                      'Recipes provide a snapshot of nutritional content based on their ingredients. Monitor calories, macronutrients (carbs, proteins, fats), and micronutrients (vitamins, minerals) to meet your health goals. Use the scale factor to adjust portion sizes and update nutrition and cost accordingly.',
+                  })}
+                </p>
               </div>
             </div>
           </div>
@@ -449,7 +494,7 @@ function RecipeNotebook({ setErrorMessage }) {
                 aria-controls="collapseCookbookUsage"
                 style={{
                   ...styles.accordionButton,
-                  ...(openNotes.usage ? {} : styles.accordionButtonCollapsed)
+                  ...(openNotes.usage ? {} : styles.accordionButtonCollapsed),
                 }}
               >
                 <i className="fas fa-utensils" style={styles.icon}></i>
@@ -462,7 +507,12 @@ function RecipeNotebook({ setErrorMessage }) {
               aria-labelledby="cookbookNoteUsage"
             >
               <div className="accordion-body" style={styles.noteCard}>
-                <p>{t('cookbook.notes.usage', { defaultValue: 'Add a new recipe by entering its name, ingredients, instructions, and details like prep time and dietary preferences. Use the table to view, edit, or delete recipes. Calculate nutrition for any recipe, apply a scale factor for portion control, and export results to save or share.' })}</p>
+                <p>
+                  {t('cookbook.notes.usage', {
+                    defaultValue:
+                      'Add a new recipe by entering its name, ingredients, instructions, and details like prep time and dietary preferences. Use the table to view, edit, or delete recipes. Calculate nutrition for any recipe, apply a scale factor for portion control, and export results to save or share.',
+                  })}
+                </p>
               </div>
             </div>
           </div>
@@ -481,7 +531,7 @@ function RecipeNotebook({ setErrorMessage }) {
         </label>
         <select
           value={currency}
-          onChange={e => setCurrency(e.target.value)}
+          onChange={(e) => setCurrency(e.target.value)}
           style={styles.currencySelect}
           className="form-select d-inline-block"
         >
@@ -500,7 +550,7 @@ function RecipeNotebook({ setErrorMessage }) {
             className="form-control"
             placeholder={t('cookbook.maxCalories')}
             value={recipeMaxCalories}
-            onChange={e => setRecipeMaxCalories(e.target.value)}
+            onChange={(e) => setRecipeMaxCalories(e.target.value)}
             style={styles.input}
           />
         </div>
@@ -514,7 +564,7 @@ function RecipeNotebook({ setErrorMessage }) {
             className="form-control"
             placeholder={`(${currency})`}
             value={recipeMaxCost}
-            onChange={e => setRecipeMaxCost(e.target.value)}
+            onChange={(e) => setRecipeMaxCost(e.target.value)}
             style={styles.input}
           />
         </div>
@@ -525,7 +575,7 @@ function RecipeNotebook({ setErrorMessage }) {
           <select
             className="form-select"
             value={dietaryFilter}
-            onChange={e => setDietaryFilter(e.target.value)}
+            onChange={(e) => setDietaryFilter(e.target.value)}
             style={styles.select}
           >
             <option value="">{t('cookbook.dietaryOptions.all')}</option>
@@ -542,7 +592,7 @@ function RecipeNotebook({ setErrorMessage }) {
           <select
             className="form-select"
             value={complexityFilter}
-            onChange={e => setComplexityFilter(e.target.value)}
+            onChange={(e) => setComplexityFilter(e.target.value)}
             style={styles.select}
           >
             <option value="">{t('cookbook.complexityOptions.all')}</option>
@@ -561,7 +611,7 @@ function RecipeNotebook({ setErrorMessage }) {
           className="form-control"
           placeholder={t('cookbook.search')}
           value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
+          onChange={(e) => setSearchQuery(e.target.value)}
           style={styles.input}
         />
       </div>
@@ -575,8 +625,9 @@ function RecipeNotebook({ setErrorMessage }) {
               type="text"
               className="form-control"
               placeholder={t('cookbook.recipeName')}
-              value={newRecipeName}
-              onChange={e => setNewRecipeName(e.target.value)}
+              name="recipeName"
+              value={formData.recipeName}
+              onChange={handleChange}
               style={styles.input}
             />
           </div>
@@ -587,14 +638,14 @@ function RecipeNotebook({ setErrorMessage }) {
             <Select
               isMulti
               options={ingredientOptions}
-              value={newRecipeIngredients}
-              onChange={setNewRecipeIngredients}
+              value={formData.ingredients}
+              onChange={(selected) => setFormData((prev) => ({ ...prev, ingredients: selected }))}
               placeholder={t('cookbook.selectIngredients')}
               className="basic-multi-select"
               classNamePrefix="select"
             />
           </div>
-          {newRecipeIngredients.map(ing => (
+          {formData.ingredients.map((ing) => (
             <div key={ing.value} className="input-group mb-2">
               <label className="form-label" style={styles.label}>
                 <i className="bi bi-egg-fried" style={styles.icon}></i> {ing.label} {t('cookbook.quantity')}:
@@ -605,10 +656,12 @@ function RecipeNotebook({ setErrorMessage }) {
                 className="form-control"
                 placeholder={t('cookbook.quantity')}
                 value={ingredientQuantities[ing.value] || ''}
-                onChange={e => setIngredientQuantities({
-                  ...ingredientQuantities,
-                  [ing.value]: e.target.value
-                })}
+                onChange={(e) =>
+                  setIngredientQuantities({
+                    ...ingredientQuantities,
+                    [ing.value]: e.target.value,
+                  })
+                }
                 style={styles.input}
               />
             </div>
@@ -617,8 +670,9 @@ function RecipeNotebook({ setErrorMessage }) {
             <textarea
               className="form-control"
               placeholder={t('cookbook.instructions')}
-              value={newRecipeInstructions}
-              onChange={e => setNewRecipeInstructions(e.target.value)}
+              name="instructions"
+              value={formData.instructions}
+              onChange={handleChange}
               style={styles.input}
             />
           </div>
@@ -628,16 +682,30 @@ function RecipeNotebook({ setErrorMessage }) {
               min="0"
               className="form-control"
               placeholder={t('cookbook.prepTime')}
-              value={newRecipePrepTime}
-              onChange={e => setNewRecipePrepTime(e.target.value)}
+              name="prepTime"
+              value={formData.prepTime}
+              onChange={handleChange}
+              style={styles.input}
+            />
+          </div>
+          <div className="input-group mb-2">
+            <input
+              type="number"
+              name="servings"
+              value={formData.servings || 1}
+              onChange={handleChange}
+              placeholder={t('cookbook.servings') || 'Number of Servings'}
+              min="1"
+              className="form-control"
               style={styles.input}
             />
           </div>
           <div className="input-group mb-2">
             <select
               className="form-select"
-              value={newRecipeDietary}
-              onChange={e => setNewRecipeDietary(e.target.value)}
+              name="dietary"
+              value={formData.dietary}
+              onChange={handleChange}
               style={styles.select}
             >
               <option value="">{t('cookbook.dietaryOptions.select')}</option>
@@ -648,8 +716,9 @@ function RecipeNotebook({ setErrorMessage }) {
             </select>
             <select
               className="form-select"
-              value={newRecipeComplexity}
-              onChange={e => setNewRecipeComplexity(e.target.value)}
+              name="complexity"
+              value={formData.complexity}
+              onChange={handleChange}
               style={styles.select}
             >
               <option value="">{t('cookbook.complexityOptions.select')}</option>
@@ -658,12 +727,7 @@ function RecipeNotebook({ setErrorMessage }) {
               <option value="hard">{t('cookbook.complexityOptions.hard')}</option>
             </select>
           </div>
-          <button
-            className="btn"
-            onClick={handleAddRecipe}
-            style={styles.button}
-            disabled={isLoading}
-          >
+          <button className="btn" onClick={handleAddRecipe} style={styles.button} disabled={isLoading}>
             <i className="bi bi-plus-circle" style={styles.icon}></i>
             {isLoading ? t('cookbook.adding') : t('cookbook.addButton')}
           </button>
@@ -695,18 +759,22 @@ function RecipeNotebook({ setErrorMessage }) {
           <tbody>
             {filteredRecipes.length === 0 ? (
               <tr>
-                <td colSpan="9" className="text-center">{t('cookbook.table.noRecipes')}</td>
+                <td colSpan="9" className="text-center">
+                  {t('cookbook.table.noRecipes')}
+                </td>
               </tr>
             ) : (
-              filteredRecipes.map(recipe => (
+              filteredRecipes.map((recipe) => (
                 <tr key={recipe.recipe_name}>
                   <td>{recipe.recipe_name}</td>
                   <td>
-                    {recipe.ingredient_list.map(ing => {
-                      const ingredientData = ingredients.find(i => i.ingredient_name === ing.ingredient);
-                      const persianName = ingredientData?.persian_name || 'N/A';
-                      return `${ing.ingredient} (${persianName}) (${ing.quantity}g)`;
-                    }).join(', ')}
+                    {recipe.ingredient_list
+                      .map((ing) => {
+                        const ingredientData = ingredients.find((i) => i.ingredient_name === ing.ingredient);
+                        const persianName = ingredientData?.persian_name || 'N/A';
+                        return `${ing.ingredient} (${persianName}) (${ing.quantity}g)`;
+                      })
+                      .join(', ')}
                   </td>
                   <td>
                     {truncateText(recipe.instructions)}
@@ -733,7 +801,7 @@ function RecipeNotebook({ setErrorMessage }) {
                         className="form-control"
                         placeholder={t('cookbook.scale')}
                         value={scaleFactor}
-                        onChange={e => setScaleFactor(e.target.value)}
+                        onChange={(e) => setScaleFactor(e.target.value)}
                         style={{ ...styles.input, width: '100px' }}
                       />
                       <button
@@ -791,12 +859,17 @@ function RecipeNotebook({ setErrorMessage }) {
       </div>
       {/* Instructions Modal */}
       {selectedRecipe && (
-        <div className={`modal fade ${showInstructionsModal ? 'show d-block' : ''}`} tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)', display: showInstructionsModal ? 'block' : 'none' }}>
+        <div
+          className={`modal fade ${showInstructionsModal ? 'show d-block' : ''}`}
+          tabIndex="-1"
+          style={{ backgroundColor: 'rgba(0,0,0,0.5)', display: showInstructionsModal ? 'block' : 'none' }}
+        >
           <div className="modal-dialog modal-dialog-centered modal-lg" style={styles.modal}>
             <div className="modal-content">
               <div className="modal-header" style={{ backgroundColor: '#295241', color: '#fff' }}>
                 <h5 className="modal-title">
-                  <i className="bi bi-list-check" style={styles.icon}></i> {t('cookbook.table.instructions')} - {selectedRecipe.recipe_name}
+                  <i className="bi bi-list-check" style={styles.icon}></i> {t('cookbook.table.instructions')} -{' '}
+                  {selectedRecipe.recipe_name}
                 </h5>
                 <button
                   type="button"
@@ -809,12 +882,7 @@ function RecipeNotebook({ setErrorMessage }) {
                 <p style={{ whiteSpace: 'pre-wrap' }}>{selectedRecipe.instructions}</p>
               </div>
               <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn"
-                  onClick={handleCloseInstructionsModal}
-                  style={styles.buttonRemove}
-                >
+                <button type="button" className="btn" onClick={handleCloseInstructionsModal} style={styles.buttonRemove}>
                   <i className="bi bi-x-circle" style={styles.iconRemove}></i> {t('cookbook.table.close')}
                 </button>
               </div>
@@ -822,8 +890,8 @@ function RecipeNotebook({ setErrorMessage }) {
           </div>
         </div>
       )}
-      {Object.keys(recipeNutrition).map(recipeName => (
-        recipeNutrition[recipeName] && (
+      {Object.keys(recipeNutrition).map((recipeName) =>
+        recipeNutrition[recipeName] ? (
           <div key={recipeName} className="mt-3">
             <h4 style={styles.subheading}>
               <i className="bi bi-bar-chart" style={styles.icon}></i>
@@ -831,7 +899,8 @@ function RecipeNotebook({ setErrorMessage }) {
             </h4>
             {recipeNutrition[recipeName].Cost && (
               <div className="alert alert-success mb-2">
-                <strong>{t('cookbook.totalCost')}:</strong> {recipeNutrition[recipeName].Cost.value} {recipeNutrition[recipeName].Cost.unit}
+                <strong>{t('cookbook.totalCost')}:</strong> {recipeNutrition[recipeName].Cost.value}{' '}
+                {recipeNutrition[recipeName].Cost.unit}
               </div>
             )}
             <div className="row">
@@ -849,14 +918,15 @@ function RecipeNotebook({ setErrorMessage }) {
                 ))}
             </div>
           </div>
-        )
-      ))}
+        ) : null
+      )}
       <div className={`modal fade ${editModalOpen ? 'show d-block' : ''}`} tabIndex="-1" style={{ display: editModalOpen ? 'block' : 'none' }}>
         <div className="modal-dialog" style={styles.modal}>
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" style={styles.heading}>
-                <i className="bi bi-pencil-square" style={styles.icon}></i> {t('cookbook.editModal.title')}: {editRecipe?.recipe_name}
+                <i className="bi bi-pencil-square" style={styles.icon}></i> {t('cookbook.editModal.title')}:{' '}
+                {editRecipe?.recipe_name}
               </h5>
               <button type="button" className="btn-close" onClick={handleCloseModal}></button>
             </div>
@@ -868,8 +938,9 @@ function RecipeNotebook({ setErrorMessage }) {
                 <input
                   type="text"
                   className="form-control"
-                  value={newRecipeName}
-                  onChange={e => setNewRecipeName(e.target.value)}
+                  name="recipeName"
+                  value={formData.recipeName}
+                  onChange={handleChange}
                   style={styles.input}
                 />
               </div>
@@ -880,14 +951,14 @@ function RecipeNotebook({ setErrorMessage }) {
                 <Select
                   isMulti
                   options={ingredientOptions}
-                  value={newRecipeIngredients}
-                  onChange={setNewRecipeIngredients}
+                  value={formData.ingredients}
+                  onChange={(selected) => setFormData((prev) => ({ ...prev, ingredients: selected }))}
                   placeholder={t('cookbook.selectIngredients')}
                   className="basic-multi-select"
                   classNamePrefix="select"
                 />
               </div>
-              {newRecipeIngredients.map(ing => (
+              {formData.ingredients.map((ing) => (
                 <div key={ing.value} className="input-group mb-2">
                   <label className="form-label" style={styles.label}>
                     <i className="bi bi-egg-fried" style={styles.icon}></i> {ing.label} {t('cookbook.quantity')}:
@@ -898,10 +969,12 @@ function RecipeNotebook({ setErrorMessage }) {
                     className="form-control"
                     placeholder={t('cookbook.quantity')}
                     value={ingredientQuantities[ing.value] || ''}
-                    onChange={e => setIngredientQuantities({
-                      ...ingredientQuantities,
-                      [ing.value]: e.target.value
-                    })}
+                    onChange={(e) =>
+                      setIngredientQuantities({
+                        ...ingredientQuantities,
+                        [ing.value]: e.target.value,
+                      })
+                    }
                     style={styles.input}
                   />
                 </div>
@@ -913,8 +986,9 @@ function RecipeNotebook({ setErrorMessage }) {
                 <textarea
                   className="form-control"
                   placeholder={t('cookbook.instructions')}
-                  value={newRecipeInstructions}
-                  onChange={e => setNewRecipeInstructions(e.target.value)}
+                  name="instructions"
+                  value={formData.instructions}
+                  onChange={handleChange}
                   style={styles.input}
                 />
               </div>
@@ -927,8 +1001,24 @@ function RecipeNotebook({ setErrorMessage }) {
                   min="0"
                   className="form-control"
                   placeholder={t('cookbook.prepTime')}
-                  value={newRecipePrepTime}
-                  onChange={e => setNewRecipePrepTime(e.target.value)}
+                  name="prepTime"
+                  value={formData.prepTime}
+                  onChange={handleChange}
+                  style={styles.input}
+                />
+              </div>
+              <div className="mb-2">
+                <label className="form-label" style={styles.label}>
+                  <i className="bi bi-egg" style={styles.icon}></i> {t('cookbook.servings')}:
+                </label>
+                <input
+                  type="number"
+                  name="servings"
+                  value={formData.servings || 1}
+                  onChange={handleChange}
+                  placeholder={t('cookbook.servings') || 'Number of Servings'}
+                  min="1"
+                  className="form-control"
                   style={styles.input}
                 />
               </div>
@@ -938,8 +1028,9 @@ function RecipeNotebook({ setErrorMessage }) {
                 </label>
                 <select
                   className="form-select"
-                  value={newRecipeDietary}
-                  onChange={e => setNewRecipeDietary(e.target.value)}
+                  name="dietary"
+                  value={formData.dietary}
+                  onChange={handleChange}
                   style={styles.select}
                 >
                   <option value="">{t('cookbook.dietaryOptions.select')}</option>
@@ -955,8 +1046,9 @@ function RecipeNotebook({ setErrorMessage }) {
                 </label>
                 <select
                   className="form-select"
-                  value={newRecipeComplexity}
-                  onChange={e => setNewRecipeComplexity(e.target.value)}
+                  name="complexity"
+                  value={formData.complexity}
+                  onChange={handleChange}
                   style={styles.select}
                 >
                   <option value="">{t('cookbook.complexityOptions.select')}</option>
@@ -967,12 +1059,7 @@ function RecipeNotebook({ setErrorMessage }) {
               </div>
             </div>
             <div className="modal-footer">
-              <button
-                type="button"
-                className="btn"
-                onClick={handleCloseModal}
-                style={styles.buttonRemove}
-              >
+              <button type="button" className="btn" onClick={handleCloseModal} style={styles.buttonRemove}>
                 <i className="bi bi-x-circle" style={styles.iconRemove}></i> {t('cookbook.editModal.cancel')}
               </button>
               <button
