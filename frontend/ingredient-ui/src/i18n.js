@@ -271,6 +271,16 @@ const resources = {
           },
           "cta": "Get Started"
         },
+        "units": {
+          "kcalPerServing": "Calories (kcal):",
+          "proteinPerServing": "Protein:",
+          "tomanPerServing": "Price (Toman):",
+          "kcal": "kcal",
+          "protein": "Protein",
+          "toman": "Toman"              
+        },
+        "loading": "Loading recipes...",
+        "noRecipesFound": "No recipes found matching your criteria.",
         "cost": "Cost",
         "totalCost": "Total Cost",
         "servings": "Servings",
@@ -645,6 +655,16 @@ const resources = {
           "high-protein": "پروتئین بالا",
           "low-calorie": "کالری پایین"
         },
+        "units": {
+          "kcalPerServing": "کالری :",
+          "proteinPerServing": "پروتئین :",
+          "tomanPerServing": "قیمت (تومان):",
+          "kcal": "کیلوکالری",
+          "protein": "پروتئین",
+          "toman": "تومان"
+        },
+        "loading": "در حال بارگذاری دستور پخت‌ها...",
+        "noRecipesFound": "هیچ دستور پختی مطابق با معیارهای شما یافت نشد.",
         "calories": "کیلوکالری",
         "protein": "پروتئین",
         "prepTime": "زمان آماده‌سازی",
