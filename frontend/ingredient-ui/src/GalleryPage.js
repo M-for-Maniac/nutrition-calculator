@@ -24,176 +24,17 @@ const GalleryPage = ({ setErrorMessage }) => {
   const [totalNutrition, setTotalNutrition] = useState(null);
   const [selectedDay, setSelectedDay] = useState('');
   const [selectedRecipe, setSelectedRecipe] = useState(null);
-  const [selectedPlan, setSelectedPlan] = useState(null);
   const [mainImage, setMainImage] = useState('');
   const [selectCategory, setSelectCategory] = useState('');
   const [ingredientTranslations, setIngredientTranslations] = useState({});
   const [userName, setUserName] = useState('');
   const [orderSuccess, setOrderSuccess] = useState('');
   const [errorMessage, setLocalErrorMessage] = useState('');
-
-  const [predefinedPlans] = useState([
-    {
-      id: 'vegan-delight',
-      name: t('centralPerk.predefinedPlans.veganDelight'),
-      dietary: 'vegan',
-      image: '/nutrition-calculator/images/vegan-delight-plan.jpg',
-      meal_plan: {
-        breakfast: [
-          {
-            recipe_name: 'Bean Soup',
-            total_calories: 250,
-            total_protein: 10,
-            dietary: 'vegan',
-            prep_time: 60,
-            ingredient_list: [{ ingredient: 'Adzuki Beans', quantity: 150 }],
-            instructions: 'Boil Adzuki Beans with spices and vegetables. Simmer for 1 hour.',
-            image: '/nutrition-calculator/images/bean-soup.jpg',
-            thumbnails: [
-              '/nutrition-calculator/images/thumbnails/bean-soup-1.jpg',
-              '/nutrition-calculator/images/thumbnails/bean-soup-2.jpg',
-              '/nutrition-calculator/images/thumbnails/bean-soup-3.jpg',
-            ],
-          },
-        ],
-        lunch: [
-          {
-            recipe_name: 'Bomb',
-            total_calories: 300,
-            total_protein: 0,
-            dietary: 'vegan',
-            prep_time: 5,
-            ingredient_list: [
-              { ingredient: 'Alcoholic.Whiskey.Proof 86', quantity: 60 },
-              { ingredient: 'Alcoholic.Beer.Strong', quantity: 500 },
-            ],
-            instructions: 'Serve whiskey in a double shot, pour the cold beer on ice, drop the shot in your glass, and drink all at once.',
-            image: '/nutrition-calculator/images/bomb.jpg',
-            thumbnails: [
-              '/nutrition-calculator/images/thumbnails/bomb-1.jpg',
-              '/nutrition-calculator/images/thumbnails/bomb-2.jpg',
-              '/nutrition-calculator/images/thumbnails/bomb-3.jpg',
-            ],
-          },
-        ],
-        dinner: [],
-        morningSnack: [],
-        afternoonSnack: [],
-      },
-    },
-    {
-      id: 'omnivore-balanced',
-      name: t('centralPerk.predefinedPlans.omnivoreBalanced'),
-      dietary: 'omnivore',
-      image: '/nutrition-calculator/images/omnivore-balanced-plan.jpg',
-      meal_plan: {
-        breakfast: [
-          {
-            recipe_name: 'Morning Trio',
-            total_calories: 200,
-            total_protein: 8,
-            dietary: 'vegetarian',
-            prep_time: 10,
-            ingredient_list: [
-              { ingredient: 'Iranian Cheese', quantity: 30 },
-              { ingredient: 'Butter', quantity: 10 },
-              { ingredient: 'Milk Chocolate', quantity: 50 },
-            ],
-            instructions: 'Enjoy along with bread and coffee',
-            image: '/nutrition-calculator/images/morning-trio.jpg',
-            thumbnails: [
-              '/nutrition-calculator/images/thumbnails/morning-trio-1.jpg',
-              '/nutrition-calculator/images/thumbnails/morning-trio-2.jpg',
-              '/nutrition-calculator/images/thumbnails/morning-trio-3.jpg',
-            ],
-          },
-        ],
-        lunch: [
-          {
-            recipe_name: 'Adzuki Bean Salad',
-            total_calories: 450,
-            total_protein: 35,
-            dietary: 'omnivore',
-            prep_time: 30,
-            ingredient_list: [
-              { ingredient: 'Adzuki Beans', quantity: 100 },
-              { ingredient: 'Chicken Breast(Grilled)', quantity: 200 },
-            ],
-            instructions: 'Cook Adzuki Beans until tender. Grill Chicken Breast. Mix with greens and dressing.',
-            image: '/nutrition-calculator/images/adzuki-bean-salad.jpg',
-            thumbnails: [
-              '/nutrition-calculator/images/thumbnails/adzuki-bean-salad-1.jpg',
-              '/nutrition-calculator/images/thumbnails/adzuki-bean-salad-2.jpg',
-              '/nutrition-calculator/images/thumbnails/adzuki-bean-salad-3.jpg',
-            ],
-          },
-        ],
-        dinner: [
-          {
-            recipe_name: 'MeatManiac',
-            total_calories: 600,
-            total_protein: 40,
-            dietary: 'omnivore',
-            prep_time: 40,
-            ingredient_list: [{ ingredient: 'Beef.Flank(Raw)', quantity: 250 }],
-            instructions: 'سرخ کنید در کنار سبزیجات میل کنید',
-            image: '/nutrition-calculator/images/meat-maniac.jpg',
-            thumbnails: [
-              '/nutrition-calculator/images/thumbnails/meat-maniac-1.jpg',
-              '/nutrition-calculator/images/thumbnails/meat-maniac-2.jpg',
-              '/nutrition-calculator/images/thumbnails/meat-maniac-3.jpg',
-            ],
-          },
-        ],
-        morningSnack: [],
-        afternoonSnack: [],
-      },
-    },
-    {
-      id: 'gluten-free-breakfast',
-      name: t('centralPerk.predefinedPlans.glutenFreeBreakfast'),
-      dietary: 'gluten-free',
-      image: '/nutrition-calculator/images/gluten-free-breakfast.jpg',
-      meal_plan: {
-        breakfast: [
-          {
-            recipe_name: 'Gluten-Free Pancakes',
-            total_calories: 400,
-            total_protein: 12,
-            dietary: 'gluten-free',
-            prep_time: 45,
-            ingredient_list: [
-              { ingredient: 'Potato flour', quantity: 120 },
-              { ingredient: 'Sugar.Granulated', quantity: 50 },
-              { ingredient: 'Baking Powder', quantity: 6 },
-              { ingredient: 'Baking Soda', quantity: 2.5 },
-              { ingredient: 'Salt(table)', quantity: 1.5 },
-              { ingredient: 'Vanilla(Extract)', quantity: 5 },
-              { ingredient: 'Egg(Raw)', quantity: 100 },
-              { ingredient: 'Oil.Vegetable', quantity: 50 },
-              { ingredient: 'Vinegar.Cider', quantity: 15 },
-              { ingredient: 'Water', quantity: 100 },
-              { ingredient: 'Honey', quantity: 30 },
-            ],
-            instructions: 'Mix Dry Ingredients: In a large bowl, whisk potato flour, sugar, baking powder, baking soda, and salt until well combined.\r\nMix Wet Ingredients: In a separate bowl, whisk eggs, vegetable oil, warm water, apple cider vinegar, honey, and vanilla extract until smooth.\r\nCombine: Gradually add the wet ingredients to the dry, whisking gently until just combined.\r\nRest Batter: Let the batter sit for 5-10 minutes.\r\nHeat Pan: Preheat a non-stick skillet over medium heat. Lightly grease.\r\nCook Pancakes: Pour about 60-70 g (1/4 cup) of batter per pancake. Cook for 2-3 minutes until bubbles form, then flip and cook for 1-2 minutes more.\r\nServe: Serve warm with gluten marmalade, maple syrup, or fresh fruit.',
-            image: '/nutrition-calculator/images/gluten-free-pancakes.jpg',
-            thumbnails: [
-              '/nutrition-calculator/images/thumbnails/gluten-free-pancakes-1.jpg',
-              '/nutrition-calculator/images/thumbnails/gluten-free-pancakes-2.jpg',
-              '/nutrition-calculator/images/thumbnails/gluten-free-pancakes-3.jpg',
-            ],
-          },
-        ],
-        lunch: [],
-        dinner: [],
-        morningSnack: [],
-        afternoonSnack: [],
-      },
-    },
-  ]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
       try {
         const recipeResponse = await axios.get(`${BASE_URL}/get_recipes`, {
           params: {
@@ -201,6 +42,7 @@ const GalleryPage = ({ setErrorMessage }) => {
             complexity: '',
             max_calories: maxCalories || undefined,
             max_cost: undefined,
+            currency: 'Toman',
           },
         });
         const enrichedRecipes = recipeResponse.data.map((recipe) => ({
@@ -211,6 +53,13 @@ const GalleryPage = ({ setErrorMessage }) => {
             '/nutrition-calculator/images/thumbnails/placeholder-2.jpg',
             '/nutrition-calculator/images/thumbnails/placeholder-3.jpg',
           ],
+          total_calories: recipe.total_calories || 0,
+          total_protein: recipe.total_protein || 0,
+          total_cost: recipe.total_cost || 0,
+          per_serving_calories: recipe.per_serving_calories || (recipe.total_calories && recipe.servings ? recipe.total_calories / recipe.servings : 0),
+          per_serving_protein: recipe.per_serving_protein || (recipe.total_protein && recipe.servings ? recipe.total_protein / recipe.servings : 0),
+          per_serving_cost: recipe.per_serving_cost || (recipe.total_cost && recipe.servings ? (recipe.total_cost / recipe.servings) * 1.2 : 0),
+          servings: recipe.servings || 1,
         }));
         setRecipes(enrichedRecipes);
         setFilteredRecipes(enrichedRecipes);
@@ -221,6 +70,8 @@ const GalleryPage = ({ setErrorMessage }) => {
         console.error('Error loading data:', error);
         setLocalErrorMessage(t('centralPerk.error.fetchRecipes'));
         setErrorMessage(t('centralPerk.error.fetchRecipes'));
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchData();
@@ -232,10 +83,10 @@ const GalleryPage = ({ setErrorMessage }) => {
       filtered = filtered.filter((recipe) => recipe.dietary.toLowerCase() === dietaryFilter.toLowerCase());
     }
     if (maxCalories) {
-      filtered = filtered.filter((recipe) => recipe.total_calories <= parseInt(maxCalories));
+      filtered = filtered.filter((recipe) => (recipe.per_serving_calories || 0) <= parseInt(maxCalories));
     }
     if (minProtein) {
-      filtered = filtered.filter((recipe) => recipe.total_protein >= parseInt(minProtein));
+      filtered = filtered.filter((recipe) => (recipe.per_serving_protein || 0) >= parseInt(minProtein));
     }
     setFilteredRecipes(filtered);
     setMealPlan({
@@ -278,8 +129,9 @@ const GalleryPage = ({ setErrorMessage }) => {
         (acc, r) => ({
           calories: acc.calories + (r.total_calories || 0),
           protein: acc.protein + (r.total_protein || 0),
+          cost: acc.cost + (r.total_cost || 0),
         }),
-        { calories: 0, protein: 0 }
+        { calories: 0, protein: 0, cost: 0 }
       );
       setTotalNutrition(newTotal);
     } else {
@@ -307,8 +159,9 @@ const GalleryPage = ({ setErrorMessage }) => {
         (acc, r) => ({
           calories: acc.calories + (r.total_calories || 0),
           protein: acc.protein + (r.total_protein || 0),
+          cost: acc.cost + (r.total_cost || 0),
         }),
-        { calories: 0, protein: 0 }
+        { calories: 0, protein: 0, cost: 0 }
       );
       setTotalNutrition(newTotal);
     } else {
@@ -329,8 +182,9 @@ const GalleryPage = ({ setErrorMessage }) => {
         (acc, r) => ({
           calories: acc.calories + (r.total_calories || 0),
           protein: acc.protein + (r.total_protein || 0),
+          cost: acc.cost + (r.total_cost || 0),
         }),
-        { calories: 0, protein: 0 }
+        { calories: 0, protein: 0, cost: 0 }
       );
       setTotalNutrition(newTotal);
     }
@@ -359,10 +213,15 @@ const GalleryPage = ({ setErrorMessage }) => {
       meal_plan: Object.keys(mealPlan).reduce((acc, key) => {
         acc[key] = mealPlan[key].map((recipe) => ({
           recipe_name: recipe.recipe_name,
-          total_calories: recipe.total_calories,
-          total_protein: recipe.total_protein,
+          total_calories: recipe.total_calories || 0,
+          total_protein: recipe.total_protein || 0,
+          total_cost: recipe.total_cost || 0,
+          per_serving_calories: recipe.per_serving_calories || 0,
+          per_serving_protein: recipe.per_serving_protein || 0,
+          per_serving_cost: recipe.per_serving_cost || 0,
           dietary: recipe.dietary,
           prep_time: recipe.prep_time,
+          servings: recipe.servings || 1,
           ingredient_list: recipe.ingredient_list,
           instructions: recipe.instructions,
           image: recipe.image,
@@ -371,7 +230,6 @@ const GalleryPage = ({ setErrorMessage }) => {
         return acc;
       }, {}),
     };
-    console.log('Sending order:', JSON.stringify(orderDetails, null, 2));
     try {
       const response = await axios.post(`${BASE_URL}/order_meal`, orderDetails, {
         headers: { 'Content-Type': 'application/json' },
@@ -384,16 +242,15 @@ const GalleryPage = ({ setErrorMessage }) => {
         if (recipes.length > 0) {
           message += `${t(`centralPerk.mealCategories.${category}`)}:\n`;
           recipes.forEach((recipe) => {
-            message += `- ${recipe.recipe_name} (${recipe.total_calories} ${t('centralPerk.calories')}, ${recipe.total_protein}${t('kitchen.grams')} ${t('centralPerk.protein')})\n`;
+            message += `- ${recipe.recipe_name} (${recipe.per_serving_calories.toFixed(2)} ${t('centralPerk.calories')} per serving, ${recipe.per_serving_protein.toFixed(2)}${t('kitchen.grams')} ${t('centralPerk.protein')}, ${recipe.per_serving_cost.toFixed(2)} Toman per serving)\n`;
           });
         }
       });
       if (totalNutrition) {
-        message += `\n${t('centralPerk.totalNutrition')}: ${totalNutrition.calories} ${t('centralPerk.calories')}, ${totalNutrition.protein}${t('kitchen.grams')} ${t('centralPerk.protein')}`;
+        message += `\n${t('centralPerk.totalNutrition')}: ${totalNutrition.calories.toFixed(2)} ${t('centralPerk.calories')}, ${totalNutrition.protein.toFixed(2)}${t('kitchen.grams')} ${t('centralPerk.protein')}, ${totalNutrition.cost.toFixed(2)} Toman`;
       }
       const encodedMessage = encodeURIComponent(message);
       const whatsappUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}`;
-      console.log('WhatsApp URL:', whatsappUrl);
       const newWindow = window.open(whatsappUrl, '_blank');
       if (!newWindow) {
         setLocalErrorMessage(t('centralPerk.error.popupBlocked').replace('{url}', whatsappUrl));
@@ -422,41 +279,14 @@ const GalleryPage = ({ setErrorMessage }) => {
     }
   };
 
-  const selectPredefinedPlan = (plan) => {
-    setMealPlan({
-      breakfast: plan.meal_plan.breakfast || [],
-      morningSnack: plan.meal_plan.morningSnack || [],
-      lunch: plan.meal_plan.lunch || [],
-      afternoonSnack: plan.meal_plan.afternoonSnack || [],
-      dinner: plan.meal_plan.dinner || [],
-    });
-    const allRecipes = Object.values(plan.meal_plan).flat();
-    if (allRecipes.length > 0) {
-      const newTotal = allRecipes.reduce(
-        (acc, r) => ({
-          calories: acc.calories + (r.total_calories || 0),
-          protein: acc.protein + (r.total_protein || 0),
-        }),
-        { calories: 0, protein: 0 }
-      );
-      setTotalNutrition(newTotal);
-    } else {
-      setTotalNutrition(null);
-    }
-  };
-
   const openModal = (recipe) => {
+    console.log('Opening recipe modal for:', recipe.recipe_name);
     setSelectedRecipe(recipe);
     setMainImage(recipe.image || '/nutrition-calculator/images/placeholder.jpg');
   };
 
-  const openPlanModal = (plan) => {
-    setSelectedPlan(plan);
-  };
-
   const closeModal = () => {
     setSelectedRecipe(null);
-    setSelectedPlan(null);
     setMainImage('');
     setSelectCategory('');
   };
@@ -535,104 +365,85 @@ const GalleryPage = ({ setErrorMessage }) => {
         </button>
       </div>
       <DragDropContext onDragEnd={handleDragEnd}>
-        <div className="predefined-plans">
-          <h2>{t('centralPerk.predefinedPlans.title')}</h2>
-          <div className="plan-grid">
-            {predefinedPlans.map((plan) => {
-              const planRecipes = Object.values(plan.meal_plan).flat();
-              const totalCalories = planRecipes.reduce((sum, r) => sum + (r.total_calories || 0), 0);
-              const totalProtein = planRecipes.reduce((sum, r) => sum + (r.total_protein || 0), 0);
-              return (
-                <div key={plan.id} className="plan-card">
-                  <img src={plan.image} alt={plan.name} className="plan-image" />
-                  <h3>{plan.name}</h3>
-                  <p>{t('centralPerk.dietary')}: {t(`centralPerk.dietaryOptions.${plan.dietary}`)}</p>
-                  <p>{t('centralPerk.totalCalories')}: {totalCalories} kcal</p>
-                  <p>{t('centralPerk.totalProtein')}: {totalProtein}g</p>
-                  <div className="recipe-actions">
-                    <button className="btn btn-info-custom" onClick={() => openPlanModal(plan)}>
-                      {t('centralPerk.viewDetails')}
-                    </button>
-                    <button className="btn btn-primary-custom" onClick={() => selectPredefinedPlan(plan)}>
-                      {t('centralPerk.selectPlan')}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
         <div className="recipe-gallery">
           <h2>{t('centralPerk.availableRecipes')}</h2>
-          <Droppable droppableId="recipes">
-            {(provided) => (
-              <div {...provided.droppableProps} ref={provided.innerRef} className="recipe-grid">
-                {filteredRecipes.map((recipe, index) => {
-                  const tags = [];
-                  if (recipe.total_protein > 20) tags.push('high-protein');
-                  if (recipe.total_calories < 300) tags.push('low-calorie');
-                  return (
-                    <Draggable key={recipe.recipe_name} draggableId={recipe.recipe_name} index={index}>
-                      {(provided, snapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className={`recipe-card dietary-${recipe.dietary.toLowerCase()} ${snapshot.isDragging ? 'dragging' : ''}`}
-                        >
-                          <div className="recipe-tags">
-                            {tags.map((tag) => (
-                              <span key={tag} className={`tag tag-${tag}`} title={t(`centralPerk.tags.${tag}`)}>
-                                <i className={`fas ${tag === 'high-protein' ? 'fa-dumbbell' : 'fa-leaf'}`}></i>
-                              </span>
-                            ))}
-                          </div>
-                          <img
-                            src={recipe.image}
-                            alt={recipe.recipe_name}
-                            className="recipe-image"
-                            onClick={() => openModal(recipe)}
-                          />
-                          <h3>{recipe.recipe_name}</h3>
-                          <p>{t('centralPerk.dietary')}: {t(`centralPerk.dietaryOptions.${recipe.dietary}`)}</p>
-                          <p>{t('centralPerk.calories')}: {recipe.total_calories} kcal</p>
-                          <p>{t('centralPerk.protein')}: {recipe.total_protein}g</p>
-                          <p>{t('centralPerk.prepTime')}: {recipe.prep_time} {t('kitchen.minutes')}</p>
-                          <div className="recipe-actions">
-                            <button className="btn btn-info-custom" onClick={() => openModal(recipe)}>
-                              {t('centralPerk.viewDetails')}
-                            </button>
-                            <div className="select-meal-plan">
-                              <select
-                                value={selectCategory}
-                                onChange={(e) => setSelectCategory(e.target.value)}
-                                className="form-control"
-                              >
-                                <option value="">{t('centralPerk.selectCategory')}</option>
-                                {mealCategories.map((cat) => (
-                                  <option key={cat.id} value={cat.id}>
-                                    {cat.label}
-                                  </option>
-                                ))}
-                              </select>
-                              <button
-                                className="btn btn-primary-custom"
-                                onClick={() => handleSelectForMealPlan(recipe)}
-                                disabled={!selectCategory}
-                              >
-                                {t('centralPerk.addToPlan')}
+          {isLoading ? (
+            <p>{t('centralPerk.loading')}</p>
+          ) : filteredRecipes.length === 0 ? (
+            <p>{t('centralPerk.noRecipesFound')}</p>
+          ) : (
+            <Droppable droppableId="recipes">
+              {(provided) => (
+                <div {...provided.droppableProps} ref={provided.innerRef} className="recipe-grid">
+                  {filteredRecipes.map((recipe, index) => {
+                    const tags = [];
+                    if ((recipe.per_serving_protein || 0) > 20) tags.push('high-protein');
+                    if ((recipe.per_serving_calories || 0) < 300) tags.push('low-calorie');
+                    return (
+                      <Draggable key={recipe.recipe_name} draggableId={recipe.recipe_name} index={index}>
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className={`recipe-card dietary-${recipe.dietary.toLowerCase()} ${snapshot.isDragging ? 'dragging' : ''}`}
+                          >
+                            <div className="recipe-tags">
+                              {tags.map((tag) => (
+                                <span key={tag} className={`tag tag-${tag}`} title={t(`centralPerk.tags.${tag}`)}>
+                                  <i className={`fas ${tag === 'high-protein' ? 'fa-dumbbell' : 'fa-leaf'}`}></i>
+                                </span>
+                              ))}
+                            </div>
+                            <img
+                              src={recipe.image}
+                              alt={recipe.recipe_name}
+                              className="recipe-image"
+                              onClick={() => openModal(recipe)}
+                            />
+                            <h3>{recipe.recipe_name}</h3>
+                            <p>{t('centralPerk.dietary')}: {t(`centralPerk.dietaryOptions.${recipe.dietary}`)}</p>
+                            <p>{t('centralPerk.calories')}: {(recipe.per_serving_calories || 0).toFixed(2)} kcal per serving</p>
+                            <p>{t('centralPerk.protein')}: {(recipe.per_serving_protein || 0).toFixed(2)}g per serving</p>
+                            <p>{t('centralPerk.cost')}: {(recipe.per_serving_cost || 0).toFixed(2)} Toman per serving</p>
+                            <p>{t('centralPerk.prepTime')}: {recipe.prep_time} {t('kitchen.minutes')}</p>
+                            <p>{t('centralPerk.servings')}: {recipe.servings || 1}</p>
+                            <div className="recipe-actions">
+                              <button className="btn btn-info-custom" onClick={() => openModal(recipe)}>
+                                {t('centralPerk.viewDetails')}
                               </button>
+                              <div className="select-meal-plan">
+                                <select
+                                  value={selectCategory}
+                                  onChange={(e) => setSelectCategory(e.target.value)}
+                                  className="form-control"
+                                >
+                                  <option value="">{t('centralPerk.selectCategory')}</option>
+                                  {mealCategories.map((cat) => (
+                                    <option key={cat.id} value={cat.id}>
+                                      {cat.label}
+                                    </option>
+                                  ))}
+                                </select>
+                                <button
+                                  className="btn btn-primary-custom"
+                                  onClick={() => handleSelectForMealPlan(recipe)}
+                                  disabled={!selectCategory}
+                                >
+                                  {t('centralPerk.addToPlan')}
+                                </button>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      )}
-                    </Draggable>
-                  );
-                })}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
+                        )}
+                      </Draggable>
+                    );
+                  })}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          )}
         </div>
         <div className="meal-planner">
           <h2>{t('centralPerk.mealPlan')}</h2>
@@ -666,7 +477,7 @@ const GalleryPage = ({ setErrorMessage }) => {
                                 {...provided.dragHandleProps}
                                 className="meal-item"
                               >
-                                {recipe.recipe_name} ({recipe.total_calories} kcal, {recipe.total_protein}g {t('centralPerk.protein')})
+                                {recipe.recipe_name} ({(recipe.per_serving_calories || 0).toFixed(2)} kcal per serving, {(recipe.per_serving_protein || 0).toFixed(2)}g {t('centralPerk.protein')}, {(recipe.per_serving_cost || 0).toFixed(2)} Toman per serving)
                                 <button
                                   className="btn btn-danger"
                                   onClick={() => removeFromMealPlan(category.id, index)}
@@ -687,7 +498,7 @@ const GalleryPage = ({ setErrorMessage }) => {
           </div>
           {totalNutrition && (
             <p>
-              {t('centralPerk.totalNutrition')}: {totalNutrition.calories} kcal, {totalNutrition.protein}g {t('centralPerk.protein')}
+              {t('centralPerk.totalNutrition')}: {totalNutrition.calories.toFixed(2)} kcal, {totalNutrition.protein.toFixed(2)}g {t('centralPerk.protein')}, {totalNutrition.cost.toFixed(2)} Toman
             </p>
           )}
         </div>
@@ -745,14 +556,16 @@ const GalleryPage = ({ setErrorMessage }) => {
                   </div>
                 </div>
                 <p><strong>{t('centralPerk.dietary')}:</strong> {t(`centralPerk.dietaryOptions.${selectedRecipe.dietary}`)}</p>
-                <p><strong>{t('centralPerk.calories')}:</strong> {selectedRecipe.total_calories} kcal</p>
-                <p><strong>{t('centralPerk.protein')}:</strong> {selectedRecipe.total_protein}g</p>
+                <p><strong>{t('centralPerk.calories')}:</strong> {(selectedRecipe.per_serving_calories || 0).toFixed(2)} kcal per serving</p>
+                <p><strong>{t('centralPerk.protein')}:</strong> {(selectedRecipe.per_serving_protein || 0).toFixed(2)}g per serving</p>
+                <p><strong>{t('centralPerk.cost')}:</strong> {(selectedRecipe.per_serving_cost || 0).toFixed(2)} Toman per serving</p>
                 <p><strong>{t('centralPerk.prepTime')}:</strong> {selectedRecipe.prep_time} {t('kitchen.minutes')}</p>
+                <p><strong>{t('centralPerk.servings')}:</strong> {selectedRecipe.servings || 1}</p>
                 <h6>{t('centralPerk.ingredients')}</h6>
                 <ul>
                   {selectedRecipe.ingredient_list?.map((ing, idx) => (
                     <li key={idx}>
-                      {ing.ingredient} {ingredientTranslations[ing.ingredient] ? `(${ingredientTranslations[ing.ingredient]})` : ''}: {ing.quantity}g
+                      {ingredientTranslations[ing.ingredient]?.persian_name || ing.ingredient}: {ing.quantity}g
                     </li>
                   ))}
                 </ul>
@@ -779,67 +592,6 @@ const GalleryPage = ({ setErrorMessage }) => {
                     {t('centralPerk.addToPlan')}
                   </button>
                 </div>
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={closeModal}>
-                  {t('centralPerk.close')}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      {selectedPlan && (
-        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog modal-lg">
-            <div className="modal-content recipe-book-modal">
-              <div className="modal-header">
-                <h5 className="modal-title">{selectedPlan.name}</h5>
-                <button type="button" className="btn-close" onClick={closeModal}></button>
-              </div>
-              <div className="modal-body">
-                <div className="recipe-image-gallery">
-                  <img src={selectedPlan.image} alt={selectedPlan.name} className="recipe-main-image" />
-                </div>
-                <p><strong>{t('centralPerk.dietary')}:</strong> {t(`centralPerk.dietaryOptions.${selectedPlan.dietary}`)}</p>
-                <p><strong>{t('centralPerk.totalCalories')}:</strong> {Object.values(selectedPlan.meal_plan).flat().reduce((sum, r) => sum + (r.total_calories || 0), 0)} kcal</p>
-                <p><strong>{t('centralPerk.totalProtein')}:</strong> {Object.values(selectedPlan.meal_plan).flat().reduce((sum, r) => sum + (r.total_protein || 0), 0)}g</p>
-                {mealCategories.map((category) => (
-                  selectedPlan.meal_plan[category.id].length > 0 && (
-                    <div key={category.id}>
-                      <h6>{t(`centralPerk.mealCategories.${category.id}`)}</h6>
-                      {selectedPlan.meal_plan[category.id].map((recipe, idx) => (
-                        <div key={idx} style={{ marginBottom: '20px' }}>
-                          <h6>{recipe.recipe_name}</h6>
-                          <img src={recipe.image} alt={recipe.recipe_name} className="recipe-main-image" style={{ maxHeight: '150px' }} />
-                          <p><strong>{t('centralPerk.dietary')}:</strong> {t(`centralPerk.dietaryOptions.${recipe.dietary}`)}</p>
-                          <p><strong>{t('centralPerk.calories')}:</strong> {recipe.total_calories} kcal</p>
-                          <p><strong>{t('centralPerk.protein')}:</strong> {recipe.total_protein}g</p>
-                          <p><strong>{t('centralPerk.prepTime')}:</strong> {recipe.prep_time} {t('kitchen.minutes')}</p>
-                          <h6>{t('centralPerk.ingredients')}</h6>
-                          <ul>
-                            {recipe.ingredient_list?.map((ing, i) => (
-                              <li key={i}>
-                                {ing.ingredient} {ingredientTranslations[ing.ingredient] ? `(${ingredientTranslations[ing.ingredient]})` : ''}: {ing.quantity}g
-                              </li>
-                            ))}
-                          </ul>
-                          <h6>{t('centralPerk.instructions')}</h6>
-                          <p>{recipe.instructions || t('centralPerk.noInstructions')}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )
-                ))}
-                <button
-                  className="btn btn-primary-custom"
-                  onClick={() => {
-                    selectPredefinedPlan(selectedPlan);
-                    closeModal();
-                  }}
-                >
-                  {t('centralPerk.selectPlan')}
-                </button>
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={closeModal}>
