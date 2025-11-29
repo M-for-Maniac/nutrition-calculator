@@ -189,6 +189,7 @@ const resources = {
         addButton: 'Add Recipe',
         confirmDelete: 'Are you sure you want to delete {recipe_name}?',
         downloadPDF: 'Download PDF',
+        servings: "Servings",
         dietaryOptions: {
           select: 'Choose a Dietary Preference',
           all: 'All',
@@ -545,6 +546,7 @@ const resources = {
         addButton: 'افزودن دستور پخت',
         confirmDelete: 'مطمئن هستید که می‌خواهید {recipe_name} را حذف کنید؟',
         downloadPDF: 'دانلود فایل',
+        servings: "تعداد سرو",
         dietaryOptions: {
           select: 'یک رژیم غذایی انتخاب کنید',
           all: 'همه',
@@ -720,7 +722,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'en',
+    lng: 'fa',
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false

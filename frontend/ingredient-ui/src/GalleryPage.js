@@ -27,10 +27,24 @@ const GalleryPage = ({ setErrorMessage }) => {
   const [mainImage, setMainImage] = useState('');
   const [selectCategory, setSelectCategory] = useState('');
   const [ingredientTranslations, setIngredientTranslations] = useState({});
+  const [recipeTranslations, setRecipeTranslations] = useState({});
   const [userName, setUserName] = useState('');
   const [orderSuccess, setOrderSuccess] = useState('');
   const [errorMessage, setLocalErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // HELPER: Always use correct per-serving cost with 20% benefit
+  const getPerServingCost = (recipe) => {
+    if (recipe.per_serving_cost !== undefined && recipe.per_serving_cost > 0) {
+      return recipe.per_serving_cost;
+    }
+    const totalCost = recipe.total_cost || 0;
+    const servings = recipe.servings || 1;
+    return Math.ceil((totalCost / servings) * 1.2 / 1000) * 1000;
+  };
+
+  // HELPER: Format price (round to nearest 1000)
+  const formatPrice = (cost) => Math.ceil((cost || 0) / 1000) * 1000;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -66,6 +80,14 @@ const GalleryPage = ({ setErrorMessage }) => {
 
         const translationResponse = await axios.get(`${BASE_URL}/get_ingredient_translations`);
         setIngredientTranslations(translationResponse.data);
+
+        try {
+          const recipeTransRes = await axios.get(`${BASE_URL}/get_recipe_translations`);
+          setRecipeTranslations(recipeTransRes.data);
+        } catch (err) {
+          console.warn('Recipe translations endpoint not available. Using English.');
+          setRecipeTranslations({});
+        }
       } catch (error) {
         console.error('Error loading data:', error);
         setLocalErrorMessage(t('centralPerk.error.fetchRecipes'));
@@ -99,12 +121,30 @@ const GalleryPage = ({ setErrorMessage }) => {
     setTotalNutrition(null);
   };
 
+  const updateTotalNutrition = (updatedMealPlan) => {
+    const allRecipes = Object.values(updatedMealPlan).flat();
+    if (allRecipes.length > 0) {
+      const newTotal = allRecipes.reduce(
+        (acc, r) => ({
+          calories: acc.calories + (r.per_serving_calories || 0),
+          protein: acc.protein + (r.per_serving_protein || 0),
+          cost: acc.cost + formatPrice(getPerServingCost(r)),
+        }),
+        { calories: 0, protein: 0, cost: 0 }
+      );
+      setTotalNutrition(newTotal);
+    } else {
+      setTotalNutrition(null);
+    }
+  };
+
   const handleDragEnd = (result) => {
     const { source, destination } = result;
     if (!destination) return;
     const sourceId = source.droppableId;
     const destId = destination.droppableId;
     if (sourceId === destId && source.index === destination.index) return;
+
     let updatedMealPlan = { ...mealPlan };
     if (sourceId === 'recipes') {
       const recipe = filteredRecipes[source.index];
@@ -123,20 +163,7 @@ const GalleryPage = ({ setErrorMessage }) => {
       }
     }
     setMealPlan(updatedMealPlan);
-    const allRecipes = Object.values(updatedMealPlan).flat();
-    if (allRecipes.length > 0) {
-      const newTotal = allRecipes.reduce(
-        (acc, r) => ({
-          calories: acc.calories + (r.per_serving_calories || 0),
-          protein: acc.protein + (r.per_serving_protein || 0),
-          cost: acc.cost + (r.per_serving_cost || 0),
-        }),
-        { calories: 0, protein: 0, cost: 0 }
-      );
-      setTotalNutrition(newTotal);
-    } else {
-      setTotalNutrition(null);
-    }
+    updateTotalNutrition(updatedMealPlan);
   };
 
   const handleSelectForMealPlan = (recipe) => {
@@ -153,20 +180,7 @@ const GalleryPage = ({ setErrorMessage }) => {
     const updatedMealPlan = { ...mealPlan };
     updatedMealPlan[selectCategory] = [...updatedMealPlan[selectCategory], recipe];
     setMealPlan(updatedMealPlan);
-    const allRecipes = Object.values(updatedMealPlan).flat();
-    if (allRecipes.length > 0) {
-      const newTotal = allRecipes.reduce(
-        (acc, r) => ({
-          calories: acc.calories + (r.per_serving_calories || 0),
-          protein: acc.protein + (r.per_serving_protein || 0),
-          cost: acc.cost + (r.per_serving_cost || 0),
-        }),
-        { calories: 0, protein: 0, cost: 0 }
-      );
-      setTotalNutrition(newTotal);
-    } else {
-      setTotalNutrition(null);
-    }
+    updateTotalNutrition(updatedMealPlan);
     setSelectCategory('');
   };
 
@@ -174,23 +188,20 @@ const GalleryPage = ({ setErrorMessage }) => {
     const updatedMealPlan = { ...mealPlan };
     updatedMealPlan[category].splice(index, 1);
     setMealPlan(updatedMealPlan);
-    const allRecipes = Object.values(updatedMealPlan).flat();
-    if (allRecipes.length === 0) {
-      setTotalNutrition(null);
-    } else {
-      const newTotal = allRecipes.reduce(
-        (acc, r) => ({
-          calories: acc.calories + (r.per_serving_calories || 0),
-          protein: acc.protein + (r.per_serving_protein || 0),
-          cost: acc.cost + (r.per_serving_cost || 0),
-        }),
-        { calories: 0, protein: 0, cost: 0 }
-      );
-      setTotalNutrition(newTotal);
-    }
+    updateTotalNutrition(updatedMealPlan);
   };
 
-  const formatPrice = (cost) => Math.ceil((cost || 0) / 1000) * 1000;
+  // Translation helpers
+  const getPersianText = (englishText, recipeName) => {
+    if (i18n.language !== 'fa') return englishText;
+    const key = recipeName || englishText;
+    return recipeTranslations[key]?.fa || englishText;
+  };
+
+  const getPersianInstructions = (englishInstructions, recipeName) => {
+    if (i18n.language !== 'fa') return englishInstructions;
+    return recipeTranslations[recipeName]?.instructions_fa || englishInstructions || t('centralPerk.noInstructions');
+  };
 
   const handleOrder = async () => {
     if (!userName.trim()) {
@@ -214,13 +225,13 @@ const GalleryPage = ({ setErrorMessage }) => {
       selected_day: selectedDay,
       meal_plan: Object.keys(mealPlan).reduce((acc, key) => {
         acc[key] = mealPlan[key].map((recipe) => ({
-          recipe_name: recipe.recipe_name,
+          recipe_name: getPersianText(recipe.recipe_name, recipe.recipe_name),
           total_calories: recipe.total_calories || 0,
           total_protein: recipe.total_protein || 0,
           total_cost: recipe.total_cost || 0,
           per_serving_calories: recipe.per_serving_calories || 0,
           per_serving_protein: recipe.per_serving_protein || 0,
-          per_serving_cost: recipe.per_serving_cost || 0,
+          per_serving_cost: getPerServingCost(recipe),
           dietary: recipe.dietary,
           prep_time: recipe.prep_time,
           servings: recipe.servings || 1,
@@ -244,7 +255,8 @@ const GalleryPage = ({ setErrorMessage }) => {
         if (recipes.length > 0) {
           message += `${t(`centralPerk.mealCategories.${category}`)}:\n`;
           recipes.forEach((recipe) => {
-            message += `- ${recipe.recipe_name} (${t('centralPerk.units.kcalPerServing')} ${(recipe.per_serving_calories || 0).toFixed(2)}, ${t('centralPerk.units.proteinPerServing')} ${(recipe.per_serving_protein || 0).toFixed(2)}${t('kitchen.grams')}, ${t('centralPerk.units.tomanPerServing')} ${formatPrice(recipe.per_serving_cost)})\n`;
+            const persianName = getPersianText(recipe.recipe_name, recipe.recipe_name);
+            message += `- ${persianName} (${t('centralPerk.units.kcalPerServing')} ${(recipe.per_serving_calories || 0).toFixed(2)}, ${t('centralPerk.units.proteinPerServing')} ${(recipe.per_serving_protein || 0).toFixed(2)}${t('kitchen.grams')}, ${t('centralPerk.units.tomanPerServing')} ${formatPrice(getPerServingCost(recipe))})\n`;
           });
         }
       });
@@ -403,7 +415,7 @@ const GalleryPage = ({ setErrorMessage }) => {
                               className="recipe-image"
                               onClick={() => openModal(recipe)}
                             />
-                            <h3>{recipe.recipe_name}</h3>
+                            <h3>{getPersianText(recipe.recipe_name, recipe.recipe_name)}</h3>
                             <p>{t('centralPerk.dietary')}: {t(`centralPerk.dietaryOptions.${recipe.dietary}`)}</p>
                             <p>
                               {t('centralPerk.units.kcalPerServing')} {(recipe.per_serving_calories || 0).toFixed(2)}
@@ -412,7 +424,7 @@ const GalleryPage = ({ setErrorMessage }) => {
                               {t('centralPerk.units.proteinPerServing')} {(recipe.per_serving_protein || 0).toFixed(2)}{t('kitchen.grams')}
                             </p>
                             <p>
-                              {t('centralPerk.units.tomanPerServing')} {formatPrice(recipe.per_serving_cost)}
+                              {t('centralPerk.units.tomanPerServing')} {formatPrice(getPerServingCost(recipe))}
                             </p>
                             <p>{t('centralPerk.prepTime')}: {recipe.prep_time} {t('kitchen.minutes')}</p>
                             <p>{t('centralPerk.servings')}: {recipe.servings || 1}</p>
@@ -485,7 +497,10 @@ const GalleryPage = ({ setErrorMessage }) => {
                                 {...provided.dragHandleProps}
                                 className="meal-item"
                               >
-                                {recipe.recipe_name} ({t('centralPerk.units.kcalPerServing')} {(recipe.per_serving_calories || 0).toFixed(2)}, {t('centralPerk.units.proteinPerServing')} {(recipe.per_serving_protein || 0).toFixed(2)}{t('kitchen.grams')}, {t('centralPerk.units.tomanPerServing')} {formatPrice(recipe.per_serving_cost)})
+                                {getPersianText(recipe.recipe_name, recipe.recipe_name)} (
+                                {t('centralPerk.units.kcalPerServing')} {(recipe.per_serving_calories || 0).toFixed(0)},{' '}
+                                {t('centralPerk.units.proteinPerServing')} {(recipe.per_serving_protein || 0).toFixed(1)}{t('kitchen.grams')},{' '}
+                                {t('centralPerk.units.tomanPerServing')} {formatPrice(getPerServingCost(recipe))})
                                 <button
                                   className="btn btn-danger"
                                   onClick={() => removeFromMealPlan(category.id, index)}
@@ -505,8 +520,13 @@ const GalleryPage = ({ setErrorMessage }) => {
             ))}
           </div>
           {totalNutrition && (
-            <p>
-              {t('centralPerk.totalNutrition')}: {t('centralPerk.units.kcalPerServing')} {totalNutrition.calories.toFixed(2)}, {t('centralPerk.units.proteinPerServing')} {totalNutrition.protein.toFixed(2)}{t('kitchen.grams')}, {t('centralPerk.units.tomanPerServing')} {formatPrice(totalNutrition.cost)}
+            <p className="total-nutrition">
+              <strong>
+                {t('centralPerk.totalNutrition')}:{' '}
+                {totalNutrition.calories.toFixed(0)} {t('centralPerk.units.kcal')} |{' '}
+                {totalNutrition.protein.toFixed(1)} {t('kitchen.grams')} {t('centralPerk.units.protein')} |{' '}
+                {formatPrice(totalNutrition.cost)} {t('centralPerk.units.toman')}
+              </strong>
             </p>
           )}
         </div>
@@ -540,12 +560,15 @@ const GalleryPage = ({ setErrorMessage }) => {
           {errorMessage && <p className="error-message">{errorMessage}</p>}
         </div>
       </DragDropContext>
+
       {selectedRecipe && (
         <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog modal-lg">
             <div className="modal-content recipe-book-modal">
               <div className="modal-header">
-                <h5 className="modal-title">{selectedRecipe.recipe_name}</h5>
+                <h5 className="modal-title">
+                  {getPersianText(selectedRecipe.recipe_name, selectedRecipe.recipe_name)}
+                </h5>
                 <button type="button" className="btn-close" onClick={closeModal}></button>
               </div>
               <div className="modal-body">
@@ -571,7 +594,7 @@ const GalleryPage = ({ setErrorMessage }) => {
                   <strong>{t('centralPerk.protein')}:</strong> {t('centralPerk.units.proteinPerServing')} {(selectedRecipe.per_serving_protein || 0).toFixed(2)}{t('kitchen.grams')}
                 </p>
                 <p>
-                  <strong>{t('centralPerk.cost')}:</strong> {t('centralPerk.units.tomanPerServing')} {formatPrice(selectedRecipe.per_serving_cost)}
+                  <strong>{t('centralPerk.cost')}:</strong> {t('centralPerk.units.tomanPerServing')} {formatPrice(getPerServingCost(selectedRecipe))}
                 </p>
                 <p><strong>{t('centralPerk.prepTime')}:</strong> {selectedRecipe.prep_time} {t('kitchen.minutes')}</p>
                 <p><strong>{t('centralPerk.servings')}:</strong> {selectedRecipe.servings || 1}</p>
@@ -579,12 +602,15 @@ const GalleryPage = ({ setErrorMessage }) => {
                 <ul>
                   {selectedRecipe.ingredient_list?.map((ing, idx) => (
                     <li key={idx}>
-                      {ingredientTranslations[ing.ingredient]?.persian_name || ing.ingredient}: {ing.quantity}g
+                      {i18n.language === 'fa'
+                        ? (ingredientTranslations[ing.ingredient] || ing.ingredient)
+                        : ing.ingredient
+                      }: {ing.quantity}g
                     </li>
                   ))}
                 </ul>
                 <h6>{t('centralPerk.instructions')}</h6>
-                <p>{selectedRecipe.instructions || t('centralPerk.noInstructions')}</p>
+                <p>{getPersianInstructions(selectedRecipe.instructions, selectedRecipe.recipe_name)}</p>
                 <div className="select-meal-plan">
                   <select
                     value={selectCategory}
