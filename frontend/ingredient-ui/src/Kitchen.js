@@ -384,7 +384,10 @@ function Kitchen({ setErrorMessage }) {
         ingredient_list: ingredientList,
         scale_factor: 1.0,
         currency,
-        title: t('kitchen.nutritionLabelTitle', { defaultValue: 'Nutrition Facts: Selected Ingredients' })
+        title: t('kitchen.nutritionLabelTitle'),
+        servings: 1,
+        use_per_serving: false,
+        force_ltr: true   // Forces English + LTR
       });
       const { image } = response.data;
       const link = document.createElement('a');
@@ -594,7 +597,7 @@ function Kitchen({ setErrorMessage }) {
             <option value="omnivore">{t('kitchen.dietaryOptions.omnivore')}</option>
             <option value="vegetarian">{t('kitchen.dietaryOptions.vegetarian')}</option>
             <option value="vegan">{t('kitchen.dietaryOptions.vegan')}</option>
-            <option value="gluten-free">{t('cookbook.dietaryOptions.gluten_free')}</option>
+            <option value="gluten-free">{t('kitchen.dietaryOptions.gluten_free')}</option>
           </select>
         </div>
       </div>

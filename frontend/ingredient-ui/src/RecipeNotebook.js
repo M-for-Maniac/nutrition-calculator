@@ -188,26 +188,32 @@ function RecipeNotebook({ setErrorMessage }) {
   };
 
   const handleCalculateRecipeNutrition = (ingredient_list, recipe_name) => {
-    if (!ingredient_list || !Array.isArray(ingredient_list)) {
-      setErrorMessage(t('cookbook.error.invalidIngredientList'));
-      return;
-    }
-    setIsLoading(true);
-    axios
-      .post(`${BASE_URL}/recipe_nutrition`, {
-        ingredient_list,
-        scale_factor: parseFloat(scaleFactor) || 1.0,
-        currency,
-      })
-      .then((res) => {
-        setRecipeNutrition((prev) => ({ ...prev, [recipe_name]: res.data }));
-      })
-      .catch((err) => {
-        console.error('Error calculating recipe nutrition:', err);
-        setErrorMessage(err.response?.data?.error || t('cookbook.error.calculateNutrition'));
-      })
-      .finally(() => setIsLoading(false));
-  };
+  if (!ingredient_list || !Array.isArray(ingredient_list)) {
+    setErrorMessage(t('cookbook.error.invalidIngredientList'));
+    return;
+  }
+
+  // Find servings from the recipe
+  const recipe = allRecipes.find(r => r.recipe_name === recipe_name);
+  const servings = recipe?.servings || 1;
+
+  setIsLoading(true);
+  axios
+    .post(`${BASE_URL}/recipe_nutrition`, {
+      ingredient_list,
+      scale_factor: parseFloat(scaleFactor) || 1.0,
+      currency,
+      servings: servings  // NOW WE SEND IT!
+    })
+    .then((res) => {
+      setRecipeNutrition((prev) => ({ ...prev, [recipe_name]: res.data }));
+    })
+    .catch((err) => {
+      console.error('Error calculating recipe nutrition:', err);
+      setErrorMessage(err.response?.data?.error || t('cookbook.error.calculateNutrition'));
+    })
+    .finally(() => setIsLoading(false));
+};
 
   const handleDeleteRecipe = (recipe_name) => {
     if (!window.confirm(t('cookbook.confirmDelete', { recipe_name }))) return;
@@ -339,8 +345,9 @@ function RecipeNotebook({ setErrorMessage }) {
 
   const handleExportRecipeNutrition = async (recipeName) => {
     if (!recipeNutrition[recipeName]) return;
-
-    const ingredientList = allRecipes.find((r) => r.recipe_name === recipeName)?.ingredient_list || [];
+    const recipe = allRecipes.find(r => r.recipe_name === recipeName);
+    const ingredientList = recipe.ingredient_list || [];
+    const servings = recipe.servings || 1;
 
     try {
       setIsLoading(true);
@@ -349,6 +356,8 @@ function RecipeNotebook({ setErrorMessage }) {
         scale_factor: parseFloat(scaleFactor) || 1.0,
         currency,
         title: `Nutrition Facts: ${recipeName}`,
+        servings: servings,
+        use_per_serving: true,      // NEW
       });
       const { image } = response.data;
       const link = document.createElement('a');
@@ -376,19 +385,16 @@ function RecipeNotebook({ setErrorMessage }) {
         prep_time: recipe.prep_time,
         dietary: recipe.dietary,
         complexity: recipe.complexity,
-        total_calories: recipe.total_calories,
-        total_cost: recipe.total_cost,
         servings: recipe.servings || 1,
         currency,
       });
-      const { pdf } = response.data;
+      // response is now a PDF file → trigger download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
-      link.href = pdf;
+      link.href = url;
       link.download = `${recipe.recipe_name}_recipe.pdf`;
-      document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
-      setErrorMessage('');
+      window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error('Error exporting recipe PDF:', err);
       setErrorMessage(err.response?.data?.error || t('cookbook.error.exportPDF'));
@@ -890,36 +896,51 @@ function RecipeNotebook({ setErrorMessage }) {
           </div>
         </div>
       )}
-      {Object.keys(recipeNutrition).map((recipeName) =>
-        recipeNutrition[recipeName] ? (
-          <div key={recipeName} className="mt-3">
+      {Object.keys(recipeNutrition).map((recipeName) => {
+        const data = recipeNutrition[recipeName];
+        if (!data) return null;
+
+        const servings = data.servings || 1;
+
+        return (
+          <div key={recipeName} className="mt-5 border p-4 rounded" style={{ backgroundColor: '#f8f9fa' }}>
             <h4 style={styles.subheading}>
-              <i className="bi bi-bar-chart" style={styles.icon}></i>
-              {recipeName} {t('cookbook.nutrition')} (Scale: {scaleFactor}x)
+              <i className="bi bi-calculator-fill"></i> {recipeName}
+              <small className="text-muted"> (×{scaleFactor} | {servings} serving{servings > 1 ? 's' : ''})</small>
             </h4>
-            {recipeNutrition[recipeName].Cost && (
-              <div className="alert alert-success mb-2">
-                <strong>{t('cookbook.totalCost')}:</strong> {recipeNutrition[recipeName].Cost.value}{' '}
-                {recipeNutrition[recipeName].Cost.unit}
-              </div>
-            )}
-            <div className="row">
-              {Object.entries(recipeNutrition[recipeName])
-                .filter(([nutrient]) => nutrient !== 'Cost')
-                .map(([nutrient, data]) => (
-                  <div key={nutrient} className="col-12 col-md-4 mb-2">
-                    <div className="card">
-                      <div className="card-body">
-                        <strong>{nutrient}:</strong> {data.value} {data.unit}
-                        {data.percent_dv !== null && ` (${data.percent_dv}% DV)`}
-                      </div>
+
+            {/* Total Nutrition */}
+            <div className="mb-4">
+              <h5><strong>Total Nutrition (Full Recipe)</strong></h5>
+              <div className="row">
+                {Object.entries(data.total_nutrition || {}).map(([nutrient, val]) => (
+                  <div key={`total-${nutrient}`} className="col-6 col-md-4 mb-2">
+                    <div className="p-2 border rounded bg-white">
+                      <strong>{nutrient}:</strong> {val.value} {val.unit}
+                      {val.percent_dv != null && ` (${val.percent_dv}% DV)`}
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* Per Serving */}
+            <div>
+              <h5><strong>Per Serving Nutrition</strong></h5>
+              <div className="row">
+                {Object.entries(data.per_serving_nutrition || {}).map(([nutrient, val]) => (
+                  <div key={`per-${nutrient}`} className="col-6 col-md-4 mb-2">
+                    <div className="p-2 border rounded bg-white">
+                      <strong>{nutrient}:</strong> {val.value} {val.unit}
+                      {val.percent_dv != null && ` (${val.percent_dv}% DV)`}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        ) : null
-      )}
+        );
+      })}
       <div className={`modal fade ${editModalOpen ? 'show d-block' : ''}`} tabIndex="-1" style={{ display: editModalOpen ? 'block' : 'none' }}>
         <div className="modal-dialog" style={styles.modal}>
           <div className="modal-content">
