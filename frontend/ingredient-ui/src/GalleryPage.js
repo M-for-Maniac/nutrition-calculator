@@ -12,8 +12,6 @@ const GalleryPage = ({ setErrorMessage }) => {
   const [recipes, setRecipes] = useState([]);
   const [filteredRecipes, setFilteredRecipes] = useState([]);
   const [dietaryFilter, setDietaryFilter] = useState('');
-  const [maxCalories, setMaxCalories] = useState('');
-  const [minProtein, setMinProtein] = useState('');
   const [mealPlan, setMealPlan] = useState({
     breakfast: [],
     morningSnack: [],
@@ -32,6 +30,8 @@ const GalleryPage = ({ setErrorMessage }) => {
   const [orderSuccess, setOrderSuccess] = useState('');
   const [errorMessage, setLocalErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [userPhone, setUserPhone] = useState('');
+  const [tagFilter, setTagFilter] = useState(''); // 'high-protein' | 'low-calorie' | 'special' | ''
 
   // HELPER: Always use correct per-serving cost with 20% benefit
   const getPerServingCost = (recipe) => {
@@ -54,7 +54,6 @@ const GalleryPage = ({ setErrorMessage }) => {
           params: {
             dietary: dietaryFilter,
             complexity: '',
-            max_calories: maxCalories || undefined,
             max_cost: undefined,
             currency: 'Toman',
           },
@@ -97,28 +96,28 @@ const GalleryPage = ({ setErrorMessage }) => {
       }
     };
     fetchData();
-  }, [dietaryFilter, maxCalories, minProtein, setErrorMessage, t]);
+  }, [dietaryFilter, setErrorMessage, t, i18n.language]);
 
   const handleFilter = () => {
     let filtered = [...recipes];
+
+    // Dietary filter
     if (dietaryFilter) {
-      filtered = filtered.filter((recipe) => recipe.dietary.toLowerCase() === dietaryFilter.toLowerCase());
+      filtered = filtered.filter(r => r.dietary.toLowerCase() === dietaryFilter.toLowerCase());
     }
-    if (maxCalories) {
-      filtered = filtered.filter((recipe) => (recipe.per_serving_calories || 0) <= parseInt(maxCalories));
+
+    // Tag filter (client-side only
+    if (tagFilter) {
+      if (tagFilter === 'high-protein') {
+        filtered = filtered.filter(r => (r.per_serving_protein || 0) > 20);
+      } else if (tagFilter === 'low-calorie') {
+        filtered = filtered.filter(r => (r.per_serving_calories || 0) < 300);
+      } else if (tagFilter === 'special') {
+        filtered = filtered.filter(r => r.is_special === true); // we'll add this field
+      }
     }
-    if (minProtein) {
-      filtered = filtered.filter((recipe) => (recipe.per_serving_protein || 0) >= parseInt(minProtein));
-    }
+
     setFilteredRecipes(filtered);
-    setMealPlan({
-      breakfast: [],
-      morningSnack: [],
-      lunch: [],
-      afternoonSnack: [],
-      dinner: [],
-    });
-    setTotalNutrition(null);
   };
 
   const updateTotalNutrition = (updatedMealPlan) => {
@@ -264,7 +263,9 @@ const GalleryPage = ({ setErrorMessage }) => {
         message += `\n${t('centralPerk.totalNutrition')}: ${t('centralPerk.units.kcalPerServing')} ${totalNutrition.calories.toFixed(2)}, ${t('centralPerk.units.proteinPerServing')} ${totalNutrition.protein.toFixed(2)}${t('kitchen.grams')}, ${t('centralPerk.units.tomanPerServing')} ${formatPrice(totalNutrition.cost)}`;
       }
       const encodedMessage = encodeURIComponent(message);
-      const whatsappUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}`;
+      // Use user's phone if valid, otherwise fall back to your number
+      const phoneToUse = userPhone && userPhone.length >= 10 ? userPhone : WHATSAPP_NUMBER;
+      const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneToUse}&text=${encodedMessage}`;
       const newWindow = window.open(whatsappUrl, '_blank');
       if (!newWindow) {
         setLocalErrorMessage(t('centralPerk.error.popupBlocked').replace('{url}', whatsappUrl));
@@ -325,58 +326,124 @@ const GalleryPage = ({ setErrorMessage }) => {
 
   return (
     <div className="central-perk-page" dir={i18n.language === 'fa' ? 'rtl' : 'ltr'}>
-      <div className="intro-section">
-        <h1>{t('centralPerk.intro.title')}</h1>
-        <p>{t('centralPerk.intro.subtitle')}</p>
-        <div className="intro-benefits">
-          <div className="benefit">
-            <i className="fas fa-carrot"></i>
-            <h3>{t('centralPerk.intro.benefit1.title')}</h3>
-            <p>{t('centralPerk.intro.benefit1.description')}</p>
-          </div>
-          <div className="benefit">
-            <i className="fas fa-heart"></i>
-            <h3>{t('centralPerk.intro.benefit2.title')}</h3>
-            <p>{t('centralPerk.intro.benefit2.description')}</p>
-          </div>
-          <div className="benefit">
-            <i className="fas fa-clock"></i>
-            <h3>{t('centralPerk.intro.benefit3.title')}</h3>
-            <p>{t('centralPerk.intro.benefit3.description')}</p>
+      <div className="intro-section-final text-center py-5 px-4">
+        <h1 className="display-5 fw-bold mb-3">{t('centralPerk.intro.title')}</h1>
+        <p className="lead mb-5">{t('centralPerk.intro.subtitle')}</p>
+
+        {/* How It Works */}
+        <div className="how-it-works-card bg-white rounded-4 shadow-sm p-4 mb-5 mx-auto" style={{ maxWidth: '500px' }}>
+          <h5 className="fw-bold mb-3">{t('centralPerk.howItWorks.title')}</h5>
+          <ol className={`text-${i18n.language === 'fa' ? 'end' : 'start'} mb-0`} style={{ lineHeight: '2' }}>
+            {t('centralPerk.howItWorks.steps', { returnObjects: true }).map((step, i) => (
+              <li key={i} className="mb-2">{step}</li>
+            ))}
+          </ol>
+        </div>
+
+        {/* Delivery Times */}
+        <div className="delivery-schedule bg-gradient rounded-4 p-4 text-white mb-5" style={{ maxWidth: '500px', margin: '0 auto' }}>
+          <h5 className="fw-bold mb-3">{t('centralPerk.delivery.title')}</h5>
+          <div className={`text-${i18n.language === 'fa' ? 'end' : 'start'}`}>
+            {t('centralPerk.delivery.times', { returnObjects: true }).map((time, i) => (
+              <div key={i} className="d-flex justify-content-between mb-1">
+                <span>{time.meal}</span>
+                <strong>{time.time}</strong>
+              </div>
+            ))}
           </div>
         </div>
+
         <button
-          className="btn btn-primary-custom intro-cta"
-          onClick={() => window.scrollTo({ top: document.querySelector('.filters').offsetTop, behavior: 'smooth' })}
+          className="btn btn-success btn-lg px-5 py-3 rounded-pill shadow"
+          onClick={() => window.scrollTo({ top: document.querySelector('.filters-modern').offsetTop - 100, behavior: 'smooth' })}
         >
           {t('centralPerk.intro.cta')}
         </button>
       </div>
-      <div className="filters">
-        <select onChange={(e) => setDietaryFilter(e.target.value)} value={dietaryFilter} className="form-control">
-          <option value="">{t('centralPerk.allDiets')}</option>
-          <option value="vegan">{t('centralPerk.dietaryOptions.vegan')}</option>
-          <option value="vegetarian">{t('centralPerk.dietaryOptions.vegetarian')}</option>
-          <option value="omnivore">{t('centralPerk.dietaryOptions.omnivore')}</option>
-          <option value="gluten-free">{t('centralPerk.dietaryOptions.glutenFree')}</option>
-        </select>
-        <input
-          type="number"
-          placeholder={t('centralPerk.maxCalories')}
-          value={maxCalories}
-          onChange={(e) => setMaxCalories(e.target.value)}
-          className="form-control"
-        />
-        <input
-          type="number"
-          placeholder={t('centralPerk.minProtein')}
-          value={minProtein}
-          onChange={(e) => setMinProtein(e.target.value)}
-          className="form-control"
-        />
-        <button className="btn btn-primary-custom" onClick={handleFilter}>
-          {t('centralPerk.applyFilters')}
-        </button>
+      <div className="filters-modern container my-5">
+        <div className="bg-white rounded-4 shadow p-4">
+          <h5 className="text-center fw-bold text-success mb-4">
+            {t('centralPerk.filter.title')}
+          </h5>
+
+          {/* Dietary Filter - Icon Buttons */}
+          <div className="dietary-filters mb-4">
+            <div className="d-flex flex-wrap justify-content-center gap-3">
+              <button
+                className={`diet-btn ${dietaryFilter === '' ? 'active' : ''}`}
+                onClick={() => setDietaryFilter('')}
+              >
+                <i className="fas fa-utensils"></i> {t('centralPerk.allDiets')}
+              </button>
+              <button
+                className={`diet-btn vegan ${dietaryFilter === 'vegan' ? 'active' : ''}`}
+                onClick={() => setDietaryFilter('vegan')}
+              >
+                <i className="fas fa-leaf"></i> {t('centralPerk.dietaryOptions.vegan')}
+              </button>
+              <button
+                className={`diet-btn vegetarian ${dietaryFilter === 'vegetarian' ? 'active' : ''}`}
+                onClick={() => setDietaryFilter('vegetarian')}
+              >
+                <i className="fas fa-seedling"></i> {t('centralPerk.dietaryOptions.vegetarian')}
+              </button>
+              <button
+                className={`diet-btn omnivore ${dietaryFilter === 'omnivore' ? 'active' : ''}`}
+                onClick={() => setDietaryFilter('omnivore')}
+              >
+                <i className="fas fa-drumstick-bite"></i> {t('centralPerk.dietaryOptions.omnivore')}
+              </button>
+              <button
+                className={`diet-btn gluten-free ${dietaryFilter === 'gluten-free' ? 'active' : ''}`}
+                onClick={() => setDietaryFilter('gluten-free')}
+              >
+                <i className="fas fa-ban"></i> {t('centralPerk.dietaryOptions.glutenFree')}
+              </button>
+            </div>
+          </div>
+
+          {/* Tag Filter - Cool Icons */}
+          <div className="tag-filters mt-4">
+            <div className="d-flex flex-wrap justify-content-center gap-3">
+              <button
+                className={`tag-btn ${tagFilter === '' ? 'active' : ''}`}
+                onClick={() => {
+                  setTagFilter('');
+                  handleFilter(); // ← THIS WAS MISSING
+                }}
+              >
+                همه
+              </button>
+              <button
+                className={`tag-btn high-protein ${tagFilter === 'high-protein' ? 'active' : ''}`}
+                onClick={() => {
+                  setTagFilter('high-protein');
+                  handleFilter(); // ← THIS WAS MISSING
+                }}
+              >
+                پروتئین بالا
+              </button>
+              <button
+                className={`tag-btn low-calorie ${tagFilter === 'low-calorie' ? 'active' : ''}`}
+                onClick={() => {
+                  setTagFilter('low-calorie');
+                  handleFilter(); // ← THIS WAS MISSING
+                }}
+              >
+                کم کالری
+              </button>
+              <button
+                className={`tag-btn special ${tagFilter === 'special' ? 'active' : ''}`}
+                onClick={() => {
+                  setTagFilter('special');
+                  handleFilter(); // ← THIS WAS MISSING
+                }}
+              >
+                ویژه سنترال پرک
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="recipe-gallery">
@@ -393,6 +460,7 @@ const GalleryPage = ({ setErrorMessage }) => {
                     const tags = [];
                     if ((recipe.per_serving_protein || 0) > 20) tags.push('high-protein');
                     if ((recipe.per_serving_calories || 0) < 300) tags.push('low-calorie');
+                    if (recipe.is_special) tags.push('special'); // ← NEW
                     return (
                       <Draggable key={recipe.recipe_name} draggableId={recipe.recipe_name} index={index}>
                         {(provided, snapshot) => (
@@ -404,8 +472,16 @@ const GalleryPage = ({ setErrorMessage }) => {
                           >
                             <div className="recipe-tags">
                               {tags.map((tag) => (
-                                <span key={tag} className={`tag tag-${tag}`} title={t(`centralPerk.tags.${tag}`)}>
-                                  <i className={`fas ${tag === 'high-protein' ? 'fa-dumbbell' : 'fa-leaf'}`}></i>
+                                <span
+                                  key={tag}
+                                  className={`tag tag-${tag}`}
+                                  title={t(`centralPerk.tags.${tag}`)}
+                                >
+                                  <i className={`fas ${
+                                    tag === 'high-protein' ? 'fa-dumbbell' :
+                                    tag === 'low-calorie' ? 'fa-fire' :
+                                    'fa-crown text-warning'
+                                  }`}></i>
                                 </span>
                               ))}
                             </div>
@@ -530,34 +606,55 @@ const GalleryPage = ({ setErrorMessage }) => {
             </p>
           )}
         </div>
-        <div className="order-section">
-          <h2>{t('centralPerk.submitOrder')}</h2>
-          <input
-            type="text"
-            className="form-control"
-            placeholder={t('centralPerk.namePlaceholder')}
-            value={userName}
-            onChange={(e) => setUserName(e.target.value)}
-          />
-          <select
-            value={selectedDay}
-            onChange={(e) => setSelectedDay(e.target.value)}
-            className="form-control"
-          >
-            <option value="">{t('centralPerk.selectDay')}</option>
-            {daysOfWeek.map((day) => (
-              <option key={day.id} value={day.id}>
-                {day.label}
-              </option>
-            ))}
-          </select>
-          <div className="order-buttons">
-            <button className="btn btn-primary-custom order-button" onClick={handleOrder}>
-              {t('centralPerk.orderPlan')}
-            </button>
+        <div className="order-section-final container my-5 p-4 bg-white rounded-4 shadow-lg border border-success">
+          <h2 className="h4 fw-bold text-center mb-4 text-success">{t('centralPerk.order.title')}</h2>
+
+          <div className="row g-3">
+            <div className="col-12">
+              <input
+                type="text"
+                className="form-control form-control-lg text-center"
+                placeholder={t('centralPerk.order.namePlaceholder')}
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+              />
+            </div>
+            <div className="col-12">
+              <input
+                type="tel"
+                className="form-control form-control-lg text-center"
+                placeholder={t('centralPerk.order.phonePlaceholder')}
+                value={userPhone}
+                onChange={(e) => setUserPhone(e.target.value.replace(/[^0-9]/g, ''))}
+                maxLength="11"
+                dir="ltr"
+              />
+            </div>
+            <div className="col-12">
+              <select className="form-select form-select-lg text-center" value={selectedDay} onChange={(e) => setSelectedDay(e.target.value)}>
+                <option value="">{t('centralPerk.order.selectDay')}</option>
+                {daysOfWeek.map(day => (
+                  <option key={day.id} value={day.id}>{day.label}</option>
+                ))}
+              </select>
+            </div>
           </div>
-          {orderSuccess && <p className="success-message">{orderSuccess}</p>}
-          {errorMessage && <p className="error-message">{errorMessage}</p>}
+
+          {totalNutrition && (
+            <div className="alert alert-success text-center mt-4 py-3 fs-5 fw-bold">
+              {t('centralPerk.order.total')}: {formatPrice(totalNutrition.cost)} {t('centralPerk.units.toman')}
+            </div>
+          )}
+
+          <button 
+            className="btn btn-success btn-lg w-100 mt-4 py-3 rounded-pill shadow-lg"
+            onClick={handleOrder}
+          >
+            {t('centralPerk.order.button')}
+          </button>
+
+          {orderSuccess && <div className="alert alert-success mt-4 text-center">{orderSuccess}</div>}
+          {errorMessage && <div className="alert alert-danger mt-4 text-center">{errorMessage}</div>}
         </div>
       </DragDropContext>
 

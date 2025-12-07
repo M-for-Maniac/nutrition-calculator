@@ -5,7 +5,7 @@ const resources = {
   en: {
     translation: {
       app: {
-        title: 'Central Perk',
+        title:'Nutrino',
         home: 'Home',
         kitchen: 'Kitchen',
         cookbook: 'Cookbook',
@@ -255,22 +255,47 @@ const resources = {
         }
       },
       "centralPerk": {
+        // Inside centralPerk (both en and fa)
         "intro": {
-          "title": "Healthy Bites Meal Planner",
-          "subtitle": "Plan your meals with ease and enjoy healthy, delicious recipes tailored to your dietary needs.",
-          "benefit1": {
-            "title": "Fresh Ingredients",
-            "description": "We use only the freshest ingredients to ensure quality and taste."
-          },
-          "benefit2": {
-            "title": "Customizable Plans",
-            "description": "Tailor your meal plan to fit your dietary preferences and goals."
-          },
-          "benefit3": {
-            "title": "Time-Saving",
-            "description": "Quick and easy recipes to fit your busy lifestyle."
-          },
-          "cta": "Get Started"
+          "title": "Nutrino",
+          "subtitle": "Healthy, fresh, personalized meals — delivered daily to your door",
+          "cta": "Start Your Order"
+        },
+        "howItWorks": {
+          "title": "How It Works",
+          "steps": [
+            "Drag your favorite meals into the boxes (up to 5 per day)",
+            "Choose your delivery day",
+            "Enter your name and phone number",
+            "Your order opens in WhatsApp — pay & confirm there"
+          ]
+        },
+        "delivery": {
+          "title": "Delivery Times",
+          "times": [
+            { "meal": "Breakfast", "time": "8–10 AM" },
+            { "meal": "Morning Snack", "time": "10 AM–12 PM" },
+            { "meal": "Lunch", "time": "12–2 PM" },
+            { "meal": "Afternoon Snack", "time": "2–6 PM" },
+            { "meal": "Dinner", "time": "6–9 PM" }
+          ]
+        },
+        "order": {
+          "title": "Complete Your Order",
+          "namePlaceholder": "Your Full Name",
+          "phonePlaceholder": "Your Phone Number (0912...)",
+          "selectDay": "Choose Delivery Day",
+          "total": "Total Amount",
+          "button": "Send Order via WhatsApp (Pay There)"
+        },
+        "filter": {
+          "title": "Filter Meals",
+          "allDiets": "All Meals"
+        },
+        "tags": {
+          "high-protein": "High Protein",
+          "low-calorie": "Low Calorie",
+          "special": "Central Perk Special"
         },
         "units": {
           "kcalPerServing": "Calories (kcal):",
@@ -293,7 +318,7 @@ const resources = {
           "vegan": "Vegan",
           "vegetarian": "Vegetarian",
           "omnivore": "Omnivore",
-          "gluten-free": "Gluten-free"
+          "glutenFree": "Gluten-free"
         },
         "predefinedPlans": {
           "title": "Predefined Meal Plans",
@@ -306,10 +331,6 @@ const resources = {
         "totalProtein": "Total Protein",
         "selectPlan": "Select Plan",
         "availableRecipes": "Available Recipes",
-        "tags": {
-          "high-protein": "High Protein",
-          "low-calorie": "Low Calorie"
-        },
         "calories": "kcal",
         "protein": "Protein",
         "prepTime": "Prep Time",
@@ -362,18 +383,18 @@ const resources = {
   fa: {
     translation: {
       app: {
-        title: 'سنترال پرک',
+        title: 'نوترینو',
         home: 'خانه',
         kitchen: 'آشپزخانه',
         cookbook: 'کتاب آشپزی',
-        gallery: 'سنترال پرک',
+        gallery: 'نوترینو',
         language: 'زبان',
         english: 'انگلیسی',
         persian: 'فارسی'
       },
       home: {
         hero: {
-          title: 'به سنترال پرک خوش اومدی!',
+          title: 'به نوترینو خوش اومدی!',
           subtitle: 'با ما به‌راحتی وعده‌های غذایی خود را برنامه‌ریزی کنید، تغذیه را ردیابی کنید و غذاهای سالم و خوشمزه سفارش دهید.',
           kitchenCTA: 'بریم تو آشپزخانه',
           cookbookCTA: 'مشاهده کتاب آشپزی'
@@ -418,9 +439,9 @@ const resources = {
             button: 'برو به کتاب آشپزی'
           },
           gallery: {
-            title: 'سنترال پرک: برنامه‌ریز غذایی و رستوران شما',
+            title: 'نوترینو: برنامه‌ریز غذایی و رستوران شما',
             description: 'انواع غذاهای باکیفیت را کاوش کنید، بر اساس نیازهای غذایی فیلتر کنید، برنامه غذایی روزانه بسازید و غذاهای خود را از طریق واتس‌اپ برای تحویل سفارش دهید!',
-            button: 'برو به سنترال پرک'
+            button: 'برو به نوترینو'
           }
         },
         sampleRecipe: {
@@ -613,22 +634,59 @@ const resources = {
       },
       "centralPerk": {
         "intro": {
-          "title": "برنامه‌ریز غذای سالم",
-          "subtitle": "برنامه غذایی خود را به راحتی تنظیم کنید و از دستورهای غذایی سالم و خوشمزه متناسب با نیازهای غذایی خود لذت ببرید.",
+          "title": "نوترينو",
+          "subtitle": "غذای سالم، خوشمزه و شخصی‌سازی‌شده با ارسال در محدوده رایگان. مواد اولیه تازه، تغذیه ایده‌آل.",
           "benefit1": {
-            "title": "مواد اولیه تازه",
-            "description": "ما فقط از تازه‌ترین مواد اولیه برای تضمین کیفیت و طعم استفاده می‌کنیم."
+            "title": "تازه و مرغوب",
+            "description": "فقط بهترین و تازه‌ترین مواد اولیه — هر روز."
           },
           "benefit2": {
-            "title": "برنامه‌های قابل تنظیم",
-            "description": "برنامه غذایی خود را متناسب با ترجیحات و اهداف غذایی خود تنظیم کنید."
+            "title": "تغذیه شخصی‌سازی‌شده",
+            "description": "غذاهایی متناسب با رژیم شما: وگان، کتو، پروتئین بالا، بدون گلوتن و..."
           },
           "benefit3": {
-            "title": "صرفه‌جویی در زمان",
-            "description": "دستورهای غذایی سریع و آسان برای سبک زندگی پرمشغله شما."
+            "title": "سفارش در چند ثانیه",
+            "description": "برنامه روزانه خود را بسازید و با یک کلیک از طریق واتس‌اپ سفارش دهید."
           },
           "cta": "شروع کنید"
         },
+        "howItWorks": {
+            "title": "چطور سفارش بدم؟",
+            "steps": [
+              "غذاهای مورد علاقه‌تون رو به باکس‌ها بکشید یا از منو وعده ها انتخاب کنید",
+              "روز تحویل رو انتخاب کنید",
+              "نام و شماره موبایل‌تون رو وارد کنید",
+              "سفارش در واتس‌اپ شما باز میشه — پرداخت و تأیید اونجا انجام میشه"
+            ]
+          },
+          "delivery": {
+            "title": "زمان تحویل",
+            "times": [
+              { "meal": "صبحانه", "time": "۸ تا ۱۰ صبح" },
+              { "meal": "میان‌وعده صبح", "time": "۱۰ تا ۱۲" },
+              { "meal": "ناهار", "time": "۱۲ تا ۱۴" },
+              { "meal": "میان‌وعده عصر", "time": "۱۴ تا ۱۸" },
+              { "meal": "شام", "time": "۱۸ تا ۲۱" }
+            ]
+          },
+          "order": {
+            "title": "تکمیل سفارش",
+            "namePlaceholder": "نام و نام خانوادگی",
+            "phonePlaceholder": "شماره موبایل (09123456789)",
+            "selectDay": "روز تحویل را انتخاب کنید",
+            "total": "مبلغ کل",
+            "button": "ارسال سفارش به واتس‌اپ (پرداخت آنجا)"
+          },
+          "filter": {
+            "title": "فیلتر غذاها",
+            "dietaryLabel": "رژیم غذایی",
+            "allDiets": "همه غذاها"
+          },
+          "tags": {
+            "high-protein": "پروتئین بالا",
+            "low-calorie": "کم کالری",
+            "special": "ویژه سنترال پرک"
+          },
         "cost": "هزینه",
         "totalCost": "هزینه کل",
         "servings": "تعداد سروینگ",
@@ -640,7 +698,7 @@ const resources = {
           "vegan": "گیاه‌خواری کامل",
           "vegetarian": "گیاه‌خواری",
           "omnivore": "همه‌چیزخوار",
-          "gluten-free": "بدون گلوتن"
+          "glutenFree": "بدون گلوتن"
         },
         "predefinedPlans": {
           "title": "برنامه‌های غذایی از پیش تعریف‌شده",
@@ -653,10 +711,6 @@ const resources = {
         "totalProtein": "کل پروتئین",
         "selectPlan": "انتخاب برنامه",
         "availableRecipes": "دستورهای غذایی موجود",
-        "tags": {
-          "high-protein": "پروتئین بالا",
-          "low-calorie": "کالری پایین"
-        },
         "units": {
           "kcalPerServing": "کالری :",
           "proteinPerServing": "پروتئین :",
@@ -671,7 +725,7 @@ const resources = {
         "protein": "پروتئین",
         "prepTime": "زمان آماده‌سازی",
         "viewDetails": "مشاهده جزئیات",
-        "selectCategory": "انتخاب دسته‌بندی غذا",
+        "selectCategory": "انتخاب وعده",
         "addToPlan": "افزودن به برنامه",
         "mealPlan": "برنامه غذایی",
         "mealCategories": {
