@@ -286,11 +286,12 @@ const resources = {
           "phonePlaceholder": "Your Phone Number (0912...)",
           "selectDay": "Choose Delivery Day",
           "total": "Total Amount",
-          "button": "Send Order via WhatsApp (Pay There)"
+          "button": "Send Order via WhatsApp (Pay There)",
+          "addressPlaceholder": "Exact delivery address"
         },
         "filter": {
           "title": "Filter Meals",
-          "allDiets": "All Meals"
+          "allDiets": "All Dietaries"
         },
         "tags": {
           "high-protein": "High Protein",
@@ -318,7 +319,8 @@ const resources = {
           "vegan": "Vegan",
           "vegetarian": "Vegetarian",
           "omnivore": "Omnivore",
-          "glutenFree": "Gluten-free"
+          "glutenFree": "Gluten-free",
+          "gluten-free": "Gluten-free",
         },
         "predefinedPlans": {
           "title": "Predefined Meal Plans",
@@ -675,12 +677,13 @@ const resources = {
             "phonePlaceholder": "شماره موبایل (09123456789)",
             "selectDay": "روز تحویل را انتخاب کنید",
             "total": "مبلغ کل",
-            "button": "ارسال سفارش به واتس‌اپ (پرداخت آنجا)"
+            "button": "ارسال سفارش به واتس‌اپ (پرداخت آنجا)",
+            "addressPlaceholder": "آدرس دقیق تحویل سفارش"
           },
           "filter": {
             "title": "فیلتر غذاها",
             "dietaryLabel": "رژیم غذایی",
-            "allDiets": "همه غذاها"
+            "allDiets": "همه رژیم ها"
           },
           "tags": {
             "high-protein": "پروتئین بالا",
@@ -698,7 +701,8 @@ const resources = {
           "vegan": "گیاه‌خواری کامل",
           "vegetarian": "گیاه‌خواری",
           "omnivore": "همه‌چیزخوار",
-          "glutenFree": "بدون گلوتن"
+          "glutenFree": "بدون گلوتن",
+          "gluten-free": "بدون گلوتن",
         },
         "predefinedPlans": {
           "title": "برنامه‌های غذایی از پیش تعریف‌شده",
