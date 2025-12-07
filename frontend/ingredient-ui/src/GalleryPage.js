@@ -31,6 +31,7 @@ const GalleryPage = ({ setErrorMessage }) => {
   const [errorMessage, setLocalErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [userPhone, setUserPhone] = useState('');
+  const [deliveryAddress, setDeliveryAddress] = useState('');
   const [tagFilter, setTagFilter] = useState(''); // 'high-protein' | 'low-calorie' | 'special' | ''
 
   // HELPER: Always use correct per-serving cost with 20% benefit
@@ -249,7 +250,12 @@ const GalleryPage = ({ setErrorMessage }) => {
       setLocalErrorMessage('');
       setErrorMessage('');
       const orderId = response.data.order_id;
-      let message = `${t('centralPerk.orderSuccess').replace('{orderId}', orderId)}\n${t('centralPerk.userName')}: ${userName.trim()}\n${t('centralPerk.day')}: ${t(`centralPerk.days.${selectedDay}`)}\n\n${t('centralPerk.mealPlan')}:\n`;
+      let message = `سفارش جدید از نوترینو!\n\n` +
+      `نام: ${userName.trim()}\n` +
+      `شماره تماس: ${userPhone || 'وارد نشده'}\n` +
+      `آدرس تحویل: ${deliveryAddress.trim() || 'وارد نشده'}\n` +
+      `روز تحویل: ${t(`centralPerk.days.${selectedDay}`)}\n\n` +
+      `برنامه غذایی:\n`;
       Object.entries(mealPlan).forEach(([category, recipes]) => {
         if (recipes.length > 0) {
           message += `${t(`centralPerk.mealCategories.${category}`)}:\n`;
@@ -264,7 +270,8 @@ const GalleryPage = ({ setErrorMessage }) => {
       }
       const encodedMessage = encodeURIComponent(message);
       // Use user's phone if valid, otherwise fall back to your number
-      const phoneToUse = userPhone && userPhone.length >= 10 ? userPhone : WHATSAPP_NUMBER;
+      // Always send to YOUR number — user info is in the message
+      const phoneToUse = WHATSAPP_NUMBER;
       const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneToUse}&text=${encodedMessage}`;
       const newWindow = window.open(whatsappUrl, '_blank');
       if (!newWindow) {
@@ -360,6 +367,7 @@ const GalleryPage = ({ setErrorMessage }) => {
           {t('centralPerk.intro.cta')}
         </button>
       </div>
+      {/* ------------------------- Filters ------------------------- */}
       <div className="filters-modern container my-5">
         <div className="bg-white rounded-4 shadow p-4">
           <h5 className="text-center fw-bold text-success mb-4">
@@ -402,49 +410,38 @@ const GalleryPage = ({ setErrorMessage }) => {
             </div>
           </div>
 
-          {/* Tag Filter - Cool Icons */}
+          {/* Tag Filter - Fully Translated */}
           <div className="tag-filters mt-4">
             <div className="d-flex flex-wrap justify-content-center gap-3">
-              <button
+              {/* <button
                 className={`tag-btn ${tagFilter === '' ? 'active' : ''}`}
-                onClick={() => {
-                  setTagFilter('');
-                  handleFilter(); // ← THIS WAS MISSING
-                }}
+                onClick={() => { setTagFilter(''); handleFilter(); }}
               >
-                همه
-              </button>
+                {t('centralPerk.filter.allTags')}
+              </button> */}
               <button
                 className={`tag-btn high-protein ${tagFilter === 'high-protein' ? 'active' : ''}`}
-                onClick={() => {
-                  setTagFilter('high-protein');
-                  handleFilter(); // ← THIS WAS MISSING
-                }}
+                onClick={() => { setTagFilter('high-protein'); handleFilter(); }}
               >
-                پروتئین بالا
+                {t('centralPerk.tags.high-protein')}
               </button>
               <button
                 className={`tag-btn low-calorie ${tagFilter === 'low-calorie' ? 'active' : ''}`}
-                onClick={() => {
-                  setTagFilter('low-calorie');
-                  handleFilter(); // ← THIS WAS MISSING
-                }}
+                onClick={() => { setTagFilter('low-calorie'); handleFilter(); }}
               >
-                کم کالری
+                {t('centralPerk.tags.low-calorie')}
               </button>
               <button
                 className={`tag-btn special ${tagFilter === 'special' ? 'active' : ''}`}
-                onClick={() => {
-                  setTagFilter('special');
-                  handleFilter(); // ← THIS WAS MISSING
-                }}
+                onClick={() => { setTagFilter('special'); handleFilter(); }}
               >
-                ویژه سنترال پرک
+                {t('centralPerk.tags.special')}
               </button>
             </div>
           </div>
         </div>
       </div>
+      {/* ------------------------- Meal Planner ------------------------- */}
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="recipe-gallery">
           <h2>{t('centralPerk.availableRecipes')}</h2>
@@ -606,6 +603,7 @@ const GalleryPage = ({ setErrorMessage }) => {
             </p>
           )}
         </div>
+        {/* ------------------------- Order Section ------------------------- */}
         <div className="order-section-final container my-5 p-4 bg-white rounded-4 shadow-lg border border-success">
           <h2 className="h4 fw-bold text-center mb-4 text-success">{t('centralPerk.order.title')}</h2>
 
@@ -628,6 +626,15 @@ const GalleryPage = ({ setErrorMessage }) => {
                 onChange={(e) => setUserPhone(e.target.value.replace(/[^0-9]/g, ''))}
                 maxLength="11"
                 dir="ltr"
+              />
+            </div>
+            <div className="col-12">
+              <textarea
+                className="form-control form-control-lg text-center"
+                rows="2"
+                placeholder={t('centralPerk.order.addressPlaceholder', 'آدرس دقیق تحویل')}
+                value={deliveryAddress}
+                onChange={(e) => setDeliveryAddress(e.target.value)}
               />
             </div>
             <div className="col-12">
