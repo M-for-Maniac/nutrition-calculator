@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/nutrition-calculator/static/css/main.89fe9ef3.css",
-    "main.js": "/nutrition-calculator/static/js/main.74b29aea.js",
+    "main.css": "/nutrition-calculator/static/css/main.ad79aeee.css",
+    "main.js": "/nutrition-calculator/static/js/main.0a1cb485.js",
     "static/media/fa-solid-900.woff2": "/nutrition-calculator/static/media/fa-solid-900.f54756da1f3d1b88887f.woff2",
     "static/media/fa-brands-400.woff2": "/nutrition-calculator/static/media/fa-brands-400.1f6bad931d92a0a52c45.woff2",
     "static/media/fa-regular-400.woff2": "/nutrition-calculator/static/media/fa-regular-400.5632c43107f4d3fa4806.woff2",
     "static/media/fa-v4compatibility.woff2": "/nutrition-calculator/static/media/fa-v4compatibility.24fc9d217708cb3f0362.woff2",
     "index.html": "/nutrition-calculator/index.html",
-    "main.89fe9ef3.css.map": "/nutrition-calculator/static/css/main.89fe9ef3.css.map",
-    "main.74b29aea.js.map": "/nutrition-calculator/static/js/main.74b29aea.js.map"
+    "main.ad79aeee.css.map": "/nutrition-calculator/static/css/main.ad79aeee.css.map",
+    "main.0a1cb485.js.map": "/nutrition-calculator/static/js/main.0a1cb485.js.map"
   },
   "entrypoints": [
-    "static/css/main.89fe9ef3.css",
-    "static/js/main.74b29aea.js"
+    "static/css/main.ad79aeee.css",
+    "static/js/main.0a1cb485.js"
   ]
 }
