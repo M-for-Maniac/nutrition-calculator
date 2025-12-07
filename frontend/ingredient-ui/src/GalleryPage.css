@@ -12,7 +12,7 @@
   text-align: center;
   margin-bottom: 30px;
   padding: 30px 15px;
-  background: linear-gradient(135deg, #295241 0%, #1f3e31 100%);
+  background: linear-gradient(135deg, #295241 0%,    100%);
   color: #f1f1f1;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -950,37 +950,161 @@
   .meal-planner h2 {
     font-size: 1rem;
   }
-
-  .order-section {
-    padding: 10px;
-  }
-
-  .order-section .form-control {
-    padding: 6px;
-    font-size: 0.8rem;
-  }
-
-  .order-section .order-button {
-    padding: 6px 12px;
-    font-size: 0.8rem;
-  }
-
-  .order-section .success-message,
-  .order-section .error-message {
-    font-size: 0.75rem;
-  }
-
-  .filters select,
-  .filters input {
-    padding: 5px;
-    font-size: 0.75rem;
-    height: 28px; /* Further reduced height for smaller screens */
-  }
-
-  .filters button {
-    padding: 5px 10px;
-    font-size: 0.75rem;
-    height: 28px; /* Match input height */
-  }
 }
 
+/* Modern Intro */
+.intro-section-modern {
+  background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+  border-radius: 20px;
+  margin: 15px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  color: #295241;
+}
+
+.intro-section-modern .how-it-works ol {
+  font-size: 0.95rem;
+  color: #295241;
+}
+
+.delivery-times {
+  font-size: 0.9rem;
+  color: #295241;
+  border: 2px dashed #295241;
+  background: #f8fff9 !important;
+}
+
+.filters-modern .form-control,
+.filters-modern .form-select {
+  border: 2px solid #295241;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 1rem;
+}
+
+.filters-modern .form-control:focus,
+.filters-modern .form-select:focus {
+  border-color: #295241;
+  box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.25);
+}
+
+/* Order Section Polish */
+.order-section {
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid #295241 !important;
+}
+
+.intro-section-final {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border-radius: 24px;
+  margin: 16px;
+  box-shadow: 0 12px 32px rgba(34, 197, 94, 0.15);
+  color: #295241;
+}
+
+.how-it-works-card {
+  border: 2px solid #295241;
+  background: linear-gradient(to bottom, #f8fff8, #f0fdf4) !important;
+  color: #295241;
+}
+
+.delivery-schedule {
+  background: linear-gradient(135deg, #295241, #295241) !important;
+  box-shadow: 0 8px 24px rgba(34, 197, 94, 0.3);
+}
+
+.order-section-final {
+  max-width: 480px;
+  margin: 30px auto;
+  border-radius: 20px !important;
+}
+
+/* Fix Persian number alignment in lists */
+[dir="rtl"] .how-it-works-card ol {
+  padding-right: 20px;
+}
+[dir="ltr"] .how-it-works-card ol {
+  padding-left: 20px;
+}
+
+.diet-btn, .tag-btn {
+  padding: 10px 16px;
+  border: 2px solid #295241;
+  border-radius: 50px;
+  background: white;
+  color: #155724;
+  font-weight: 600;
+  transition: all 0.3s;
+  min-width: 120px;
+}
+
+.diet-btn.active,
+.tag-btn.active {
+  background: #295241 !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(40,167,69,0.4);
+}
+
+.diet-btn.vegan { border-color: #295241; }
+.diet-btn.vegetarian { border-color: #295241; }
+.diet-btn.omnivore { border-color: #295241; }
+.diet-btn.gluten-free { border-color: #295241; }
+
+.tag-btn.high-protein { border-color: #295241; }
+.tag-btn.low-calorie { border-color: #295241; }
+.tag-btn.special { 
+  border-color: #295241;
+  /* background: linear-gradient(45deg, #fff8e1, #fff3e0); */
+  color: #295241;
+}
+
+.tag-special {
+  background: linear-gradient(45deg, #ffd700, #ffb300) !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.8);
+  animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+  from { box-shadow: 0 0 10px gold; }
+  to { box-shadow: 0 0 20px #ff6b00; }
+}
+
+/* Special Tag — Royal Crown with Glow */
+.tag-special {
+  background: radial-gradient(circle at 30% 30%, #fffbe6, #ffd700) !important;
+  border: 2px solid #ffb300 !important;
+  box-shadow: 
+    0 0 15px rgba(255, 215, 0, 0.8),
+    inset 0 0 10px rgba(255, 255, 255, 0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+.tag-special::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,0.3) 50%, transparent 70%);
+  transform: rotate(30deg);
+  animation: shine 3s infinite;
+  pointer-events: none;
+}
+
+.tag-special i {
+  color: #b8860b !important;
+  font-size: 1rem;
+  text-shadow: 0 0 8px gold;
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes shine {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(30deg); }
+  100% { transform: translateX(100%) translateY(100%) rotate(30deg); }
+}
