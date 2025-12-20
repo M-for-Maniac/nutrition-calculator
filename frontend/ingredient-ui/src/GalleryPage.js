@@ -46,19 +46,19 @@ const GalleryPage = ({ setErrorMessage }) => {
 
   // HELPER: Format price (round to nearest 1000)
   const formatPrice = (cost) => Math.ceil((cost || 0) / 1000) * 1000;
-
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
         const recipeResponse = await axios.get(`${BASE_URL}/get_recipes`, {
           params: {
-            dietary: dietaryFilter,
+            dietary: '',
             complexity: '',
             max_cost: undefined,
             currency: 'Toman',
           },
         });
+
         const enrichedRecipes = recipeResponse.data.map((recipe) => ({
           ...recipe,
           image: recipe.image || '/nutrition-calculator/images/placeholder.jpg',
@@ -74,9 +74,11 @@ const GalleryPage = ({ setErrorMessage }) => {
           per_serving_protein: recipe.per_serving_protein || (recipe.total_protein && recipe.servings ? recipe.total_protein / recipe.servings : 0),
           per_serving_cost: recipe.per_serving_cost || (recipe.total_cost && recipe.servings ? (recipe.total_cost / recipe.servings) * 1.2 : 0),
           servings: recipe.servings || 1,
+          is_special: !!recipe.is_special, // normalize to boolean
         }));
+
         setRecipes(enrichedRecipes);
-        setFilteredRecipes(enrichedRecipes);
+        setFilteredRecipes(enrichedRecipes); // initial load
 
         const translationResponse = await axios.get(`${BASE_URL}/get_ingredient_translations`);
         setIngredientTranslations(translationResponse.data);
@@ -85,8 +87,7 @@ const GalleryPage = ({ setErrorMessage }) => {
           const recipeTransRes = await axios.get(`${BASE_URL}/get_recipe_translations`);
           setRecipeTranslations(recipeTransRes.data);
         } catch (err) {
-          console.warn('Recipe translations endpoint not available. Using English.');
-          setRecipeTranslations({});
+          console.warn('Recipe translations not available.');
         }
       } catch (error) {
         console.error('Error loading data:', error);
@@ -97,24 +98,24 @@ const GalleryPage = ({ setErrorMessage }) => {
       }
     };
     fetchData();
-  }, [dietaryFilter, setErrorMessage, t, i18n.language]);
+  }, [setErrorMessage, t, i18n.language]); // handleFilter no longer needed here
 
-  const handleFilter = () => {
-    let filtered = [...recipes];
+  const handleFilter = (recipesToFilter = recipes) => {
+    let filtered = [...recipesToFilter];
 
     // Dietary filter
     if (dietaryFilter) {
       filtered = filtered.filter(r => r.dietary.toLowerCase() === dietaryFilter.toLowerCase());
     }
 
-    // Tag filter (client-side only
+    // Tag filter
     if (tagFilter) {
       if (tagFilter === 'high-protein') {
         filtered = filtered.filter(r => (r.per_serving_protein || 0) > 20);
       } else if (tagFilter === 'low-calorie') {
         filtered = filtered.filter(r => (r.per_serving_calories || 0) < 300);
       } else if (tagFilter === 'special') {
-        filtered = filtered.filter(r => r.is_special === true); // we'll add this field
+        filtered = filtered.filter(r => r.is_special === true || r.is_special === 1.0 || r.is_special === 1);
       }
     }
 
@@ -374,67 +375,42 @@ const GalleryPage = ({ setErrorMessage }) => {
             {t('centralPerk.filter.title')}
           </h5>
 
-          {/* Dietary Filter - Icon Buttons */}
-          <div className="dietary-filters mb-4">
+          {/* Dietary Filter */}
+          <div className="dietary-filters mb-4 pb-4 border-bottom border-success border-2">
+            <h6 className="text-center text-muted text-success mb-3">{t('centralPerk.filter.dietarySection', 'رژیم غذایی')}</h6>
             <div className="d-flex flex-wrap justify-content-center gap-3">
-              <button
-                className={`diet-btn ${dietaryFilter === '' ? 'active' : ''}`}
-                onClick={() => setDietaryFilter('')}
-              >
+              <button className={`diet-btn ${dietaryFilter === '' ? 'active' : ''}`} onClick={() => { setDietaryFilter(''); handleFilter(); }}>
                 <i className="fas fa-utensils"></i> {t('centralPerk.allDiets')}
               </button>
-              <button
-                className={`diet-btn vegan ${dietaryFilter === 'vegan' ? 'active' : ''}`}
-                onClick={() => setDietaryFilter('vegan')}
-              >
+              <button className={`diet-btn vegan ${dietaryFilter === 'vegan' ? 'active' : ''}`} onClick={() => { setDietaryFilter('vegan'); handleFilter(); }}>
                 <i className="fas fa-leaf"></i> {t('centralPerk.dietaryOptions.vegan')}
               </button>
-              <button
-                className={`diet-btn vegetarian ${dietaryFilter === 'vegetarian' ? 'active' : ''}`}
-                onClick={() => setDietaryFilter('vegetarian')}
-              >
+              <button className={`diet-btn vegetarian ${dietaryFilter === 'vegetarian' ? 'active' : ''}`} onClick={() => { setDietaryFilter('vegetarian'); handleFilter(); }}>
                 <i className="fas fa-seedling"></i> {t('centralPerk.dietaryOptions.vegetarian')}
               </button>
-              <button
-                className={`diet-btn omnivore ${dietaryFilter === 'omnivore' ? 'active' : ''}`}
-                onClick={() => setDietaryFilter('omnivore')}
-              >
+              <button className={`diet-btn omnivore ${dietaryFilter === 'omnivore' ? 'active' : ''}`} onClick={() => { setDietaryFilter('omnivore'); handleFilter(); }}>
                 <i className="fas fa-drumstick-bite"></i> {t('centralPerk.dietaryOptions.omnivore')}
               </button>
-              <button
-                className={`diet-btn gluten-free ${dietaryFilter === 'gluten-free' ? 'active' : ''}`}
-                onClick={() => setDietaryFilter('gluten-free')}
-              >
+              <button className={`diet-btn gluten-free ${dietaryFilter === 'gluten-free' ? 'active' : ''}`} onClick={() => { setDietaryFilter('gluten-free'); handleFilter(); }}>
                 <i className="fas fa-ban"></i> {t('centralPerk.dietaryOptions.glutenFree')}
               </button>
             </div>
           </div>
 
-          {/* Tag Filter - Fully Translated */}
-          <div className="tag-filters mt-4">
+          {/* Tag Filter */}
+          <div className="tag-filters">
+            <h6 className="text-center text-muted text-success mb-3">{t('centralPerk.filter.tagsSection', 'ویژگی‌ها')}</h6>
             <div className="d-flex flex-wrap justify-content-center gap-3">
-              {/* <button
-                className={`tag-btn ${tagFilter === '' ? 'active' : ''}`}
-                onClick={() => { setTagFilter(''); handleFilter(); }}
-              >
+              <button className={`tag-btn ${tagFilter === '' ? 'active' : ''}`} onClick={() => { setTagFilter(''); handleFilter(); }}>
                 {t('centralPerk.filter.allTags')}
-              </button> */}
-              <button
-                className={`tag-btn high-protein ${tagFilter === 'high-protein' ? 'active' : ''}`}
-                onClick={() => { setTagFilter('high-protein'); handleFilter(); }}
-              >
+              </button>
+              <button className={`tag-btn high-protein ${tagFilter === 'high-protein' ? 'active' : ''}`} onClick={() => { setTagFilter('high-protein'); handleFilter(); }}>
                 {t('centralPerk.tags.high-protein')}
               </button>
-              <button
-                className={`tag-btn low-calorie ${tagFilter === 'low-calorie' ? 'active' : ''}`}
-                onClick={() => { setTagFilter('low-calorie'); handleFilter(); }}
-              >
+              <button className={`tag-btn low-calorie ${tagFilter === 'low-calorie' ? 'active' : ''}`} onClick={() => { setTagFilter('low-calorie'); handleFilter(); }}>
                 {t('centralPerk.tags.low-calorie')}
               </button>
-              <button
-                className={`tag-btn special ${tagFilter === 'special' ? 'active' : ''}`}
-                onClick={() => { setTagFilter('special'); handleFilter(); }}
-              >
+              <button className={`tag-btn special ${tagFilter === 'special' ? 'active' : ''}`} onClick={() => { setTagFilter('special'); handleFilter(); }}>
                 {t('centralPerk.tags.special')}
               </button>
             </div>

@@ -1109,3 +1109,26 @@
   0% { transform: translateX(-100%) translateY(-100%) rotate(30deg); }
   100% { transform: translateX(100%) translateY(100%) rotate(30deg); }
 }
+
+/* Fix button hover/active on mobile — prevent hover from stealing first tap */
+.diet-btn, .tag-btn {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.diet-btn:active, .tag-btn:active {
+  transform: scale(0.95);
+  transition: transform 0.1s;
+}
+
+/* Ensure active state wins over hover */
+.diet-btn.active, .tag-btn.active {
+  transform: none !important;
+}
+
+.filter-divider {
+  height: 2px;
+  background: linear-gradient(to right, transparent, #28a745, transparent);
+  border-radius: 1px;
+  opacity: 0.6;
+}

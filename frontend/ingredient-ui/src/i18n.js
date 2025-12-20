@@ -12,7 +12,35 @@ const resources = {
         gallery: 'Central Perk',
         language: 'Language',
         english: 'English',
-        persian: 'Persian'
+        persian: 'Persian',
+        "about": "About Us"
+      },
+      "about": {
+        "title": "Our Story – From Central Perk to Nutrino",
+        "subtitle": "A journey of friendship, coffee, and healthy food",
+
+        "section1": {
+          "title": "The Cafe That Felt Like Home",
+          "text1": "In 2018, we opened Central Perk – a real-life version of the iconic cafe from Friends. Located on Hafez Street near Amir Kabir University, it quickly became a second home for students.",
+          "text2": "Young people came between classes, during breaks, or just to find friends. They shared tables, laughed, and built real connections over big coffee mugs and delicious pastries."
+        },
+
+        "section2": {
+          "title": "A Place Where Friendships Were Made",
+          "text": "Our menu was inspired by the show: Monica’s lasagna, Chandler’s Thanksgiving toast, fresh scones, cupcakes – all served with warmth and love. In crowded hours, strangers became friends by sharing tables. That was the magic we created."
+        },
+
+        "section3": {
+          "title": "A New Vision Was Born",
+          "text1": "After a beautiful year, we had to close due to building issues. But one day, our loyal customer Ahmad – an engineer – finished his favorite Chandler’s toast and said:",
+          "text2": "\"This meal was delicious and healthy. If only I knew the nutrition facts, I could plan my meals better.\" That moment changed everything."
+        },
+
+        "dedication": {
+          "title": "This Is For You",
+          "text": "Nutrino was born from that idea: healthy, delicious food with precise nutrition labels – so you can enjoy meals that remind you of good times, while taking care of your body.",
+          "team": "Dedicated to our family: Mojtaba, Mehrab, Sogol, Romina, Behzad, Ahmad, Mohammad, Amir – and every friend who ever sat at our table."
+        }
       },
       home: {
         hero: {
@@ -291,7 +319,10 @@ const resources = {
         },
         "filter": {
           "title": "Filter Meals",
-          "allDiets": "All Dietaries"
+          "allDiets": "All Dietaries",
+          "allTags": "All Tags",
+          "dietarySection": "Dietary",
+          "tagsSection": "Special Features" 
         },
         "tags": {
           "high-protein": "High Protein",
@@ -392,7 +423,35 @@ const resources = {
         gallery: 'نوترینو',
         language: 'زبان',
         english: 'انگلیسی',
-        persian: 'فارسی'
+        persian: 'فارسی',
+        about: 'از سنترال تا نوترینو'
+      },
+      "about": {
+        "title": "داستان ما – از سنترال پرک تا نوترینو",
+        "subtitle": "سفری از دوستی، قهوه و غذای سالم",
+
+        "section1": {
+          "title": "کافه‌ای که مثل خانه بود",
+          "text1": "سال ۱۳۹۷ کافه سنترال پرک رو باز کردیم – نسخه واقعی کافه معروف سریال فرندز. توی خیابان حافظ نزدیک دانشگاه امیرکبیر، خیلی زود شد خونه دوم دانشجوها.",
+          "text2": "جوان‌ها بین کلاس‌ها، توی استراحت یا فقط برای پیدا کردن دوست می‌اومدن. میزها رو با هم شریک می‌شدن، می‌خندیدن و واقعاً با هم دوست می‌شدن – با ماگ‌های بزرگ قهوه و شیرینی‌های خوشمزه."
+        },
+
+        "section2": {
+          "title": "جایی که دوستی‌ها ساخته می‌شد",
+          "text": "منومون از سریال الهام گرفته بود: لازانیای مونیکا، تُست شکرگزاری چندلر، اسکون تازه، کاپ‌کیک – همه با عشق و گرمی سرو می‌شد. توی ساعت‌های شلوغ، غریبه‌ها با هم میز شریک می‌شدن و دوست می‌شدن. این بود جادوی ما."
+        },
+
+        "section3": {
+          "title": "یه چشم‌انداز جدید متولد شد",
+          "text1": "بعد از یه سال فوق‌العاده، مجبور شدیم کافه رو ببندیم به خاطر مشکلات ساختمان. اما یه روز مشتری وفادارمون احمد – مهندس دانشگاه – تُست شکرگزاری چندلرش رو تموم کرد و گفت:",
+          "text2": "\"این غذا هم خوشمزه بود هم سالم. کاش می‌دونستم ترکیب تغذیه‌ایش چیه، بهتر می‌تونستم وعده‌هام رو برنامه‌ریزی کنم.\" اون لحظه همه چیز عوض شد."
+        },
+
+        "dedication": {
+          "title": "این برای شماست",
+          "text": "نوترینو از همون ایده به دنیا اومد: غذای سالم و خوشمزه با برچسب تغذیه دقیق – تا بتونید از غذایی لذت ببرید که خاطرات خوب رو زنده می‌کنه، و همزمان به بدنتون اهمیت بدید.",
+          "team": "تقدیم به خانواده‌مون: مجتبی، مهراب، سُگل، رومینا، بهزاد، احمد، محمد، امیر – و هر دوستی که یه روزی پای میز ما نشست."
+        }
       },
       home: {
         hero: {
@@ -683,7 +742,10 @@ const resources = {
           "filter": {
             "title": "فیلتر غذاها",
             "dietaryLabel": "رژیم غذایی",
-            "allDiets": "همه رژیم ها"
+            "allDiets": "همه رژیم ها",
+            "allTags": "همه تگ ها",
+            "dietarySection": "رژیم غذایی",
+            "tagsSection": "ویژگی ها" 
           },
           "tags": {
             "high-protein": "پروتئین بالا",
