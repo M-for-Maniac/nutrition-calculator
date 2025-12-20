@@ -8,6 +8,8 @@ import RecipeNotebook from './RecipeNotebook';
 import GalleryPage from './GalleryPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import AboutPage from './AboutPage';
+import { FaBookOpen } from 'react-icons/fa'; // npm install react-icons
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -27,6 +29,7 @@ function App() {
             <Link className="navbar-brand fw-bold text-success" to="/">
               Nutrino
             </Link>
+            
 
             {/* Mobile: Replace burger with language dropdown */}
             <div className="d-lg-none">
@@ -44,6 +47,9 @@ function App() {
                 </ul>
               </div>
             </div>
+            <Link to="/about" className="btn btn-outline-success d-flex align-items-center gap-2 mx-2">
+              <FaBookOpen /> {t('app.about')}
+            </Link>
 
             {/* Desktop: Normal collapse with only language */}
             <div className="collapse navbar-collapse" id="navbarNav">
@@ -88,6 +94,7 @@ function App() {
           <Route path="/" element={<GalleryPage setErrorMessage={setErrorMessage} />} />
           <Route path="/nutrition-calculator" element={<GalleryPage setErrorMessage={setErrorMessage} />} />
           <Route path="/order" element={<GalleryPage setErrorMessage={setErrorMessage} />} />
+          <Route path="/about" element={<AboutPage />} />
 
           {/* PRIVATE ADMIN TOOLS — Only you know these URLs */}
           <Route path="/kitchen" element={<Kitchen setErrorMessage={setErrorMessage} />} />
