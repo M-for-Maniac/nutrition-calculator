@@ -9,7 +9,7 @@ import GalleryPage from './GalleryPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import AboutPage from './AboutPage';
-import { FaBookOpen } from 'react-icons/fa'; // npm install react-icons
+// import { FaBookOpen } from 'react-icons/fa'; // npm install react-icons
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -44,22 +44,24 @@ function App() {
                 <ul className="dropdown-menu dropdown-menu-end">
                   <li><button className="dropdown-item" onClick={() => changeLanguage('en')}>English</button></li>
                   <li><button className="border-top dropdown-item" onClick={() => changeLanguage('fa')}>فارسی</button></li>
+                  <li className="nav-item"><Link className="nav-link" to="/kitchen">{t('app.kitchen')}</Link></li>
+                  <li className="nav-item"><Link className="nav-link" to="/cookbook">{t('app.cookbook')}</Link></li>
                 </ul>
               </div>
             </div>
-            <Link to="/about" className="btn btn-outline-success d-flex align-items-center gap-2 mx-2">
+            {/* <Link to="/about" className="btn btn-outline-success d-flex align-items-center gap-2 mx-2">
               <FaBookOpen /> {t('app.about')}
-            </Link>
+            </Link> */}
 
             {/* Desktop: Normal collapse with only language */}
             <div className="collapse navbar-collapse" id="navbarNav">
               <ul className="navbar-nav ms-auto">
                 {/* HIDDEN PREMIUM LINKS — UNCOMMENT WHEN READY */}
-                {/* 
+                
                 <li className="nav-item"><Link className="nav-link" to="/nutrition-calculator">{t('app.home')}</Link></li>
                 <li className="nav-item"><Link className="nav-link" to="/kitchen">{t('app.kitchen')}</Link></li>
                 <li className="nav-item"><Link className="nav-link" to="/cookbook">{t('app.cookbook')}</Link></li>
-                */}
+               
               </ul>
 
               {/* Desktop Language Dropdown */}
