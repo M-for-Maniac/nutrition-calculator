@@ -1,70 +1,63 @@
-# Getting Started with Create React App
+# Nutrition Calculator
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern web application for calculating nutritional values, costs, and recipes with full transparency. Built with a focus on high-protein, balanced meals for our cloud kitchen operations. Supports Persian ingredient names and live calculations.
 
-## Available Scripts
+## Live Demo
+- **Frontend**: [https://m-for-maniac.github.io/nutrition-calculator](https://m-for-maniac.github.io/nutrition-calculator)
+- **Backend/API**: [https://maniac.pythonanywhere.com](https://maniac.pythonanywhere.com)
 
-In the project directory, you can run:
+## Project Structure
+This **public repository contains only the frontend** for transparency and security.  
+Sensitive backend logic, database, and data files (`Data/` and `Backend/`) are **untracked** and excluded via `.gitignore` (kept private on our production server).
 
-### `npm start`
+## Features
+- Real-time nutrition and cost calculations for ingredients and recipes.
+- **Kitchen Module**: Ingredient management, price updates, and CSV export.
+- **Cookbook Module**: Add, edit, delete, and calculate nutrition for recipes with dietary tags, complexity filters, and Persian support.
+- Modular design for easy customization and scalability.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Setup Instructions (Frontend Only)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Local Development
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/m-for-maniac/nutrition-calculator.git
+   cd nutrition-calculator
 
-### `npm test`
+2. Navigate to frontend:
+   ```bash
+   cd frontend/ingredient-ui
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+3. Install dependencies:
+   ```bash
+   npm install
 
-### `npm run build`
+4. Run locally:
+   ```bash
+   npm start
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+5. Build & Deploy to GitHub Pages:
+   ```bash
+   npm run build
+   npm run deploy
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Backend (Private / Production)
+Hosted separately on PythonAnywhere.  
+Contact us for collaboration, self-hosting details, or access to the backend (Flask + required dependencies).
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Tech Stack
+- **Frontend**: React, Axios, Chart.js (react-chartjs-2), React Router, Bootstrap, Font Awesome, gh-pages.
+- **Backend**: Flask (Python), Pandas, NumPy (private deployment).
 
-### `npm run eject`
+## Contributing
+We welcome contributions to the public frontend!  
+Fork the repo, create a feature branch, and submit a Pull Request. For backend-related ideas or collaboration, please reach out first.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## License
+Frontend is open source under the **MIT License**.  
+Backend and sensitive components remain proprietary for operational security and confidentiality.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+**Made with ❤️ for transparent, healthy nutrition.**  
+Part of our cloud kitchen initiative delivering verified, high-protein meals with real calculations.
